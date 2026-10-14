@@ -3,26 +3,52 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Motion Input Grid</title>
+    <meta name="google-site-verification" content="AYYth6U-XyzggHgdrgbTU_SXQcgxRwvbFpexqpaSGHI" />
+    <title>Robin-G0</title>
     <link rel="icon" type="image/png" sizes="48x48" href="./favicon.png">
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="shortcut icon" href="./favicon.ico">
     <style>
         :root { color-scheme: light; font-family: system-ui, sans-serif; color: #202923; background: #f7f4ed; }
-        body { margin: 0; padding: 2rem; }
-        main { max-width: 36rem; margin: 12vh auto; }
-        h1 { font-size: clamp(2rem, 6vw, 3rem); line-height: 1.15; }
-        p { line-height: 1.6; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 2rem 1.25rem; }
+        main { max-width: 42rem; margin: 8vh auto; }
+        h1 { font-size: clamp(2rem, 7vw, 3.5rem); line-height: 1.1; letter-spacing: -.04em; margin: 0 0 1rem; }
+        h2 { font-size: 1rem; margin: 2.5rem 0 1rem; }
+        p { line-height: 1.6; color: #586159; }
         a { color: #245e51; text-underline-offset: .2em; }
-        a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+        a:focus-visible { outline: 2px solid #245e51; outline-offset: 4px; }
+        nav { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+        nav a { display: inline-flex; align-items: center; min-height: 44px; padding: .65rem 1rem; border: 1px solid #cdcfc5; border-radius: 6px; text-decoration: none; }
+        ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .75rem; padding: 0; margin: 0; }
+        li a { display: flex; align-items: center; min-height: 56px; height: 100%; padding: 1rem; border: 1px solid #cdcfc5; border-radius: 6px; text-decoration: none; }
+        nav a:hover, li a:hover { background: #e8ece3; border-color: #245e51; }
+        .studio { margin-top: 1.25rem; font-size: .95rem; }
     </style>
 </head>
 <body>
     <main>
-        <h1>Motion Input Grid</h1>
-        <p>Explore gesture-based input directly in your browser.</p>
-        <p><a href="./Motion-Input-Grid/">Explore the presentation</a></p>
-        <p><a href="./Motion-Input-Grid/studio/">Open the configuration Studio</a></p>
+        <h1>nothing to see here</h1>
+        <p>But you can find my work below.</p>
+        <nav aria-label="GitHub links">
+            <a href="https://github.com/Robin-G0">GitHub profile</a>
+            <a href="https://github.com/Robin-G0/Robin-G0#readme">Profile README</a>
+            <a href="https://github.com/Robin-G0?tab=repositories">All repositories</a>
+        </nav>
+        <section aria-labelledby="projects-title">
+            <h2 id="projects-title">Projects</h2>
+            <ul>
+                <li><a href="./Motion-Input-Grid/">Motion Input Grid</a></li>
+                <li><a href="https://hackaton-upstart-2026.vercel.app">Upstart Hackathon 2026</a></li>
+                <li><a href="https://github.com/Robin-G0/CPP-Raytracer">C++ Raytracer</a></li>
+                <li><a href="https://github.com/Robin-G0/CPP-RType">C++ R-Type</a></li>
+                <li><a href="https://github.com/Robin-G0/C-Teams">C Teams</a></li>
+                <li><a href="https://github.com/Robin-G0/Python-Neural-Network-PoC">Neural networks from scratch</a></li>
+                <li><a href="https://github.com/Robin-G0/Python-Cryptography">Python Cryptography</a></li>
+                <li><a href="https://github.com/Robin-G0/Hackaton-boostrap">Hackathon Bootstrap</a></li>
+            </ul>
+            <p class="studio"><a href="./Motion-Input-Grid/studio/">Open Motion Input Grid Studio</a></p>
+        </section>
     </main>
 </body>
 </html>
