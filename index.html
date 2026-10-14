@@ -21,8 +21,9 @@
         nav { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
         nav a { display: inline-flex; align-items: center; min-height: 44px; padding: .65rem 1rem; border: 1px solid #cdcfc5; border-radius: 6px; text-decoration: none; }
         ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .75rem; padding: 0; margin: 0; }
-        li a { display: flex; align-items: center; min-height: 56px; height: 100%; padding: 1rem; border: 1px solid #cdcfc5; border-radius: 6px; text-decoration: none; }
+        li a { display: flex; align-items: center; gap: .75rem; min-height: 56px; height: 100%; padding: 1rem; border: 1px solid #cdcfc5; border-radius: 6px; text-decoration: none; }
         nav a:hover, li a:hover { background: #e8ece3; border-color: #245e51; }
+        .project-icon { width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; }
         .studio { margin-top: 1.25rem; font-size: .95rem; }
     </style>
 </head>
@@ -38,14 +39,13 @@
         <section aria-labelledby="projects-title">
             <h2 id="projects-title">Projects</h2>
             <ul>
-                <li><a href="./Motion-Input-Grid/">Motion Input Grid</a></li>
-                <li><a href="https://hackaton-upstart-2026.vercel.app">Upstart Hackathon 2026</a></li>
-                <li><a href="https://github.com/Robin-G0/CPP-Raytracer">C++ Raytracer</a></li>
-                <li><a href="https://github.com/Robin-G0/CPP-RType">C++ R-Type</a></li>
-                <li><a href="https://github.com/Robin-G0/C-Teams">C Teams</a></li>
-                <li><a href="https://github.com/Robin-G0/Python-Neural-Network-PoC">Neural networks from scratch</a></li>
-                <li><a href="https://github.com/Robin-G0/Python-Cryptography">Python Cryptography</a></li>
-                <li><a href="https://github.com/Robin-G0/Hackaton-boostrap">Hackathon Bootstrap</a></li>
+                <li><a href="./Motion-Input-Grid/"><img class="project-icon" src="./favicon.svg" width="32" height="32" alt="">Motion Input Grid</a></li>
+                <li><a href="https://github.com/Robin-G0/CPP-Raytracer"><img class="project-icon" src="./assets/icons/cplusplus.svg" width="32" height="32" alt="">C++ Raytracer</a></li>
+                <li><a href="https://github.com/Robin-G0/CPP-RType"><img class="project-icon" src="./assets/icons/cplusplus.svg" width="32" height="32" alt="">C++ R-Type</a></li>
+                <li><a href="https://github.com/Robin-G0/C-Teams"><img class="project-icon" src="./assets/icons/c.svg" width="32" height="32" alt="">C Teams</a></li>
+                <li><a href="https://github.com/Robin-G0/Python-Neural-Network-PoC"><img class="project-icon" src="./assets/icons/python.svg" width="32" height="32" alt="">Neural networks from scratch</a></li>
+                <li><a href="https://github.com/Robin-G0/Python-Cryptography"><img class="project-icon" src="./assets/icons/python.svg" width="32" height="32" alt="">Python Cryptography</a></li>
+                <li><a href="https://github.com/Robin-G0/Hackaton-boostrap"><img class="project-icon" src="./assets/icons/python.svg" width="32" height="32" alt="">Hackathon Bootstrap</a></li>
             </ul>
             <p class="studio"><a href="./Motion-Input-Grid/studio/">Open Motion Input Grid Studio</a></p>
         </section>
