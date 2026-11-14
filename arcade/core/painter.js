@@ -80,7 +80,12 @@ export class Painter {
     }
     sprite(name, x, y, width, height) {
         const image = this.images.get(name);
-        if (image) { this.c.drawImage(image, x, y, width, height); return true; }
+        if (image) {
+            const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+            const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+            this.c.drawImage(image, x + (width - w) / 2, y + (height - h) / 2, w, h);
+            return true;
+        }
         return false;
     }
     ball(x, y, radius, color = 'accent') {

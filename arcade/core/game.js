@@ -15,8 +15,8 @@ export function game(state, handlers) {
             handlers.update?.(state, dt);
         },
         render(painter) { if (!disposed) handlers.render(state, painter); },
-        pause() { paused = true; },
-        resume() { paused = false; },
+        pause() { paused = true; handlers.pause?.(state); },
+        resume() { paused = false; handlers.resume?.(state); },
         dispose() { disposed = true; handlers.dispose?.(state); }
     };
 }
