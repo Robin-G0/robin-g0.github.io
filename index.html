@@ -12,14 +12,17 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=d2b3a085f9">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=7e0df23bd2">
+  <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=135b4edf1e"></script>
+  <script type="module" src="./arcade/app.js?v=c2f6186458"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="ambient" aria-hidden="true"><div class="aurora-layer aurora-far"></div><div class="aurora-layer aurora-mid"></div><div class="aurora-layer aurora-near"></div><div id="digital-rain"></div></div>
   <header class="site-header">
     <a class="wordmark" href="#main" aria-label="Robin-G0, home"><img src="./favicon.svg" width="28" height="28" alt=""><span>Robin-G0<span class="wordmark-cursor">_</span></span></a>
-    <nav aria-label="Main navigation"><a href="#projects">Projects</a><a href="#activity">Activity</a><a href="https://github.com/Robin-G0">GitHub ↗</a></nav>
+    <nav aria-label="Main navigation"><a href="#projects">Projects</a><a href="#arcade">Arcade</a><a href="#activity">Activity</a><a href="https://github.com/Robin-G0">GitHub ↗</a></nav>
     <button id="open-themes" class="theme-trigger" type="button" aria-controls="theme-picker" aria-expanded="false"><span aria-hidden="true">◐</span><span>Change theme</span></button>
   </header>
   <main id="main" class="page-shell">
@@ -66,9 +69,39 @@
       <div class="language-heading"><h3>Languages</h3><span>Share of code</span></div><ul id="language-list" class="language-list" aria-label="Languages by share of code"></ul>
       <div class="stats-footnote"><p>Languages measured by code size. Commits on default branches. Line edits include filtered additions and deletions.</p><a class="text-link" href="https://github.com/Robin-G0/Robin-G0/blob/main/assets/stats.json">View public data ↗</a></div>
     </section>
+    <section class="arcade scene" id="arcade" aria-labelledby="arcade-title">
+      <div class="window-chrome" aria-hidden="true"><span class="window-lights"><i></i><i></i><i></i></span><span>Arcade</span><span class="window-actions">_ □ ×</span></div>
+      <div class="section-heading"><div><p class="eyebrow">05 / Motion Input Grid</p><h2 id="arcade-title">Arcade</h2></div><span class="text-link">Three games for this era</span></div>
+      <p class="arcade-intro">Short rounds. Two controls. Play with wrist movements, the keyboard, or the touch buttons.</p>
+      <div class="arcade-list" id="arcade-games"></div>
+      <div class="arcade-imports"><button type="button" id="arcade-import-button">Import a game</button><input type="file" id="arcade-import-file" accept=".json,application/json" hidden><a href="./arcade/examples/my-snake.json" download>Example game file ↗</a><a href="./arcade/README.md">Build your own ↗</a><button id="arcade-imported" type="button" hidden></button></div>
+      <p id="arcade-import-status" role="status"></p>
+    </section>
     <footer class="site-footer"><span>Robin-G0</span><a href="https://github.com/Robin-G0">GitHub ↗</a><a href="https://github.com/Robin-G0/Robin-G0/tree/main/themes">Explore the README themes ↗</a><a href="#main">Back to top ↑</a></footer>
   </main>
   <dialog id="theme-picker" aria-labelledby="picker-title"><div class="picker-heading"><div><p class="eyebrow">Eleven visual eras</p><h2 id="picker-title">Choose an atmosphere</h2></div><button class="close-picker" id="close-themes" type="button" aria-label="Close theme picker">×</button></div><div class="picker-controls"><button type="button" class="button" id="choose-daily">Theme of the day</button><button type="button" class="button" id="choose-random">Another random theme ↻</button><button type="button" class="button" id="toggle-mode" aria-pressed="false">Dark appearance</button></div><p class="picker-hint">Today follows the GitHub profile. Choose an era to explore it, or share its URL.</p><div id="theme-options" class="theme-options"></div></dialog>
+  <dialog id="arcade-player" aria-labelledby="arcade-title-current" aria-describedby="arcade-goal">
+    <header class="arcade-room-header"><div><p class="eyebrow">Motion Input Grid / Arcade</p><h2 id="arcade-title-current"><span id="arcade-game-title"></span></h2><p id="arcade-goal"></p></div><button id="arcade-close" class="arcade-room-close" type="button" aria-label="Close game" autofocus>×</button></header>
+    <dl class="arcade-hud"><div><dt>Score</dt><dd id="arcade-score">0</dd></div><div><dt>Time</dt><dd id="arcade-time">60s</dd></div><div><dt>Attempts</dt><dd id="arcade-lives">3</dd></div></dl>
+    <div class="arcade-stage">
+      <canvas id="arcade-canvas" width="1440" height="840" tabindex="0" aria-label="Game playfield"></canvas>
+      <div class="arcade-overlay" id="arcade-tutorial">
+        <div class="gesture-lesson">
+          <figure><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="19" r="9"/><path d="M50 29V68M50 68L36 93M50 68L64 93M50 43L75 66"/><g class="lesson-arm"><path d="M50 43L25 66"/></g></svg><figcaption data-tutorial-action="left"></figcaption></figure>
+          <figure><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="19" r="9"/><path d="M50 29V68M50 68L36 93M50 68L64 93M50 43L25 66"/><g class="lesson-arm lesson-right"><path d="M50 43L75 66"/></g></svg><figcaption data-tutorial-action="right"></figcaption></figure>
+        </div>
+        <p>Lower your hands, lift one wrist, then lower it again.</p>
+        <p id="arcade-practice" role="status">You can try a gesture before starting.</p>
+        <button id="arcade-begin" class="button primary" type="button">Start playing</button>
+      </div>
+      <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Get comfortable, then continue when you’re ready.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
+      <div class="arcade-overlay" id="arcade-result" hidden><h3>Round complete</h3><p>Score: <strong id="arcade-final-score">0</strong></p><button id="arcade-again" class="button primary" type="button">Play again</button></div>
+    </div>
+    <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
+    <p id="arcade-feedback" role="status" aria-live="polite"></p>
+    <div class="arcade-toolbar"><button id="arcade-camera" type="button">Use camera</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><button id="arcade-help" type="button">How to play</button><a href="./arcade/profiles/wrist-raises.json" download>Gesture profile ↗</a></div>
+    <div class="arcade-camera-dock" id="arcade-camera-dock" hidden><div class="camera-view"><video id="arcade-video" autoplay muted playsinline></video><i class="camera-wrist" data-wrist="left" hidden></i><i class="camera-wrist" data-wrist="right" hidden></i></div><div><p id="arcade-camera-status">Camera stopped.</p><button id="arcade-recalibrate" type="button">Recalibrate</button></div><canvas id="arcade-mig-overlay" aria-hidden="true"></canvas></div>
+  </dialog>
   <noscript><p class="noscript-notice">Browse the projects above or <a href="https://github.com/Robin-G0/Robin-G0">view the profile and public statistics on GitHub</a>.</p></noscript>
 </body>
 </html>

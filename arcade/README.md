@@ -17,15 +17,17 @@ npm run dev
 
 `prepare:assets` copies the installed package's browser runtime and licenses to
 `vendor/motion-input-grid`. The import map exposes its original entry point as
-`motion-input-grid`. Nothing is compiled or downloaded when the ordinary site opens.
-Camera models are loaded only after the player explicitly starts the camera.
+`motion-input-grid`. Camera models and recognition WASM are downloaded only after
+the player explicitly starts the camera. The static site needs no server build.
 
 ## Files to start with
 
 - `catalog.js`: the three games associated with each visual era, their goals and controls.
 - `games/`: trusted game logic, grouped by theme.
 - `core/game.js`: the small lifecycle used by every game.
+- `core/runner.js`: simulation time, tutorial, pause, restart and round duration.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
+- `room.js`: the dialog, camera preview, controls and single animation loop.
 - `mig/profile.js`: a readable schema-v2 profile derived from MIG's wrist-raise example.
 - `mig/camera.js`: `MIGSession`, frame health, status, recalibration and disposal.
 - `core/import-game.js`: strict validation of declarative game files.
@@ -66,6 +68,8 @@ duplicate callbacks, and commands outside active play. It never replays paused
 inputs. It does not turn coordinates into a second recognizer. Rhythm games use
 explicit generous scoring windows; other games respond immediately. The render
 loop bounds simulation steps after a slow frame instead of accumulating a burst.
+Callback timestamps measure delivery to the application, not camera capture time;
+the host cannot recover inference latency that the package does not report.
 
 The minimal camera view marks wrists using public `coordinate()` observations.
 It does not draw fingers when finger tracking is disabled. A sustained tracking
@@ -76,6 +80,12 @@ loss pauses the round; recovery never silently resumes it.
 To add trusted executable code, write a factory in `games/`, register it in
 `registry.js`, and add its description to `catalog.js`. There is no dynamic module
 path in imported data.
+
+For a small first experiment, copy a factory such as `binary` in `games/matrix.js`.
+It has no physics or timing requirement: one pulse rotates the register, the other
+flips a bit. Register the copied factory explicitly, then add its goal and the two
+action labels to the catalog. `mig/camera.js` already handles the package session;
+the new game only needs `event.action` and should never inspect camera landmarks.
 
 Visitors import JSON descriptions targeting an installed engine. Only the listed
 schema fields are accepted: id, engine, title, goal, duration, seed and difficulty,

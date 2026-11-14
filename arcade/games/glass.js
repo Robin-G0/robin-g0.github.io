@@ -57,7 +57,6 @@ export function prisms(env) {
                 p.line([[x - 20, y - sign * 20], [x + 20, y + sign * 20]], 'ink', 5);
                 if (i === s.selected) p.circle(x, y, 28, 'accent', false);
             });
-            p.text('Turn selected mirror / select next', 360, 395, 19, 'muted', 'center');
         }
     });
 }

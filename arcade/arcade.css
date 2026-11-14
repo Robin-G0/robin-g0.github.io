@@ -1,0 +1,146 @@
+.arcade-intro { max-width: 530px; font-size: 14px; margin-bottom: 30px; }
+.arcade-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.arcade-card { min-width: 0; }
+.arcade-card h3 { font-size: 22px; margin: 19px 0 11px; letter-spacing: -.02em; }
+.arcade-card > p { font-size: 12px; line-height: 1.6; max-width: 280px; }
+.arcade-play {
+    position: relative; display: block; width: 100%; padding: 0;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; background: var(--bg); color: var(--ink);
+}
+.arcade-play canvas { display: block; width: 100%; height: auto; }
+.arcade-play-label {
+    display: block; padding: 10px 14px; text-align: left;
+    font-size: 11px; border-top: 1px solid var(--border);
+}
+.arcade-play:hover { border-color: var(--accent); }
+.arcade-imports { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-top: 27px; }
+.arcade-imports button { background: none; border: 0; padding: 10px 0; font-size: 12px; text-decoration: underline; text-underline-offset: 5px; }
+.arcade-imports a { font-size: 11px; }
+#arcade-import-status { font-size: 12px; margin: 8px 0 0; min-height: 18px; }
+
+#arcade-player {
+    width: min(1000px, calc(100% - 24px)); max-width: calc(100% - 12px); padding: 0;
+    max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain;
+    border: 1px solid var(--border); border-radius: max(3px, var(--radius));
+}
+.arcade-room-header { display: flex; align-items: flex-start; gap: 25px; padding: 22px 26px 16px; }
+.arcade-room-header > div { min-width: 0; flex: 1; }
+.arcade-room-header .eyebrow { margin-bottom: 6px; }
+.arcade-room-header h2 { font-size: 29px; line-height: 1.15; letter-spacing: -.035em; }
+.arcade-room-header p:last-child { font-size: 12px; margin: 10px 0 0; }
+.arcade-room-close { width: 44px; height: 44px; flex-shrink: 0; background: none; border: 1px solid var(--border); border-radius: var(--radius); font-size: 25px; }
+.arcade-hud { display: flex; align-items: center; gap: 30px; padding: 12px 26px; margin: 0; border-block: 1px solid var(--border); }
+.arcade-hud > div { display: flex; gap: 10px; align-items: baseline; }
+.arcade-hud dt { font-size: 10px; color: var(--muted); }
+.arcade-hud dd { font: 18px 'Lucida Console', monospace; margin: 0; }
+.arcade-stage { position: relative; width: 100%; min-width: 0; aspect-ratio: 12 / 7; min-height: 290px; max-height: 440px; background: var(--bg); overflow: hidden; }
+#arcade-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.arcade-overlay {
+    position: absolute; inset: 0; z-index: 3; padding: 22px; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 10px;
+}
+.arcade-overlay h3 { font-size: 25px; }
+.arcade-overlay > p { font-size: 12px; max-width: 410px; margin: 0; }
+.gesture-lesson { display: grid; grid-template-columns: 1fr 1fr; gap: 45px; width: min(400px, 100%); }
+.gesture-lesson figure { margin: 0; display: grid; justify-items: center; gap: 3px; }
+.gesture-lesson svg { width: 92px; height: 94px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.gesture-lesson figcaption { font-size: 12px; }
+.lesson-arm { transform-origin: 50px 43px; animation: lesson-raise 4.2s ease-in-out infinite; }
+.lesson-right { animation-name: lesson-raise-right; }
+#arcade-practice { min-height: 19px; font-size: 11px; color: var(--accent); }
+.arcade-overlay .button { min-width: 150px; }
+.arcade-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 17px 26px 0; }
+.arcade-action {
+    display: flex; align-items: center; gap: 14px; min-height: 63px;
+    text-align: left; padding: 12px 18px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: var(--soft); color: var(--ink);
+    touch-action: manipulation;
+}
+.arcade-action .action-key { font: 20px 'Lucida Console', monospace; color: var(--accent); }
+.arcade-action .action-name { font-size: 13px; }
+.arcade-action small { display: block; font-size: 9px; color: var(--muted); margin-top: 5px; }
+.arcade-action[data-pulse] { outline: 2px solid var(--accent); outline-offset: -3px; background: color-mix(in srgb, var(--soft), var(--accent) 15%); }
+#arcade-feedback { min-height: 24px; margin: 10px 26px; font-size: 12px; color: var(--accent); }
+.arcade-toolbar { display: flex; flex-wrap: wrap; gap: 7px 18px; padding: 0 26px 17px; align-items: center; }
+.arcade-toolbar button { background: none; border: 0; padding: 8px 0; min-height: 44px; font-size: 11px; text-decoration: underline; text-underline-offset: 4px; }
+.arcade-toolbar a { font-size: 10px; margin-left: auto; }
+.arcade-camera-dock { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 20px; border-top: 1px solid var(--border); padding: 17px 26px; }
+.arcade-camera-dock p { font-size: 12px; margin: 0 0 8px; }
+.arcade-camera-dock button { background: none; border: 0; padding: 4px 0; min-height: 44px; font-size: 11px; text-decoration: underline; text-underline-offset: 4px; }
+.camera-view { width: 150px; aspect-ratio: 16/9; overflow: hidden; position: relative; border-radius: max(3px, var(--radius)); background: var(--soft); transform: scaleX(-1); }
+.camera-view video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.camera-wrist { position: absolute; width: 11px; height: 11px; translate: -50% -50%; background: var(--accent); border: 2px solid var(--bg); border-radius: 50%; }
+.camera-wrist[data-wrist=right] { background: var(--gold); }
+#arcade-mig-overlay { display: none; }
+@keyframes lesson-raise { 0%, 20%, 100% { transform: rotate(0); } 40%, 62% { transform: rotate(75deg); } }
+@keyframes lesson-raise-right { 0%, 20%, 100% { transform: rotate(0); } 40%, 62% { transform: rotate(-75deg); } }
+
+[data-theme=desktop95] #arcade-player { border: 3px outset #fff; border-radius: 0; }
+[data-theme=desktop95] .arcade-room-header { background: #000080; color: #fff; padding: 13px 17px; }
+[data-theme=desktop95] .arcade-room-header .eyebrow, [data-theme=desktop95] .arcade-room-header p { color: #d1ddff; }
+[data-theme=desktop95] .arcade-action { border: 2px outset #fff; background: #c0c0c0; color: #111; }
+[data-theme=desktop95] .arcade-action .action-key { color: #000080; }
+[data-theme=construction] .arcade-room-header h2 { color: #62ffff; }
+[data-theme=construction] .arcade-play-label { color: #ffff55; border-top-style: dashed; }
+[data-theme=construction] .arcade-action { border: 2px outset #fff; background: #ffef00; color: #000080; }
+[data-theme=construction] .arcade-action small, [data-theme=construction] .arcade-action .action-key { color: #000080; }
+[data-theme=aqua] .arcade-room-header { background: linear-gradient(#fcfdff,#c5cbd2); color: #25455f; }
+[data-theme=aqua] .arcade-room-header p { color: #42647e; }
+[data-theme=aqua] .arcade-action { background: linear-gradient(#f2fbff,#c7e2f5); border-color: #83a8c8; }
+[data-theme=aero] #arcade-player { background: #effbff; color: #084b70; }
+[data-theme=aero] .arcade-action { background: linear-gradient(#f4ffff,#b6e6ef); border-color: #79bed2; }
+[data-theme=metro] .arcade { padding-inline: 0; border: 0; background: transparent; }
+[data-theme=metro] .arcade-play { border: 0; }
+[data-theme=metro] .arcade-play-label { background: #087aa5; color: #fff; border: 0; }
+[data-theme=metro] .arcade-card:nth-child(2) .arcade-play-label { background: #7434a6; }
+[data-theme=metro] .arcade-card:nth-child(3) .arcade-play-label { background: #347c62; }
+[data-theme=metro] .arcade-action { background: #087aa5; color: #fff; border: 0; }
+[data-theme=metro] .arcade-action:nth-child(2) { background: #7434a6; }
+[data-theme=metro] .arcade-action small, [data-theme=metro] .arcade-action .action-key { color: #fff; }
+[data-theme=material] .arcade-play { box-shadow: 0 3px 12px #22184418; border: 0; }
+[data-theme=glass] #arcade-player { background: #101d35f5; color: #f1f6ff; backdrop-filter: blur(24px); }
+[data-theme=glass] .arcade-action { background: #c5ddff16; box-shadow: inset 0 1px #ffffff30; border-color: #d1eaff66; }
+[data-theme=field-notes] .arcade-play { border: 0; border-block: 1px solid var(--border); border-radius: 0; }
+[data-theme=field-notes] .arcade-action { background: transparent; border: 0; border-block: 1px solid var(--border); }
+
+@media (max-width: 760px) {
+    .arcade-list { grid-template-columns: 1fr; gap: 24px; }
+    .arcade-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 22px; align-items: center; }
+    .arcade-play { grid-row: 1/3; }
+    .arcade-card h3 { margin: 0 0 10px; align-self: end; font-size: 23px; }
+    .arcade-card > p { align-self: start; margin: 0; }
+}
+@media (max-width: 480px) {
+    .arcade-card { display: block; }
+    .arcade-card h3 { margin-top: 14px; font-size: 25px; }
+    #arcade-player { width: calc(100% - 12px); max-height: calc(100dvh - 12px); }
+    .arcade-room-header { padding: 16px 14px 12px; gap: 12px; }
+    .arcade-room-header h2 { font-size: 24px; }
+    .arcade-room-header .eyebrow { font-size: 8px; }
+    .arcade-room-header p:last-child { font-size: 11px; }
+    .arcade-hud { padding: 10px 14px; gap: 22px; }
+    .arcade-hud > div { gap: 7px; }
+    .arcade-hud dd { font-size: 16px; }
+    .arcade-stage { min-height: 290px; }
+    .arcade-overlay { padding: 12px; gap: 8px; }
+    .gesture-lesson { gap: 20px; }
+    .gesture-lesson svg { width: 68px; height: 74px; }
+    .gesture-lesson figcaption { font-size: 11px; }
+    #arcade-practice { font-size: 10px; max-width: 250px; }
+    .arcade-inputs { padding: 12px 14px 0; gap: 10px; }
+    .arcade-action { padding: 11px; gap: 10px; min-height: 65px; }
+    .arcade-action .action-name { font-size: 12px; }
+    .arcade-action .action-key { font-size: 17px; }
+    #arcade-feedback { margin: 10px 14px; font-size: 11px; }
+    .arcade-toolbar { padding: 0 14px 12px; gap: 5px 16px; }
+    .arcade-toolbar a { margin-left: 0; }
+    .arcade-camera-dock { grid-template-columns: 116px 1fr; padding: 14px; gap: 13px; }
+    .camera-view { width: 116px; }
+    .arcade-camera-dock p { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .lesson-arm { animation: none; transform: rotate(75deg); }
+    .lesson-right { transform: rotate(-75deg); }
+}

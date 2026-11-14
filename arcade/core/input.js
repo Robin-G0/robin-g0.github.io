@@ -41,7 +41,7 @@ export class InputRouter {
 }
 
 export function bindAlternativeControls(element, router, signal) {
-    const keyActions = { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right' };
+    const keyActions = { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right', A: 'left', D: 'right' };
     element.addEventListener('keydown', event => {
         if (event.target.matches('input, select, textarea') || event.ctrlKey || event.metaKey) return;
         const action = keyActions[event.key];
