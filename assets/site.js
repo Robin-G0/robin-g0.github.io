@@ -151,7 +151,8 @@ cells.forEach((cell,index) => {
   });
 });
 $('.gesture-grid').addEventListener('pointermove',event => {
-  if (!dragging) return;
+  // A mouse can lose capture while its primary button remains down.
+  if (!dragging && event.buttons !== 1) return;
   const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');
   if (cell && $('.gesture-grid').contains(cell)) visit(Number(cell.dataset.cell));
 });
