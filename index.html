@@ -12,10 +12,10 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=d2b3a085f9">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=7e0df23bd2">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=camera-2">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=135b4edf1e"></script>
-  <script type="module" src="./arcade/app.js?v=c2f6186458"></script>
+  <script type="module" src="./arcade/app.js?v=camera-2"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -83,6 +83,29 @@
   <dialog id="arcade-player" aria-labelledby="arcade-title-current" aria-describedby="arcade-goal">
     <header class="arcade-room-header"><div><p class="eyebrow">Motion Input Grid / Arcade</p><h2 id="arcade-title-current"><span id="arcade-game-title"></span></h2><p id="arcade-goal"></p></div><button id="arcade-close" class="arcade-room-close" type="button" aria-label="Close game" autofocus>×</button></header>
     <dl class="arcade-hud"><div><dt>Score</dt><dd id="arcade-score">0</dd></div><div><dt>Time</dt><dd id="arcade-time">60s</dd></div><div><dt>Attempts</dt><dd id="arcade-lives">3</dd></div></dl>
+    <section class="arcade-camera-dock" id="arcade-camera-dock" aria-label="Camera and positioning">
+      <div class="camera-view">
+        <video id="arcade-video" autoplay muted playsinline></video>
+        <span class="camera-placeholder">Camera preview</span>
+        <svg class="camera-guide" viewBox="0 0 240 180" aria-hidden="true"><ellipse cx="120" cy="38" rx="19" ry="24"/><path d="M81 73Q120 57 159 73L172 159M81 73L68 159M96 75L90 172M144 75L150 172"/></svg>
+        <i class="camera-wrist" data-wrist="left" hidden>L</i><i class="camera-wrist" data-wrist="right" hidden>R</i>
+      </div>
+      <div class="camera-details">
+        <div class="camera-heading"><strong>Motion controls</strong><button id="arcade-camera" class="button primary" type="button">Use camera</button></div>
+        <p id="arcade-camera-status" role="status">Starting camera…</p>
+        <ul class="camera-placement" aria-label="Positioning feedback">
+          <li data-tracking="shoulders">Shoulders <span>Not in view</span></li>
+          <li data-tracking="left">Left wrist <span>Not in view</span></li>
+          <li data-tracking="right">Right wrist <span>Not in view</span></li>
+        </ul>
+        <p class="camera-positioning">Step back until your shoulders and wrists fit in the outline. Hands down at waist level between lifts.</p>
+        <p id="arcade-recognition" role="status"></p>
+        <p id="arcade-countdown" role="status"></p>
+        <button id="arcade-cancel-countdown" type="button" hidden>Cancel countdown</button>
+        <button id="arcade-recalibrate" type="button">Recalibrate</button>
+      </div>
+      <canvas id="arcade-mig-overlay" aria-hidden="true"></canvas>
+    </section>
     <div class="arcade-stage">
       <canvas id="arcade-canvas" width="1440" height="840" tabindex="0" aria-label="Game playfield"></canvas>
       <div class="arcade-overlay" id="arcade-tutorial">
@@ -93,14 +116,14 @@
         <p>Lower your hands, lift one wrist, then lower it again.</p>
         <p id="arcade-practice" role="status">You can try a gesture before starting.</p>
         <button id="arcade-begin" class="button primary" type="button">Start playing</button>
+        <button id="arcade-no-camera" class="camera-alternative" type="button">Keyboard / touch only</button>
       </div>
-      <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Get comfortable, then continue when you’re ready.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
+      <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Lower either wrist, then lift it to resume with a countdown. You can also press Resume.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
       <div class="arcade-overlay" id="arcade-result" hidden><h3>Round complete</h3><p>Score: <strong id="arcade-final-score">0</strong></p><button id="arcade-again" class="button primary" type="button">Play again</button></div>
     </div>
     <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
     <p id="arcade-feedback" role="status" aria-live="polite"></p>
-    <div class="arcade-toolbar"><button id="arcade-camera" type="button">Use camera</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><button id="arcade-help" type="button">How to play</button><a href="./arcade/profiles/wrist-raises.json" download>Gesture profile ↗</a></div>
-    <div class="arcade-camera-dock" id="arcade-camera-dock" hidden><div class="camera-view"><video id="arcade-video" autoplay muted playsinline></video><i class="camera-wrist" data-wrist="left" hidden></i><i class="camera-wrist" data-wrist="right" hidden></i></div><div><p id="arcade-camera-status">Camera stopped.</p><button id="arcade-recalibrate" type="button">Recalibrate</button></div><canvas id="arcade-mig-overlay" aria-hidden="true"></canvas></div>
+    <div class="arcade-toolbar"><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><button id="arcade-help" type="button">How to play</button><a href="./arcade/profiles/wrist-raises.json" download>Gesture profile ↗</a></div>
   </dialog>
   <noscript><p class="noscript-notice">Browse the projects above or <a href="https://github.com/Robin-G0/Robin-G0">view the profile and public statistics on GitHub</a>.</p></noscript>
 </body>

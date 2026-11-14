@@ -17,8 +17,10 @@ npm run dev
 
 `prepare:assets` copies the installed package's browser runtime and licenses to
 `vendor/motion-input-grid`. The import map exposes its original entry point as
-`motion-input-grid`. Camera models and recognition WASM are downloaded only after
-the player explicitly starts the camera. The static site needs no server build.
+`motion-input-grid`. Opening a game starts its camera setup and downloads camera
+models and recognition WASM; ordinary profile browsing does neither. The browser
+still asks for camera permission. Keyboard / touch only cancels the camera session.
+The static site needs no server build.
 
 ## Files to start with
 
@@ -71,9 +73,14 @@ loop bounds simulation steps after a slow frame instead of accumulating a burst.
 Callback timestamps measure delivery to the application, not camera capture time;
 the host cannot recover inference latency that the package does not report.
 
-The minimal camera view marks wrists using public `coordinate()` observations.
-It does not draw fingers when finger tracking is disabled. A sustained tracking
-loss pauses the round; recovery never silently resumes it.
+The camera view sits above the playfield. It mirrors the video and wrist markers
+together, and reports shoulders and each wrist separately using confident public
+`coordinate()` observations inside the image. It does not invent finger tracking.
+A sustained tracking loss pauses the round. A new recognised MIG wrist raise in
+the tutorial or pause screen confirms a visible three-second start/resume
+countdown; that pulse is consumed by navigation and never enters the game. Loss of
+tracking cancels the countdown. `core/motion-navigation.js` keeps that small flow
+separate from the game input router and never recognises a gesture itself.
 
 ## Add or import a game
 

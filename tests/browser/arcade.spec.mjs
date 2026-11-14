@@ -4,6 +4,8 @@ import { games } from '../../arcade/catalog.js';
 test.beforeEach(async ({ page }) => {
     // A fixed local snapshot keeps external profile refreshes out of game tests.
     await page.route('https://raw.githubusercontent.com/**', route => route.abort());
+    // Camera startup has its own real-package and synthetic-observation tests.
+    await page.route('**/vendor/motion-input-grid/src/index.mjs', route => route.abort());
 });
 
 for (const theme of new Set(games.map(game => game.theme))) {
@@ -80,8 +82,6 @@ test('ordinary browsing does not download camera models or WASM', async ({ page 
     const cameraRequests = [];
     page.on('request', request => { if (request.url().includes('/vendor/')) cameraRequests.push(request.url()); });
     await page.goto('/?theme=aero#arcade');
-    await page.locator('.arcade-play').first().click();
-    await page.locator('#arcade-begin').click();
     await page.waitForTimeout(100);
     expect(cameraRequests).toEqual([]);
 });

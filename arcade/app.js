@@ -3,7 +3,7 @@ import { engines } from './registry.js';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js';
+import { GameRoom } from './room.js?v=camera-2';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

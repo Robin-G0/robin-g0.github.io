@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import createMIG from '../vendor/motion-input-grid/runtime/mig.mjs';
 import { arcadeProfile } from '../arcade/mig/profile.js';
+import { visiblePoint } from '../arcade/mig/camera.js';
 
 const wasm = await createMIG();
 
@@ -39,6 +40,18 @@ test('real packaged WASM recognizes broad fast sweeps, then waits for release', 
             assert.equal(h.events.length, 2, 'A visible return rearms the next raise');
         } finally { h.close(); }
     }
+});
+
+test('real package coordinates support wrist placement feedback and disappear on loss', () => {
+    const h = harness();
+    try {
+        const wrist = h.tracker.coordinate(15, 0);
+        assert.equal(visiblePoint(wrist), true);
+        assert.ok(Math.abs(wrist.x - .62) < .001);
+        assert.ok(Math.abs(wrist.y - .75) < .001);
+        h.frame(null);
+        assert.equal(visiblePoint(h.tracker.coordinate(15, 0)), false);
+    } finally { h.close(); }
 });
 
 test('tracking loss, finish-only poses and cooldown paths do not invent actions', () => {
