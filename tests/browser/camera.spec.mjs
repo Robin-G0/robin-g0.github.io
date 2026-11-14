@@ -105,8 +105,10 @@ async function openObservedCamera(page) {
 
 test('preview and individual wrist feedback are visible before starting', async ({ page }) => {
     await openObservedCamera(page);
-    await expect(page.locator('#arcade-video')).toBeInViewport();
-    await expect(page.locator('#arcade-camera')).toBeInViewport();
+    const field = await page.locator('.arcade-stage').boundingBox();
+    const camera = await page.locator('#arcade-camera-dock').boundingBox();
+    expect(camera.y).toBeGreaterThanOrEqual(field.y + field.height);
+    await page.locator('#arcade-camera-dock').scrollIntoViewIfNeeded();
     await page.evaluate(() => window.motionTest.observe(true, 16));
     await expect(page.locator('[data-tracking=left] span')).toHaveText('Detected');
     await expect(page.locator('[data-tracking=right] span')).toHaveText('Not in view');
@@ -169,6 +171,7 @@ test('Pop-up Panic practice turns recognised wrists into visible window closures
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-lesson', 'learn');
     await expect(page.locator('#arcade-countdown')).toBeEmpty();
     await page.locator('#arcade-practise').click();
+    await page.locator('#arcade-canvas').scrollIntoViewIfNeeded();
     await page.evaluate(() => window.motionTest.gesture('left'));
     await expect(page.locator('#arcade-playfield-input')).toHaveText('Close left +10');
     await expect(page.locator('#arcade-playfield-message')).toContainText('Left window closed +10');
@@ -190,4 +193,28 @@ test('Pop-up Panic practice turns recognised wrists into visible window closures
     await page.evaluate(() => window.motionTest.gesture('left'));
     await expect(page.locator('#arcade-score')).toHaveText('10');
     await expect(page.locator('#arcade-playfield-message')).toHaveText('Left window closed +10');
+});
+
+test('playfield stays above camera and keeps its position as detection feedback changes', async ({ page }) => {
+    for (const viewport of [{ width: 1365, height: 1000 }, { width: 320, height: 740 }]) {
+        await page.setViewportSize(viewport);
+        await page.goto('/?theme=construction#arcade');
+        await openObservedCamera(page);
+        await page.locator('#arcade-practise').click();
+        await page.locator('#arcade-player').evaluate(dialog => dialog.scrollTop = 0);
+        const field = page.locator('.arcade-stage');
+        const before = await field.boundingBox();
+        await page.evaluate(() => { window.motionTest.observe(); window.motionTest.gesture('left'); });
+        await expect(page.locator('#arcade-playfield-input')).toHaveText('Close left +10');
+        const detected = await field.boundingBox();
+        expect(detected.y).toBeCloseTo(before.y, 1);
+        expect(detected.height).toBeCloseTo(before.height, 1);
+        await page.waitForTimeout(1900);
+        await expect(page.locator('#arcade-recognition')).toBeEmpty();
+        const cleared = await field.boundingBox();
+        expect(cleared.y).toBeCloseTo(before.y, 1);
+        const camera = await page.locator('#arcade-camera-dock').boundingBox();
+        expect(camera.y).toBeGreaterThanOrEqual(cleared.y + cleared.height);
+        await page.locator('#arcade-close').click();
+    }
 });

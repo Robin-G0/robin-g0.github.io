@@ -12,10 +12,10 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=d2b3a085f9">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=tutorial-3">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=layout-4">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=135b4edf1e"></script>
-  <script type="module" src="./arcade/app.js?v=tutorial-3"></script>
+  <script type="module" src="./arcade/app.js?v=layout-4"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -83,6 +83,37 @@
   <dialog id="arcade-player" aria-labelledby="arcade-title-current" aria-describedby="arcade-goal">
     <header class="arcade-room-header"><div><p class="eyebrow">Motion Input Grid / Arcade</p><h2 id="arcade-title-current"><span id="arcade-game-title"></span></h2><p id="arcade-goal"></p></div><button id="arcade-close" class="arcade-room-close" type="button" aria-label="Close game" autofocus>×</button></header>
     <dl class="arcade-hud"><div><dt>Score</dt><dd id="arcade-score">0</dd></div><div><dt>Time</dt><dd id="arcade-time">60s</dd></div><div><dt>Attempts</dt><dd id="arcade-lives">3</dd></div></dl>
+
+
+    <span id="arcade-practice-label" class="arcade-practice-label" hidden>Practice · no timer or lost attempts</span>
+    <div class="arcade-stage">
+      <canvas id="arcade-canvas" width="1440" height="840" tabindex="0" aria-label="Game playfield"></canvas>
+      <span id="arcade-playfield-input" class="arcade-playfield-input" role="status" hidden></span>
+      <p id="arcade-playfield-message" class="arcade-playfield-message" role="status" hidden></p>
+      <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Lower either wrist, then lift it to resume with a countdown. You can also press Resume.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
+      <div class="arcade-overlay" id="arcade-result" hidden><h3>Round complete</h3><p>Score: <strong id="arcade-final-score">0</strong></p><button id="arcade-again" class="button primary" type="button">Play again</button></div>
+    </div>
+    <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
+    <p id="arcade-feedback" role="status" aria-live="polite"></p>
+    <div class="arcade-toolbar"><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><button id="arcade-help" type="button">How to play</button><a href="./arcade/profiles/wrist-raises.json" download>Gesture profile ↗</a></div>
+    <section class="arcade-tutorial" id="arcade-tutorial" aria-labelledby="arcade-lesson-title">
+        <ol class="lesson-steps" aria-label="Before the round"><li data-lesson-step="learn">1. Learn</li><li data-lesson-step="practice">2. Practise</li><li data-lesson-step="ready">3. Ready</li></ol>
+        <h3 id="arcade-lesson-title">Learn the controls</h3>
+        <p id="arcade-lesson-goal"></p>
+        <div class="gesture-lesson">
+          <div><strong>Left wrist ↑ / ← / A</strong><h4 data-tutorial-action="left"></h4><p data-tutorial-explanation="left"></p><small data-practised="left"></small></div>
+          <div><strong>Right wrist ↑ / → / D</strong><h4 data-tutorial-action="right"></h4><p data-tutorial-explanation="right"></p><small data-practised="right"></small></div>
+        </div>
+        <p id="arcade-lesson-tip"></p>
+        <p>Lift one wrist at a time: left and right are separate buttons. Lower your wrist to waist level between lifts.</p>
+        <p id="arcade-practice" role="status"></p>
+        <div class="lesson-actions">
+          <button id="arcade-practise" class="button primary" type="button">Try controls</button>
+          <button id="arcade-ready" class="button primary" type="button" hidden>Ready to play</button>
+          <button id="arcade-begin" class="button primary" type="button" hidden>Start round</button>
+          <button id="arcade-no-camera" class="camera-alternative" type="button">Use keyboard / touch</button>
+        </div>
+    </section>
     <section class="arcade-camera-dock" id="arcade-camera-dock" aria-label="Camera and positioning">
       <div class="camera-view">
         <video id="arcade-video" autoplay muted playsinline></video>
@@ -106,35 +137,6 @@
       </div>
       <canvas id="arcade-mig-overlay" aria-hidden="true"></canvas>
     </section>
-    <section class="arcade-tutorial" id="arcade-tutorial" aria-labelledby="arcade-lesson-title">
-        <ol class="lesson-steps" aria-label="Before the round"><li data-lesson-step="learn">1. Learn</li><li data-lesson-step="practice">2. Practise</li><li data-lesson-step="ready">3. Ready</li></ol>
-        <h3 id="arcade-lesson-title">Learn the controls</h3>
-        <p id="arcade-lesson-goal"></p>
-        <div class="gesture-lesson">
-          <div><strong>Left wrist ↑ / ← / A</strong><h4 data-tutorial-action="left"></h4><p data-tutorial-explanation="left"></p><small data-practised="left"></small></div>
-          <div><strong>Right wrist ↑ / → / D</strong><h4 data-tutorial-action="right"></h4><p data-tutorial-explanation="right"></p><small data-practised="right"></small></div>
-        </div>
-        <p id="arcade-lesson-tip"></p>
-        <p>Lift one wrist at a time: left and right are separate buttons. Lower your wrist to waist level between lifts.</p>
-        <p id="arcade-practice" role="status"></p>
-        <div class="lesson-actions">
-          <button id="arcade-practise" class="button primary" type="button">Try controls</button>
-          <button id="arcade-ready" class="button primary" type="button" hidden>Ready to play</button>
-          <button id="arcade-begin" class="button primary" type="button" hidden>Start round</button>
-          <button id="arcade-no-camera" class="camera-alternative" type="button">Use keyboard / touch</button>
-        </div>
-    </section>
-    <span id="arcade-practice-label" class="arcade-practice-label" hidden>Practice · no timer or lost attempts</span>
-    <div class="arcade-stage">
-      <canvas id="arcade-canvas" width="1440" height="840" tabindex="0" aria-label="Game playfield"></canvas>
-      <span id="arcade-playfield-input" class="arcade-playfield-input" role="status" hidden></span>
-      <p id="arcade-playfield-message" class="arcade-playfield-message" role="status" hidden></p>
-      <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Lower either wrist, then lift it to resume with a countdown. You can also press Resume.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
-      <div class="arcade-overlay" id="arcade-result" hidden><h3>Round complete</h3><p>Score: <strong id="arcade-final-score">0</strong></p><button id="arcade-again" class="button primary" type="button">Play again</button></div>
-    </div>
-    <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
-    <p id="arcade-feedback" role="status" aria-live="polite"></p>
-    <div class="arcade-toolbar"><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><button id="arcade-help" type="button">How to play</button><a href="./arcade/profiles/wrist-raises.json" download>Gesture profile ↗</a></div>
   </dialog>
   <noscript><p class="noscript-notice">Browse the projects above or <a href="https://github.com/Robin-G0/Robin-G0">view the profile and public statistics on GitHub</a>.</p></noscript>
 </body>

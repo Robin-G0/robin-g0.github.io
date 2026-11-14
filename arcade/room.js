@@ -86,7 +86,7 @@ export class GameRoom {
     }
 
     play() {
-        this.cancelCountdown(); this.clearFeedback(); this.runner.play(); this.canvas.focus();
+        this.cancelCountdown(); this.clearFeedback(); this.runner.play(); this.canvas.focus({ preventScroll: true });
     }
 
     clearFeedback() {
@@ -104,13 +104,13 @@ export class GameRoom {
             if (practising) this.lesson.next();
             this.updateLesson();
         } else this.runner.restart();
-        this.canvas.focus();
+        this.canvas.focus({ preventScroll: true });
     }
 
     nextLesson() {
         this.lesson.next(); this.updateLesson();
         const target = this.lesson.stage === 'practice' ? this.canvas : this.$('#arcade-begin');
-        target.focus();
+        target.focus({ preventScroll: true });
     }
 
     updateLesson() {

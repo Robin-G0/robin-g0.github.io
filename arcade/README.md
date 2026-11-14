@@ -74,7 +74,9 @@ loop bounds simulation steps after a slow frame instead of accumulating a burst.
 Callback timestamps measure delivery to the application, not camera capture time;
 the host cannot recover inference latency that the package does not report.
 
-The camera view sits above the playfield. It mirrors the video and wrist markers
+The playfield comes first; the camera and tutorial sit below it. The dialog keeps
+a fixed viewport height, feedback reserves space, and gesture-driven focus does
+not scroll the page. The camera mirrors the video and wrist markers
 together, and reports shoulders and each wrist separately using confident public
 `coordinate()` observations inside the image. It does not invent finger tracking.
 A sustained tracking loss pauses the round. Tutorials have three deliberate steps:
