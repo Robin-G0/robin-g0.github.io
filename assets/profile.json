@@ -1,0 +1,364 @@
+{
+  "theme": {
+    "id": "construction",
+    "name": "Under Construction",
+    "era": "1996â€“2001",
+    "selected": "2026-11-14",
+    "timezone": "UTC",
+    "palette": {
+      "light": {
+        "bg": "#10103b",
+        "ink": "#ffffff",
+        "muted": "#d1c5ff",
+        "border": "#8d68ff",
+        "accent": "#62ffff",
+        "soft": "#26265b",
+        "gold": "#ffff55",
+        "goldbg": "#494124"
+      },
+      "dark": {
+        "bg": "#080823",
+        "ink": "#ffffff",
+        "muted": "#ccc0ff",
+        "border": "#745be0",
+        "accent": "#5affee",
+        "soft": "#20204b",
+        "gold": "#ffff55",
+        "goldbg": "#443d1d"
+      }
+    }
+  },
+  "stats": {
+    "schema": 4,
+    "status": "ready",
+    "user": "Robin-G0",
+    "updated": "2026-11-14",
+    "repositories": 10,
+    "commits": 849,
+    "additions": 110719,
+    "deletions": 30376,
+    "lines_changed": 141095,
+    "languages": {
+      "C++": 1593517,
+      "JavaScript": 722145,
+      "Python": 532150,
+      "C": 170685,
+      "TypeScript": 129696,
+      "CMake": 64570,
+      "CSS": 57446,
+      "HTML": 50479,
+      "PowerShell": 39049,
+      "Luau": 33688,
+      "Shell": 21184,
+      "C#": 12070,
+      "Makefile": 6639,
+      "Java": 5025,
+      "Dockerfile": 1866,
+      "GLSL": 1243,
+      "GDScript": 27
+    },
+    "language_unit": "bytes",
+    "scope": "owned_public",
+    "line_filter_version": 1,
+    "history": "authored_non_merge_commits_on_default_branches_deduplicated"
+  },
+  "themes": [
+    {
+      "id": "phosphor",
+      "name": "Phosphor",
+      "era": "1970-1989",
+      "radius": 0,
+      "font": "Consolas, monospace",
+      "light": {
+        "bg": "#101709",
+        "ink": "#c2fa89",
+        "muted": "#9dc878",
+        "border": "#58833c",
+        "accent": "#b8ff6b",
+        "soft": "#24341a",
+        "gold": "#efd78c",
+        "goldbg": "#3a3420"
+      },
+      "dark": {
+        "bg": "#070d07",
+        "ink": "#a5f7a0",
+        "muted": "#80bd7d",
+        "border": "#355d35",
+        "accent": "#75f488",
+        "soft": "#172d1b",
+        "gold": "#dfe88a",
+        "goldbg": "#2e341a"
+      }
+    },
+    {
+      "id": "desktop95",
+      "name": "Desktop 95",
+      "era": "1995-1998",
+      "radius": 0,
+      "font": "Tahoma, Arial, sans-serif",
+      "light": {
+        "bg": "#c0c0c0",
+        "ink": "#111111",
+        "muted": "#373737",
+        "border": "#808080",
+        "accent": "#000080",
+        "soft": "#d7d7e5",
+        "gold": "#633800",
+        "goldbg": "#e9dab5"
+      },
+      "dark": {
+        "bg": "#303b3b",
+        "ink": "#ffffff",
+        "muted": "#d0dada",
+        "border": "#788888",
+        "accent": "#8fbaff",
+        "soft": "#445457",
+        "gold": "#ffe090",
+        "goldbg": "#5b5036"
+      }
+    },
+    {
+      "id": "construction",
+      "name": "Under Construction",
+      "era": "1996-2001",
+      "radius": 0,
+      "font": "'Times New Roman', Times, serif",
+      "light": {
+        "bg": "#10103b",
+        "ink": "#ffffff",
+        "muted": "#d1c5ff",
+        "border": "#8d68ff",
+        "accent": "#62ffff",
+        "soft": "#26265b",
+        "gold": "#ffff55",
+        "goldbg": "#494124"
+      },
+      "dark": {
+        "bg": "#080823",
+        "ink": "#ffffff",
+        "muted": "#ccc0ff",
+        "border": "#745be0",
+        "accent": "#5affee",
+        "soft": "#20204b",
+        "gold": "#ffff55",
+        "goldbg": "#443d1d"
+      }
+    },
+    {
+      "id": "matrix",
+      "name": "Matrix / Construct",
+      "era": "1999-2003",
+      "radius": 2,
+      "font": "Consolas, monospace",
+      "light": {
+        "bg": "#07160c",
+        "ink": "#c4ffcf",
+        "muted": "#91c69b",
+        "border": "#265337",
+        "accent": "#42f587",
+        "soft": "#153721",
+        "gold": "#ddff9c",
+        "goldbg": "#324722"
+      },
+      "dark": {
+        "bg": "#030c07",
+        "ink": "#b1ffc5",
+        "muted": "#83b890",
+        "border": "#1b442c",
+        "accent": "#36ef77",
+        "soft": "#102b1b",
+        "gold": "#d5fa89",
+        "goldbg": "#293b19"
+      }
+    },
+    {
+      "id": "y2k",
+      "name": "Y2K Chrome",
+      "era": "1999-2004",
+      "radius": 36,
+      "font": "Arial, sans-serif",
+      "light": {
+        "bg": "#edf0ff",
+        "ink": "#162254",
+        "muted": "#515b80",
+        "border": "#a0aed2",
+        "accent": "#3734cc",
+        "soft": "#d9ddfa",
+        "gold": "#813c89",
+        "goldbg": "#f0d9f0"
+      },
+      "dark": {
+        "bg": "#101329",
+        "ink": "#eef2ff",
+        "muted": "#b1badd",
+        "border": "#5d688d",
+        "accent": "#9aabff",
+        "soft": "#28305a",
+        "gold": "#f0a8f2",
+        "goldbg": "#4d2b55"
+      }
+    },
+    {
+      "id": "aqua",
+      "name": "Aqua",
+      "era": "2001-2007",
+      "radius": 14,
+      "font": "Lucida Grande, Verdana, sans-serif",
+      "light": {
+        "bg": "#f5faff",
+        "ink": "#172e4c",
+        "muted": "#4e6481",
+        "border": "#9db7d0",
+        "accent": "#075fbb",
+        "soft": "#d1e9fd",
+        "gold": "#775d13",
+        "goldbg": "#f9edbd"
+      },
+      "dark": {
+        "bg": "#172431",
+        "ink": "#e6f5ff",
+        "muted": "#a9c4d7",
+        "border": "#4b6c87",
+        "accent": "#77c7ff",
+        "soft": "#28485f",
+        "gold": "#ffe19a",
+        "goldbg": "#51462c"
+      }
+    },
+    {
+      "id": "aero",
+      "name": "Frutiger Aero",
+      "era": "2004-2012",
+      "radius": 24,
+      "font": "Trebuchet MS, sans-serif",
+      "light": {
+        "bg": "#effbff",
+        "ink": "#123b50",
+        "muted": "#39667b",
+        "border": "#85bfcc",
+        "accent": "#076ca8",
+        "soft": "#c7e8f5",
+        "gold": "#41651b",
+        "goldbg": "#e1efb4"
+      },
+      "dark": {
+        "bg": "#102c40",
+        "ink": "#e5faff",
+        "muted": "#a3cddc",
+        "border": "#407a95",
+        "accent": "#83dbff",
+        "soft": "#204d65",
+        "gold": "#d1f58e",
+        "goldbg": "#3b542d"
+      }
+    },
+    {
+      "id": "metro",
+      "name": "Metro",
+      "era": "2012-2016",
+      "radius": 0,
+      "font": "Segoe UI, Arial, sans-serif",
+      "light": {
+        "bg": "#ffffff",
+        "ink": "#162a40",
+        "muted": "#485e73",
+        "border": "#c0cfda",
+        "accent": "#006ca9",
+        "soft": "#d9edf9",
+        "gold": "#7a3d7a",
+        "goldbg": "#f0dff2"
+      },
+      "dark": {
+        "bg": "#101c2d",
+        "ink": "#ffffff",
+        "muted": "#b9cee2",
+        "border": "#3a5474",
+        "accent": "#5fc5ff",
+        "soft": "#123e60",
+        "gold": "#efafff",
+        "goldbg": "#4a2858"
+      }
+    },
+    {
+      "id": "material",
+      "name": "Material",
+      "era": "2014-2020",
+      "radius": 8,
+      "font": "Arial, sans-serif",
+      "light": {
+        "bg": "#faf9ff",
+        "ink": "#25263d",
+        "muted": "#62647e",
+        "border": "#d5d5e8",
+        "accent": "#5946b2",
+        "soft": "#e9e2ff",
+        "gold": "#956300",
+        "goldbg": "#fff0c7"
+      },
+      "dark": {
+        "bg": "#211e2b",
+        "ink": "#f3edff",
+        "muted": "#c0b6cf",
+        "border": "#534b64",
+        "accent": "#c6b4ff",
+        "soft": "#3e3553",
+        "gold": "#ffcf78",
+        "goldbg": "#51412b"
+      }
+    },
+    {
+      "id": "glass",
+      "name": "Glass / Fluent",
+      "era": "2020-2026",
+      "radius": 28,
+      "font": "Segoe UI, Arial, sans-serif",
+      "light": {
+        "bg": "#f1f3ff",
+        "ink": "#202440",
+        "muted": "#5e6481",
+        "border": "#c4cbe9",
+        "accent": "#4b52ad",
+        "soft": "#dfe4fb",
+        "gold": "#84612c",
+        "goldbg": "#f4e6cb"
+      },
+      "dark": {
+        "bg": "#1a2035",
+        "ink": "#f0f2ff",
+        "muted": "#b4bfdc",
+        "border": "#4a557c",
+        "accent": "#b2bfff",
+        "soft": "#303d61",
+        "gold": "#f3d392",
+        "goldbg": "#514934"
+      }
+    },
+    {
+      "id": "field-notes",
+      "name": "Field Notes",
+      "era": "Contemporary / original identity",
+      "radius": 20,
+      "font": "Georgia, serif",
+      "light": {
+        "bg": "#f7f4ed",
+        "ink": "#202923",
+        "muted": "#586159",
+        "border": "#cdcfc5",
+        "accent": "#245e51",
+        "soft": "#dce9df",
+        "gold": "#846119",
+        "goldbg": "#eee0bd"
+      },
+      "dark": {
+        "bg": "#111c18",
+        "ink": "#e9efe8",
+        "muted": "#a6b8ac",
+        "border": "#334b3e",
+        "accent": "#91d5af",
+        "soft": "#203e30",
+        "gold": "#e7c677",
+        "goldbg": "#443b24"
+      }
+    }
+  ]
+}
