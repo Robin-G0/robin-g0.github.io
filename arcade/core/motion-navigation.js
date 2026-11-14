@@ -1,7 +1,7 @@
 /** A recognised MIG pulse can confirm a screen, never become a queued game move. */
 export class MotionNavigation {
     request(phase, visible, now) {
-        if (!visible || this.deadline || !['tutorial', 'paused'].includes(phase)) return false;
+        if (!visible || this.deadline || !['ready', 'paused'].includes(phase)) return false;
         this.deadline = now + 3000;
         return true;
     }

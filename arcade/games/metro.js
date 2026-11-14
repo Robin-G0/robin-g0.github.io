@@ -1,9 +1,10 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { integer } from '../core/random.js';
 
 export function memory(env) {
     const state = { sequence: ['left'], phase: 'show', started: 0, index: 0, rounds: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 220 : 500, y: 210 }; },
         input(s, event) {
             if (s.phase !== 'repeat') { env.message('Watch the tiles first.'); return; }
             if (event.action !== s.sequence[s.index]) {
@@ -49,6 +50,7 @@ export function collapse(row) {
 export function merge(env) {
     const state = { tiles: [2, 0, 2, 0, 0], moves: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 100 : 632, y: 194 }; },
         input(s, event) {
             const source = event.action === 'left' ? [...s.tiles] : [...s.tiles].reverse();
             const next = collapse(source);
@@ -76,6 +78,7 @@ export function merge(env) {
 export function rail(env) {
     const state = { route: 0, destination: 0, trains: [], lastDispatch: -2 };
     return game(state, {
+        feedback(s, event) { return { x: 360, y: event.action === 'left' ? 220 : 330 }; },
         input(s, event) {
             if (event.action === 'left') { s.route = 1 - s.route; return; }
             if (s.time - s.lastDispatch < 1) { env.message('Leave room between trains.'); return; }

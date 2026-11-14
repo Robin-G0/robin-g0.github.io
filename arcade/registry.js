@@ -1,14 +1,14 @@
-import * as phosphor from './games/phosphor.js';
-import * as desktop from './games/desktop95.js';
-import * as web from './games/construction.js';
-import * as matrix from './games/matrix.js';
-import * as chrome from './games/y2k.js';
-import * as aqua from './games/aqua.js';
-import * as aero from './games/aero.js';
-import * as metro from './games/metro.js';
-import * as paper from './games/material.js';
-import * as glass from './games/glass.js';
-import * as notes from './games/field-notes.js';
+import * as phosphor from './games/phosphor.js?v=tutorial-3';
+import * as desktop from './games/desktop95.js?v=tutorial-3';
+import * as web from './games/construction.js?v=tutorial-3';
+import * as matrix from './games/matrix.js?v=tutorial-3';
+import * as chrome from './games/y2k.js?v=tutorial-3';
+import * as aqua from './games/aqua.js?v=tutorial-3';
+import * as aero from './games/aero.js?v=tutorial-3';
+import * as metro from './games/metro.js?v=tutorial-3';
+import * as paper from './games/material.js?v=tutorial-3';
+import * as glass from './games/glass.js?v=tutorial-3';
+import * as notes from './games/field-notes.js?v=tutorial-3';
 
 // This is the only executable registry. Imports cannot add module paths to it.
 export const engines = Object.freeze({

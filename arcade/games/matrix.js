@@ -1,9 +1,10 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
 
 export function parry(env) {
     const state = { attacks: [{ side: 'left', due: 3 }], next: 4.5, guard: null, until: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 260 : 460, y: 180 }; },
         input(s, event) { s.guard = event.action; s.until = s.time + 1.6; env.message('Guard raised'); },
         update(s) {
             if (s.time >= s.next) {
@@ -42,6 +43,7 @@ export function parry(env) {
 export function binary(env) {
     const state = { bits: [0, 0, 0, 0], target: [1, 0, 1, 0], solved: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 390 : 250, y: 245 }; },
         input(s, event) {
             if (event.action === 'left') s.bits.push(s.bits.shift());
             else s.bits[0] = 1 - s.bits[0];
@@ -70,9 +72,11 @@ export function gravity(env) {
     const state = { y: 330, velocity: 0, gravity: 1, walls: [{ x: 650, top: false }],
         next: 4, slowUntil: 0, ready: 0 };
     return game(state, {
+        feedback(s, event) { return { x: 168, y: s.y }; },
         input(s, event) {
             if (event.action === 'left') { s.gravity *= -1; s.velocity = 0; }
             else if (s.time >= s.ready) { s.slowUntil = s.time + 2; s.ready = s.time + 5; env.message('Time slowed'); }
+            else env.message('Slow time is still recharging.');
         },
         update(s, dt) {
             s.velocity += s.gravity * 140 * dt; s.y = clamp(s.y + s.velocity * dt, 75, 345);

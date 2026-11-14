@@ -43,12 +43,20 @@
 }
 .arcade-overlay h3 { font-size: 25px; }
 .arcade-overlay > p { font-size: 12px; max-width: 410px; margin: 0; }
-.gesture-lesson { display: grid; grid-template-columns: 1fr 1fr; gap: 45px; width: min(400px, 100%); }
-.gesture-lesson figure { margin: 0; display: grid; justify-items: center; gap: 3px; }
-.gesture-lesson svg { width: 92px; height: 94px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
-.gesture-lesson figcaption { font-size: 12px; }
-.lesson-arm { transform-origin: 50px 43px; animation: lesson-raise 4.2s ease-in-out infinite; }
-.lesson-right { animation-name: lesson-raise-right; }
+.gesture-lesson { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 25px; width: 100%; margin: 18px 0; }
+.arcade-tutorial { padding: 22px 26px; border-bottom: 1px solid var(--border); }
+.arcade-tutorial h3 { font-size: 24px; margin: 12px 0; }
+.arcade-tutorial p { font-size: 13px; line-height: 1.6; margin: 9px 0; }
+.gesture-lesson > div { border-left: 3px solid var(--border); padding-left: 16px; }
+.gesture-lesson strong { font-size: 11px; color: var(--accent); }
+.gesture-lesson h4 { font-size: 17px; margin: 8px 0; }
+.gesture-lesson small { font-size: 11px; color: var(--accent); }
+.lesson-steps { display: flex; list-style: none; flex-wrap: wrap; gap: 22px; padding: 0; margin: 0; font-size: 11px; color: var(--muted); }
+.lesson-steps [aria-current] { color: var(--ink); font-weight: bold; border-bottom: 2px solid var(--accent); padding-bottom: 5px; }
+.lesson-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 25px; margin-top: 15px; }
+.arcade-practice-label { display: block; background: var(--bg); color: var(--accent); font-size: 11px; padding: 9px 26px; border-bottom: 1px solid var(--border); }
+.arcade-playfield-input { position: absolute; top: 45px; right: 10px; z-index: 2; max-width: calc(100% - 20px); padding: 9px 14px; background: var(--bg); color: var(--ink); border: 2px solid var(--accent); border-radius: var(--radius); font-size: 13px; font-weight: bold; pointer-events: none; }
+.arcade-playfield-message { position: absolute; bottom: 9px; left: 50%; translate: -50% 0; z-index: 2; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 9px 16px; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--bg); color: var(--ink); pointer-events: none; }
 #arcade-practice { min-height: 19px; font-size: 11px; color: var(--accent); }
 .arcade-overlay .button { min-width: 150px; }
 .arcade-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 17px 26px 0; }
@@ -91,8 +99,9 @@
 .camera-wrist { position: absolute; display: grid; place-items: center; width: 24px; height: 24px; translate: -50% -50%; background: var(--bg); color: var(--ink); border: 3px solid var(--accent); border-radius: 50%; font: bold 11px Arial; font-style: normal; }
 .camera-wrist[data-wrist=right] { border-color: var(--gold); }
 #arcade-mig-overlay { display: none; }
-@keyframes lesson-raise { 0%, 20%, 100% { transform: rotate(0); } 40%, 62% { transform: rotate(75deg); } }
-@keyframes lesson-raise-right { 0%, 20%, 100% { transform: rotate(0); } 40%, 62% { transform: rotate(-75deg); } }
+.arcade-camera-dock.compact { position: sticky; top: 0; z-index: 4; grid-template-columns: 120px minmax(0, 1fr); background: var(--bg); padding-block: 10px; }
+.compact .camera-positioning, .compact #arcade-recalibrate, .compact .camera-heading strong { display: none; }
+.compact .camera-heading { margin-bottom: 4px; }
 
 [data-theme=desktop95] #arcade-player { border: 3px outset #fff; border-radius: 0; }
 [data-theme=desktop95] .arcade-room-header { background: #000080; color: #fff; padding: 13px 17px; }
@@ -142,9 +151,11 @@
     .arcade-hud dd { font-size: 16px; }
     .arcade-stage { min-height: 320px; }
     .arcade-overlay { padding: 12px; gap: 8px; }
-    .gesture-lesson { gap: 20px; }
-    .gesture-lesson svg { width: 68px; height: 74px; }
-    .gesture-lesson figcaption { font-size: 11px; }
+    .gesture-lesson { gap: 16px; }
+    .arcade-tutorial { padding: 18px 14px; }
+    .gesture-lesson > div { padding-left: 9px; }
+    .gesture-lesson h4 { font-size: 15px; }
+    .arcade-tutorial p { font-size: 12px; }
     #arcade-practice { font-size: 10px; max-width: 250px; }
     .arcade-inputs { padding: 12px 14px 0; gap: 10px; }
     .arcade-action { padding: 11px; gap: 10px; min-height: 65px; }
@@ -163,16 +174,7 @@
     #arcade-recalibrate { grid-column: 2; justify-self: start; }
     .camera-placement { gap: 8px 14px; }
     .arcade-camera-dock p { font-size: 11px; }
-    [data-phase=playing] .arcade-camera-dock,
-    [data-phase=paused] .arcade-camera-dock { position: sticky; top: 0; z-index: 4; grid-template-columns: 88px minmax(0, 1fr); background: var(--bg); }
-    [data-phase=playing] .camera-positioning, [data-phase=paused] .camera-positioning,
-    [data-phase=playing] #arcade-recalibrate, [data-phase=paused] #arcade-recalibrate { display: none; }
-    [data-phase=playing] .camera-heading strong, [data-phase=paused] .camera-heading strong { display: none; }
-    [data-phase=playing] .camera-placement, [data-phase=paused] .camera-placement { gap: 5px 10px; }
-    [data-phase=playing] .camera-placement li, [data-phase=paused] .camera-placement li { font-size: 9px; }
-    [data-phase=playing] .camera-placement span, [data-phase=paused] .camera-placement span { font-size: 9px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .lesson-arm { animation: none; transform: rotate(75deg); }
-    .lesson-right { transform: rotate(-75deg); }
+    .arcade-camera-dock.compact { grid-template-columns: 88px minmax(0, 1fr); }
+    .compact .camera-placement { gap: 5px 10px; }
+    .compact .camera-placement li, .compact .camera-placement span { font-size: 9px; }
 }

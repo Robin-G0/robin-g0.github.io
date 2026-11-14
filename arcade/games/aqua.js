@@ -1,9 +1,10 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
 
 export function marble(env) {
     const state = { x: 360, y: 70, vx: 0, opening: 360, gates: 0 };
     return game(state, {
+        feedback(s, event) { return { x: s.x, y: s.y }; },
         input(s, event) { s.vx = clamp(s.vx + (event.action === 'left' ? -65 : 65), -130, 130); },
         update(s, dt) {
             s.x = clamp(s.x + s.vx * dt, 65, 655); s.vx *= Math.exp(-dt * .7);
@@ -28,6 +29,7 @@ export function marble(env) {
 export function gel(env) {
     const state = { size: .1, target: .5, packed: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 235 : 485, y: 210 }; },
         input(s, event) {
             if (event.action === 'left') {
                 s.size += .12;
@@ -56,6 +58,7 @@ export function dock(env) {
     const state = { icons: [0, 1, 2], target: [2, 0, 1], solved: 0 };
     const names = ['Mail', 'Files', 'Music'], colors = ['#62bce9', '#77b16d', '#bd91da'];
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 280 : 440, y: 263 }; },
         input(s, event) {
             const a = event.action === 'left' ? 0 : 1;
             [s.icons[a], s.icons[a + 1]] = [s.icons[a + 1], s.icons[a]];

@@ -8,13 +8,24 @@ export function game(state, handlers) {
     return {
         state,
         start() { paused = false; },
-        input(event) { if (!paused && !disposed) handlers.input?.(state, event); },
+        input(event) {
+            if (paused || disposed) return;
+            const score = state.score, lives = state.lives;
+            handlers.input?.(state, event);
+            const target = handlers.feedback?.(state, event) || { x: event.action === 'left' ? 180 : 540, y: 210 };
+            state.inputFeedback = { ...target, action: event.action, at: state.time,
+                points: state.score - score, hurt: state.lives < lives };
+        },
         update(dt) {
             if (paused || disposed) return;
             state.time += dt;
             handlers.update?.(state, dt);
         },
-        render(painter) { if (!disposed) handlers.render(state, painter); },
+        render(painter) {
+            if (disposed) return;
+            handlers.render(state, painter);
+            if (state.inputFeedback && state.time - state.inputFeedback.at < 1.4) painter.inputFeedback?.(state.inputFeedback);
+        },
         pause() { paused = true; handlers.pause?.(state); },
         resume() { paused = false; handlers.resume?.(state); },
         dispose() { disposed = true; handlers.dispose?.(state); }

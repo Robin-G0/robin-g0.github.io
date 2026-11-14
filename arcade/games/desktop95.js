@@ -1,4 +1,4 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
 
 export function sort(env) {
@@ -10,6 +10,7 @@ export function sort(env) {
         s.deadline = s.time + Math.max(2.5, 4 - s.score / 250) / env.pace;
     }
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 150 : 570, y: 300 }; },
         input(s, event) {
             if (event.action === s.correct) { s.streak++; reward(s, env, 10 + Math.min(10, s.streak), 'Copied'); }
             else { s.streak = 0; hurt(s, env, 'Images on the left. Text on the right.'); }
@@ -34,6 +35,7 @@ export function sort(env) {
 export function stack(env) {
     const state = { x: 30, velocity: 85, width: 290, layers: [{ x: 215, width: 290 }], placements: 0 };
     return game(state, {
+        feedback(s, event) { return { x: s.x + s.width / 2, y: 322 - (s.layers.length - 1) * 28 }; },
         input(s, event) {
             if (event.action === 'right') { s.velocity *= -1; return; }
             const last = s.layers.at(-1);
@@ -65,6 +67,7 @@ export function stack(env) {
 export function ski(env) {
     const state = { lane: 1, gates: [{ gap: 1, y: 60 }], nextGate: 3.5 };
     return game(state, {
+        feedback(s, event) { return { x: 150 + s.lane * 210, y: 325 }; },
         input(s, event) { s.lane = clamp(s.lane + (event.action === 'left' ? -1 : 1), 0, 2); },
         update(s, dt) {
             if (s.time > s.nextGate) { s.gates.push({ gap: integer(env.random, 0, 2), y: -20 }); s.nextGate = s.time + 3 / env.pace; }

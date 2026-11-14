@@ -1,9 +1,10 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp } from '../core/random.js';
 
 export function orbital(env) {
     const state = { angle: Math.PI / 2, ball: { x: 360, y: 200, vx: 35, vy: 65 }, hits: 0 };
     return game(state, {
+        feedback(s, event) { return { x: 360 + Math.cos(s.angle) * 160, y: 215 + Math.sin(s.angle) * 160 }; },
         input(s, event) { s.angle += (event.action === 'left' ? -1 : 1) * Math.PI / 4; },
         update(s, dt) {
             const ball = s.ball;
@@ -35,6 +36,7 @@ export function orbital(env) {
 export function beat(env) {
     const state = { notes: [{ action: 'left', due: 3 }, { action: 'right', due: 6 }], next: 9, streak: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 235 : 485, y: 318 }; },
         input(s, event) {
             const at = event.at ?? s.time;
             const note = s.notes.find(note => !note.hit && note.action === event.action && Math.abs(note.due - at) <= .42);
@@ -69,6 +71,7 @@ export function beat(env) {
 export function reactor(env) {
     const state = { heat: .45, power: .5, glow: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 119 : 601, y: 210 }; },
         input(s, event) {
             if (event.action === 'left') { s.heat -= .18; s.power -= .045; }
             else { s.heat += .065; s.power += .12; }

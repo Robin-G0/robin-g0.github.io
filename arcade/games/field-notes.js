@@ -1,9 +1,10 @@
-import { game, hurt, reward } from '../core/game.js';
+import { game, hurt, reward } from '../core/game.js?v=tutorial-3';
 import { integer } from '../core/random.js';
 
 export function clockwork(env) {
     const state = { gears: [0, 0], targets: [2, 3], solved: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 225 : 495, y: 215 }; },
         input(s, event) {
             if (event.action === 'left') { s.gears[0] = (s.gears[0] + 1) % 8; s.gears[1] = (s.gears[1] + 1) % 8; }
             else s.gears[1] = (s.gears[1] + 1) % 8;
@@ -45,6 +46,7 @@ export function contour(env) {
     const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     const reset = s => { s.path = [{ x: 1, y: 1 }]; s.direction = 0; };
     return game(state, {
+        feedback(s, event) { return { x: 110 + s.path.at(-1).x * 60, y: 75 + s.path.at(-1).y * 53 }; },
         input(s, event) {
             if (event.action === 'left') { s.direction = (s.direction + 1) % 4; return; }
             const last = s.path.at(-1), [dx, dy] = directions[s.direction];
@@ -78,6 +80,7 @@ const stars = [{ x: 120, y: 245 }, { x: 280, y: 170 }, { x: 450, y: 265 }, { x: 
 export function constellations(env) {
     const state = { sequence: [0, 2, 4, 1, 3], path: [0], selected: 1 };
     return game(state, {
+        feedback(s, event) { return { x: stars[s.selected].x, y: stars[s.selected].y }; },
         input(s, event) {
             if (event.action === 'left') { s.selected = (s.selected + 1) % stars.length; return; }
             if (s.selected !== s.sequence[s.path.length]) { env.message('Follow the next star in the reference.'); return; }

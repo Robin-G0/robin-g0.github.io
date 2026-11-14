@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { games } from '../../arcade/catalog.js';
 
+async function startRound(page) {
+    await page.locator('#arcade-practise').click();
+    await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight');
+    await expect(page.locator('[data-practised=left]')).toContainText('Tried');
+    await expect(page.locator('[data-practised=right]')).toContainText('Tried');
+    await page.locator('#arcade-ready').click();
+    await page.locator('#arcade-begin').click();
+}
+
 test.beforeEach(async ({ page }) => {
     // A fixed local snapshot keeps external profile refreshes out of game tests.
     await page.route('https://raw.githubusercontent.com/**', route => route.abort());
@@ -19,7 +28,7 @@ for (const theme of new Set(games.map(game => game.theme))) {
             await expect(page.locator('#arcade-player')).toBeVisible();
             await expect(page.locator('#arcade-game-title')).toHaveText(game.title);
             await expect(page.locator('#arcade-tutorial')).toBeVisible();
-            await page.locator('#arcade-begin').click();
+            await startRound(page);
             await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight');
             await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
             await page.locator('#arcade-pause').click();
@@ -46,7 +55,7 @@ test('mobile touch controls fit at 320 px and survive orientation changes', asyn
         const lesson = await page.locator('.gesture-lesson').boundingBox();
         const stage = await page.locator('.arcade-stage').boundingBox();
         expect(lesson.x + lesson.width).toBeLessThanOrEqual(stage.x + stage.width + 1);
-        await page.locator('#arcade-begin').click();
+        await startRound(page);
         const left = page.locator('[data-arcade-input=left]');
         const box = await left.boundingBox();
         expect(box.height).toBeGreaterThanOrEqual(44);
@@ -61,7 +70,7 @@ test('mobile touch controls fit at 320 px and survive orientation changes', asyn
     }
     await page.setViewportSize({ width: 740, height: 320 });
     await page.locator('.arcade-play').first().click();
-    await page.locator('#arcade-begin').click();
+    await startRound(page);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
 });
 
@@ -89,7 +98,7 @@ test('ordinary browsing does not download camera models or WASM', async ({ page 
 test('changing the theme closes the active game without breaking the theme picker', async ({ page }) => {
     await page.goto('/?theme=glass#arcade');
     await page.locator('.arcade-play').first().click();
-    await page.locator('#arcade-begin').click();
+    await startRound(page);
     await page.evaluate(() => document.documentElement.dataset.theme = 'aero');
     await expect(page.locator('#arcade-player')).not.toBeVisible();
     await expect(page.locator('[data-game="aero-school"]')).toBeVisible();

@@ -1,4 +1,4 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
 
 function paperShape(p, type, x, y, rotation, color, filled) {
@@ -14,6 +14,7 @@ function paperShape(p, type, x, y, rotation, color, filled) {
 export function tangram(env) {
     const state = { piece: 0, rotation: 0, targets: [1, 3, 2], placed: [false, false, false] };
     return game(state, {
+        feedback(s, event) { return { x: 360, y: 310 }; },
         input(s, event) {
             if (event.action === 'left') { s.rotation = (s.rotation + 1) % 4; return; }
             if (s.rotation !== s.targets[s.piece]) { env.message('Match the outlined shape before stamping.'); return; }
@@ -36,9 +37,10 @@ export function golf(env) {
     const state = { x: 95, velocity: 0, power: 1, cup: 535, strokes: 0, next: 0 };
     const powers = [95, 125, 155];
     return game(state, {
+        feedback(s, event) { return { x: s.x, y: 265 }; },
         input(s, event) {
             if (event.action === 'left') { s.power = (s.power + 1) % powers.length; return; }
-            if (s.velocity || s.time < s.next) return;
+            if (s.velocity || s.time < s.next) { env.message('The ball is still moving. Wait before the next stroke.'); return; }
             s.velocity = powers[s.power]; s.strokes++;
         },
         update(s, dt) {
@@ -65,6 +67,7 @@ export function golf(env) {
 export function balance(env) {
     const state = { weights: [3, 3], angle: 0, velocity: 0, warning: 0, next: 4 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 170 : 550, y: 245 }; },
         input(s, event) { s.weights[event.action === 'left' ? 0 : 1] += .6; },
         update(s, dt) {
             if (s.time > s.next) { s.weights[integer(env.random, 0, 1)] += .9; s.next = s.time + 4 / env.pace; }

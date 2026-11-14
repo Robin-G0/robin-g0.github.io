@@ -1,13 +1,21 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { integer } from '../core/random.js';
 
 export function popups(env) {
-    const state = { windows: [{ side: 'left', born: 0 }], next: 2 };
+    const state = { windows: [{ side: 'left', born: 0 }, { side: 'right', born: 0 }], next: 2, closed: null };
     return game(state, {
+        feedback(s, event) {
+            const index = s.windows.findLastIndex(window => window.side === event.action);
+            const row = s.closed?.at === s.time && s.closed.side === event.action ? s.closed.row : Math.max(0, index) % 4;
+            return { x: event.action === 'left' ? 309 : 659, y: 112 + row * 45, hideLabel: true };
+        },
         input(s, event) {
             const index = s.windows.findLastIndex(window => window.side === event.action);
-            if (index >= 0) { s.windows.splice(index, 1); reward(s, env, 10, 'Closed'); }
-            else env.message('That side is clear.');
+            if (index >= 0) {
+                s.closed = { side: event.action, row: index % 4, at: s.time };
+                s.windows.splice(index, 1); reward(s, env, 10, `${event.action === 'left' ? 'Left' : 'Right'} window closed +10`);
+            }
+            else { s.closed = null; env.message('That side is clear.'); }
         },
         update(s) {
             if (s.time > s.next) {
@@ -25,8 +33,14 @@ export function popups(env) {
                 p.rect(x, y, 280, 100, '#171148'); p.outline(x, y, 280, 100, '#af7dff', 3);
                 p.rect(x, y, 280, 25, '#5221a5'); p.text('A NEW WINDOW!', x + 12, y + 13, 16, '#fff');
                 p.rect(x + 253, y + 3, 22, 19, '#ffef00'); p.text('×', x + 264, y + 12, 19, '#000080', 'center');
-                p.text('Close me', x + 140, y + 64, 25, '#62ffff', 'center');
+                p.text(`${window.side === 'left' ? 'LEFT' : 'RIGHT'} wrist ↑`, x + 140, y + 64, 25, '#62ffff', 'center');
             });
+            if (s.closed && s.time - s.closed.at < 1) {
+                const x = s.closed.side === 'left' ? 45 : 395, y = 100 + s.closed.row * 45;
+                p.outline(x, y, 280, 100, '#62ffff', 4);
+                p.rect(x + 35, y + 35, 210, 36, '#171148');
+                p.text('CLOSED +10', x + 140, y + 54, 25, '#62ffff', 'center');
+            }
         }
     });
 }
@@ -35,6 +49,7 @@ export function maze(env) {
     const state = { path: Array.from({ length: 6 }, () => env.random() < .5 ? 'left' : 'right'),
         depth: 0, dead: new Map(), visits: [], wrong: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 195 : 525, y: 275 }; },
         input(s, event) {
             s.visits.push({ depth: s.depth, action: event.action });
             if (event.action === s.path[s.depth]) {
@@ -64,6 +79,7 @@ export function maze(env) {
 export function juggle(env) {
     const state = { balls: [{ x: 205, y: 205, velocity: -90 }, { x: 515, y: 110, velocity: 15 }] };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 205 : 515, y: s.balls[event.action === 'left' ? 0 : 1].y }; },
         input(s, event) {
             const ball = s.balls[event.action === 'left' ? 0 : 1];
             if (ball.y > 150 && ball.velocity > 0) { ball.velocity = -185; reward(s, env, 10, 'Bounce'); }

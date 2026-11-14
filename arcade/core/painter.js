@@ -100,4 +100,21 @@ export class Painter {
         const direction = side === 'left' ? -1 : 1;
         this.line([[x - direction * 16, y - 14], [x + direction * 2, y], [x - direction * 16, y + 14]], color, 4);
     }
+    inputFeedback({ x, y, action, points, hurt, hideLabel }) {
+        const c = this.c; c.save();
+        const label = this.controls?.[action] || action;
+        const text = `${action === 'left' ? '←' : '→'} ${label}${points > 0 ? ` +${points}` : hurt ? ' · Try again' : ''}`;
+        x = Math.max(30, Math.min(690, x)); y = Math.max(60, Math.min(365, y));
+        this.circle(x, y, 27, hurt ? 'gold' : 'accent', false);
+        if (hideLabel && points > 0) { c.restore(); return; }
+        c.font = `bold 25px ${this.colors.font || 'Arial'}`;
+        const width = Math.min(580, (c.measureText(text)?.width || text.length * 14) + 30);
+        const left = Math.max(10, Math.min(710 - width, x - width / 2));
+        const top = y < 125 ? y + 35 : y - 72;
+        this.rect(left, top, width, 42, 'bg', 5);
+        this.outline(left, top, width, 42, hurt ? 'gold' : 'accent', 2);
+        this.text(text, left + width / 2, top + 21, 25, 'ink', 'center');
+        this.line([[x, y < 125 ? top : top + 42], [x, y < 125 ? y + 28 : y - 28]], 'accent', 2);
+        c.restore();
+    }
 }

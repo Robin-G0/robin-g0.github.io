@@ -1,9 +1,10 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer, distance } from '../core/random.js';
 
 export function school(env) {
     const state = { gates: [false, false], swimmers: [{ lane: 0, y: 70, shark: false }], next: 3, groups: 0 };
     return game(state, {
+        feedback(s, event) { return { x: event.action === 'left' ? 220 : 500, y: 307 }; },
         input(s, event) {
             const lane = event.action === 'left' ? 0 : 1;
             s.gates[lane] = !s.gates[lane];
@@ -56,6 +57,7 @@ export function bubbles(env) {
     }
     refill(state);
     return game(state, {
+        feedback(s, event) { return { x: 360, y: 380 }; },
         input(s, event) {
             if (event.action === 'left') { s.arc = 1 - s.arc; return; }
             if (!s.shot) s.shot = { x: 360, y: 380, vx: s.arc ? 105 : -105, vy: -300 };
@@ -89,6 +91,7 @@ export function bubbles(env) {
 export function garden(env) {
     const state = { plants: Array.from({ length: 3 }, () => ({ water: .6, light: .6, growth: 0 })), active: 0, next: 6 };
     return game(state, {
+        feedback(s, event) { return { x: 160 + s.active * 200, y: 300 }; },
         input(s, event) {
             const plant = s.plants[s.active], key = event.action === 'left' ? 'water' : 'light';
             plant[key] += .25;

@@ -1,4 +1,4 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer, distance } from '../core/random.js';
 
 const rotateCell = (x, y, turns) => {
@@ -36,8 +36,9 @@ export function prisms(env) {
     }
     setup(state);
     return game(state, {
+        feedback(s, event) { return { x: 226 + s.mirrors[s.selected].x * 62, y: 86 + s.mirrors[s.selected].y * 62 }; },
         input(s, event) {
-            if (s.solved) return;
+            if (s.solved) { env.message('Light received. The next puzzle is arriving.'); return; }
             if (event.action === 'left') s.mirrors[s.selected].angle ^= 1;
             else s.selected = (s.selected + 1) % 4;
             if (traceMirrors(s.mirrors, s.rotation).hit) {
@@ -64,6 +65,7 @@ export function prisms(env) {
 export function abyss(env) {
     const state = { y: 210, velocity: 0, reefs: [{ x: 500, gap: 210 }], next: 6 };
     return game(state, {
+        feedback(s, event) { return { x: 175, y: s.y }; },
         input(s, event) { s.velocity = event.action === 'left' ? -65 : 45; },
         update(s, dt) {
             s.velocity += 10 * dt; s.velocity *= Math.exp(-dt * .18); s.y += s.velocity * dt;
@@ -117,12 +119,13 @@ export function orbit(env) {
     }
     target(state);
     return game(state, {
+        feedback(s, event) { return { x: 95, y: 310 }; },
         input(s, event) {
             if (event.action === 'left') { s.selected = (s.selected + 1) % 3; return; }
             if (!s.probe) {
                 const angle = angles[s.selected];
                 s.probe = { x: 95, y: 310, vx: 180 * Math.cos(angle), vy: 180 * Math.sin(angle), trail: [] };
-            }
+            } else env.message('Probe in flight. Wait before launching another.');
         },
         update(s, dt) {
             if (!s.probe) return;

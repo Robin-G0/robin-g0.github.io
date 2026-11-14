@@ -1,4 +1,4 @@
-import { game, hurt, reward, hearts } from '../core/game.js';
+import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
 
 export function invaders(env) {
@@ -10,6 +10,7 @@ export function invaders(env) {
     }
     fleet(state);
     return game(state, {
+        feedback(s, event) { return { x: s.x, y: 360 }; },
         input(s, event) { s.x = clamp(s.x + (event.action === 'left' ? -90 : 90), 55, 665); },
         update(s, dt) {
             if (s.time >= s.nextShot) { s.bullets.push({ x: s.x, y: 352 }); s.nextShot = s.time + .85; }
@@ -44,8 +45,9 @@ export function lander(env) {
     const state = { y: 65, velocity: 5, fuel: 100, landings: 0, flame: 0 };
     const reset = s => { s.y = 65; s.velocity = 5; s.fuel = 100; };
     return game(state, {
+        feedback(s, event) { return { x: 360, y: s.y }; },
         input(s, event) {
-            if (s.fuel <= 0) return;
+            if (s.fuel <= 0) { env.message('No fuel left. Watch the descent.'); return; }
             if (event.action === 'left') { s.velocity -= 28; s.fuel -= 7; s.flame = .35; }
             else { s.velocity *= .4; s.fuel -= 4; env.message('Air brake'); }
         },
@@ -86,6 +88,7 @@ export function snake(env) {
         s.food = free[integer(env.random, 0, free.length - 1)];
     }
     return game(state, {
+        feedback(s, event) { return { x: 103 + s.body[0].x * 30, y: 83 + s.body[0].y * 30 }; },
         input(s, event) {
             if (s.turn != null) { env.message('Turn already set for the next step.'); return; }
             s.turn = event.action === 'left' ? -1 : 1;

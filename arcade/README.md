@@ -28,6 +28,7 @@ The static site needs no server build.
 - `games/`: trusted game logic, grouped by theme.
 - `core/game.js`: the small lifecycle used by every game.
 - `core/runner.js`: simulation time, tutorial, pause, restart and round duration.
+- `core/tutorial.js` and `lessons.js`: isolated practice and specific explanations for each engine.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
 - `mig/profile.js`: a readable schema-v2 profile derived from MIG's wrist-raise example.
@@ -76,16 +77,26 @@ the host cannot recover inference latency that the package does not report.
 The camera view sits above the playfield. It mirrors the video and wrist markers
 together, and reports shoulders and each wrist separately using confident public
 `coordinate()` observations inside the image. It does not invent finger tracking.
-A sustained tracking loss pauses the round. A new recognised MIG wrist raise in
-the tutorial or pause screen confirms a visible three-second start/resume
-countdown; that pulse is consumed by navigation and never enters the game. Loss of
+A sustained tracking loss pauses the round. Tutorials have three deliberate steps:
+Learn → Practise → Ready. Learn and Practise never start a round from a gesture.
+Practice runs a separate copy of the real engine, keeps three attempts and leaves
+the real score and round clock untouched. Choose Ready to play explicitly; only
+then can a wrist raise confirm the visible three-second start countdown. A wrist
+raise can also resume a paused round. That pulse never enters the game. Loss of
 tracking cancels the countdown. `core/motion-navigation.js` keeps that small flow
 separate from the game input router and never recognises a gesture itself.
+
+Each engine supplies a small `feedback(state, event)` hook returning a logical
+`{ x, y }` position on the affected game object. The shared lifecycle records the
+action and score change, and the painter displays a short callout at that target.
+Keep the hook visual: it must not change game rules. Rule messages also appear
+inside the playfield, including reasons why a recognised input cannot act yet.
+Pop-up closures additionally leave a one-second outline and CLOSED +10 trace.
 
 ## Add or import a game
 
 To add trusted executable code, write a factory in `games/`, register it in
-`registry.js`, and add its description to `catalog.js`. There is no dynamic module
+`registry.js`, and add its description to `catalog.js` and its rules to `lessons.js`. There is no dynamic module
 path in imported data.
 
 For a small first experiment, copy a factory such as `binary` in `games/matrix.js`.

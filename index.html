@@ -12,10 +12,10 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=d2b3a085f9">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=camera-2">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=tutorial-3">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=135b4edf1e"></script>
-  <script type="module" src="./arcade/app.js?v=camera-2"></script>
+  <script type="module" src="./arcade/app.js?v=tutorial-3"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -106,18 +106,29 @@
       </div>
       <canvas id="arcade-mig-overlay" aria-hidden="true"></canvas>
     </section>
+    <section class="arcade-tutorial" id="arcade-tutorial" aria-labelledby="arcade-lesson-title">
+        <ol class="lesson-steps" aria-label="Before the round"><li data-lesson-step="learn">1. Learn</li><li data-lesson-step="practice">2. Practise</li><li data-lesson-step="ready">3. Ready</li></ol>
+        <h3 id="arcade-lesson-title">Learn the controls</h3>
+        <p id="arcade-lesson-goal"></p>
+        <div class="gesture-lesson">
+          <div><strong>Left wrist ↑ / ← / A</strong><h4 data-tutorial-action="left"></h4><p data-tutorial-explanation="left"></p><small data-practised="left"></small></div>
+          <div><strong>Right wrist ↑ / → / D</strong><h4 data-tutorial-action="right"></h4><p data-tutorial-explanation="right"></p><small data-practised="right"></small></div>
+        </div>
+        <p id="arcade-lesson-tip"></p>
+        <p>Lift one wrist at a time: left and right are separate buttons. Lower your wrist to waist level between lifts.</p>
+        <p id="arcade-practice" role="status"></p>
+        <div class="lesson-actions">
+          <button id="arcade-practise" class="button primary" type="button">Try controls</button>
+          <button id="arcade-ready" class="button primary" type="button" hidden>Ready to play</button>
+          <button id="arcade-begin" class="button primary" type="button" hidden>Start round</button>
+          <button id="arcade-no-camera" class="camera-alternative" type="button">Use keyboard / touch</button>
+        </div>
+    </section>
+    <span id="arcade-practice-label" class="arcade-practice-label" hidden>Practice · no timer or lost attempts</span>
     <div class="arcade-stage">
       <canvas id="arcade-canvas" width="1440" height="840" tabindex="0" aria-label="Game playfield"></canvas>
-      <div class="arcade-overlay" id="arcade-tutorial">
-        <div class="gesture-lesson">
-          <figure><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="19" r="9"/><path d="M50 29V68M50 68L36 93M50 68L64 93M50 43L75 66"/><g class="lesson-arm"><path d="M50 43L25 66"/></g></svg><figcaption data-tutorial-action="left"></figcaption></figure>
-          <figure><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="19" r="9"/><path d="M50 29V68M50 68L36 93M50 68L64 93M50 43L25 66"/><g class="lesson-arm lesson-right"><path d="M50 43L75 66"/></g></svg><figcaption data-tutorial-action="right"></figcaption></figure>
-        </div>
-        <p>Lower your hands, lift one wrist, then lower it again.</p>
-        <p id="arcade-practice" role="status">You can try a gesture before starting.</p>
-        <button id="arcade-begin" class="button primary" type="button">Start playing</button>
-        <button id="arcade-no-camera" class="camera-alternative" type="button">Keyboard / touch only</button>
-      </div>
+      <span id="arcade-playfield-input" class="arcade-playfield-input" role="status" hidden></span>
+      <p id="arcade-playfield-message" class="arcade-playfield-message" role="status" hidden></p>
       <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><p>Lower either wrist, then lift it to resume with a countdown. You can also press Resume.</p><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
       <div class="arcade-overlay" id="arcade-result" hidden><h3>Round complete</h3><p>Score: <strong id="arcade-final-score">0</strong></p><button id="arcade-again" class="button primary" type="button">Play again</button></div>
     </div>
