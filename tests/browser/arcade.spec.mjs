@@ -2,11 +2,6 @@ import { test, expect } from '@playwright/test';
 import { games } from '../../arcade/catalog.js';
 
 async function startRound(page) {
-    await page.locator('#arcade-practise').click();
-    await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight');
-    await expect(page.locator('[data-practised=left]')).toContainText('Tried');
-    await expect(page.locator('[data-practised=right]')).toContainText('Tried');
-    await page.locator('#arcade-ready').click();
     await page.locator('#arcade-begin').click();
 }
 

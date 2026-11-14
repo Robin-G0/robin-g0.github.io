@@ -28,7 +28,7 @@ The static site needs no server build.
 - `games/`: trusted game logic, grouped by theme.
 - `core/game.js`: the small lifecycle used by every game.
 - `core/runner.js`: simulation time, tutorial, pause, restart and round duration.
-- `core/tutorial.js` and `lessons.js`: isolated practice and specific explanations for each engine.
+- `lessons.js`: short control explanations and optional game tips for every engine.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
 - `mig/profile.js`: a readable schema-v2 profile derived from MIG's wrist-raise example.
@@ -74,17 +74,18 @@ loop bounds simulation steps after a slow frame instead of accumulating a burst.
 Callback timestamps measure delivery to the application, not camera capture time;
 the host cannot recover inference latency that the package does not report.
 
-The playfield comes first; the camera and tutorial sit below it. The dialog keeps
+The playfield comes first; the camera sits below it. A short controls window opens
+over the playfield before a round and can be reopened with the Controls button.
+The dialog keeps
 a fixed viewport height, feedback reserves space, and gesture-driven focus does
 not scroll the page. The camera mirrors the video and wrist markers
 together, and reports shoulders and each wrist separately using confident public
 `coordinate()` observations inside the image. It does not invent finger tracking.
-A sustained tracking loss pauses the round. Tutorials have three deliberate steps:
-Learn → Practise → Ready. Learn and Practise never start a round from a gesture.
-Practice runs a separate copy of the real engine, keeps three attempts and leaves
-the real score and round clock untouched. Choose Ready to play explicitly; only
-then can a wrist raise confirm the visible three-second start countdown. A wrist
-raise can also resume a paused round. That pulse never enters the game. Loss of
+A sustained tracking loss pauses the round. The controls window starts directly:
+press Start, or lower and raise the RIGHT wrist for a visible three-second
+countdown. There are no practice or readiness gates. Controls pauses an existing
+round without resetting its score or position; Start becomes Resume. A wrist raise
+can also resume a paused round. The confirmation pulse never enters the game. Loss of
 tracking cancels the countdown. `core/motion-navigation.js` keeps that small flow
 separate from the game input router and never recognises a gesture itself.
 

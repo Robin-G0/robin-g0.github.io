@@ -31,6 +31,7 @@
 .arcade-room-header h2 { font-size: 29px; line-height: 1.15; letter-spacing: -.035em; }
 .arcade-room-header p:last-child { font-size: 12px; margin: 10px 0 0; }
 .arcade-room-close { width: 44px; height: 44px; flex-shrink: 0; background: none; border: 1px solid var(--border); border-radius: var(--radius); font-size: 25px; }
+.arcade-controls-trigger { min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--soft); font-size: 11px; }
 .arcade-hud { display: flex; align-items: center; gap: 30px; padding: 12px 26px; margin: 0; border-block: 1px solid var(--border); }
 .arcade-hud > div { display: flex; gap: 10px; align-items: baseline; }
 .arcade-hud dt { font-size: 10px; color: var(--muted); }
@@ -45,18 +46,26 @@
 .arcade-overlay h3 { font-size: 25px; }
 .arcade-overlay > p { font-size: 12px; max-width: 410px; margin: 0; }
 .gesture-lesson { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 25px; width: 100%; margin: 18px 0; }
-.arcade-tutorial { padding: 22px 26px; border-bottom: 1px solid var(--border); }
-.arcade-tutorial h3 { font-size: 24px; margin: 12px 0; }
-.arcade-tutorial p { font-size: 13px; line-height: 1.6; margin: 9px 0; }
 .gesture-lesson > div { border-left: 3px solid var(--border); padding-left: 16px; }
 .gesture-lesson strong { font-size: 11px; color: var(--accent); }
 .gesture-lesson h4 { font-size: 17px; margin: 8px 0; }
 .gesture-lesson small { font-size: 11px; color: var(--accent); }
-.lesson-steps { display: flex; list-style: none; flex-wrap: wrap; gap: 22px; padding: 0; margin: 0; font-size: 11px; color: var(--muted); }
-.lesson-steps [aria-current] { color: var(--ink); font-weight: bold; border-bottom: 2px solid var(--accent); padding-bottom: 5px; }
 .lesson-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 25px; margin-top: 15px; }
-.arcade-practice-label { display: block; background: var(--bg); color: var(--accent); font-size: 11px; padding: 9px 26px; border-bottom: 1px solid var(--border); }
-.arcade-practice-label[hidden] { display: block !important; visibility: hidden; }
+.arcade-controls { align-items: stretch; justify-content: flex-start; text-align: left; overflow-y: auto; gap: 9px; }
+.arcade-controls h3 { font-size: 23px; margin: 0; }
+.arcade-controls-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.arcade-controls-heading .button { min-width: 95px; padding: 10px 18px; }
+.arcade-controls > p { max-width: none; }
+.arcade-controls .gesture-lesson { grid-template-columns: 1fr; gap: 0; margin: 0; }
+.arcade-controls .gesture-lesson > div { display: grid; grid-template-columns: minmax(100px, 30%) minmax(0, 1fr); gap: 15px; padding: 10px 0; border-left: 0; border-bottom: 1px solid var(--border); }
+.arcade-controls .gesture-lesson strong { font-size: 13px; color: var(--ink); }
+.arcade-controls .gesture-lesson small { display: block; font-size: 10px; margin-top: 4px; color: var(--muted); }
+.arcade-controls .gesture-lesson p { font-size: 12px; line-height: 1.5; margin: 0; }
+#arcade-controls-status { min-height: 36px; font-size: 13px; font-weight: bold; color: var(--accent); }
+.arcade-controls .lesson-actions { margin: 0; }
+.arcade-controls details { font-size: 12px; }
+.arcade-controls summary { cursor: pointer; padding: 8px 0; }
+.arcade-controls details p { font-size: 12px; line-height: 1.5; margin: 8px 0; }
 .arcade-playfield-input { position: absolute; top: 45px; right: 10px; z-index: 2; max-width: calc(100% - 20px); padding: 9px 14px; background: var(--bg); color: var(--ink); border: 2px solid var(--accent); border-radius: var(--radius); font-size: 13px; font-weight: bold; pointer-events: none; }
 .arcade-playfield-message { position: absolute; bottom: 9px; left: 50%; translate: -50% 0; z-index: 2; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 9px 16px; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--bg); color: var(--ink); pointer-events: none; }
 #arcade-practice { min-height: 19px; font-size: 11px; color: var(--accent); }
@@ -154,10 +163,8 @@
     .arcade-stage { min-height: 320px; }
     .arcade-overlay { padding: 12px; gap: 8px; }
     .gesture-lesson { gap: 16px; }
-    .arcade-tutorial { padding: 18px 14px; }
     .gesture-lesson > div { padding-left: 9px; }
     .gesture-lesson h4 { font-size: 15px; }
-    .arcade-tutorial p { font-size: 12px; }
     #arcade-practice { font-size: 10px; max-width: 250px; }
     .arcade-inputs { padding: 12px 14px 0; gap: 10px; }
     .arcade-action { padding: 11px; gap: 10px; min-height: 65px; }

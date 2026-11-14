@@ -4,7 +4,7 @@ import { MotionNavigation } from '../arcade/core/motion-navigation.js';
 import { visiblePoint } from '../arcade/mig/camera.js';
 
 test('a recognised wrist confirms tutorial or pause after a visible countdown', () => {
-    for (const phase of ['ready', 'paused']) {
+    for (const phase of ['tutorial', 'paused']) {
         const navigation = new MotionNavigation();
         assert.equal(navigation.request(phase, false, 1000), false);
         assert.equal(navigation.request(phase, true, 1000), true);
@@ -18,14 +18,14 @@ test('a recognised wrist confirms tutorial or pause after a visible countdown', 
 test('tracking loss, stale frames and explicit cancellation never resume a round', () => {
     const navigation = new MotionNavigation();
     assert.equal(navigation.request('playing', true, 1000), false);
-    assert.equal(navigation.request('tutorial', true, 1000), false);
+    assert.equal(navigation.request('ready', true, 1000), false);
     assert.equal(navigation.request('practice', true, 1000), false);
     assert.equal(navigation.request('learn', true, 1000), false);
     navigation.request('paused', true, 1000);
     assert.deepEqual(navigation.step({ visible: false, lastSeen: 1900, lostSince: 1100 }, 1900), { cancelled: true });
     navigation.request('paused', true, 2000);
     assert.deepEqual(navigation.step({ visible: true, lastSeen: 2000 }, 4000), { cancelled: true });
-    navigation.request('ready', true, 5000); navigation.cancel();
+    navigation.request('tutorial', true, 5000); navigation.cancel();
     assert.equal(navigation.step({ visible: true, lastSeen: 8000 }, 8000), null);
 });
 
