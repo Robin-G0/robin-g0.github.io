@@ -4,8 +4,8 @@ import { seededRandom } from './random.js';
 /** Owns simulation time. Games never own timers, animation loops or cameras. */
 export class GameRunner {
     constructor(description, factory, { clock = () => performance.now(), feedback = () => {},
-        message = () => {}, changed = () => {} } = {}) {
-        Object.assign(this, { description, factory, clock, message, changed });
+        message = () => {}, changed = () => {}, sound = () => {}, reducedMotion = false } = {}) {
+        Object.assign(this, { description, factory, clock, message, changed, sound, reducedMotion });
         this.seed = description.seed ?? (Date.now() >>> 0);
         this.router = new InputRouter({ clock, feedback, accept: event => {
             const lag = Math.max(0, this.clock() - event.timestamp) / 1000;
@@ -22,6 +22,7 @@ export class GameRunner {
         this.started = false;
         this.game = this.factory({ random: seededRandom(this.seed),
             pace: this.description.difficulty === 'standard' ? 1 : .8,
+            sound: event => this.sound(event), reducedMotion: this.reducedMotion,
             message: text => this.message(text), finish: text => this.finish(text) });
         this.router.setPhase(this.phase);
     }
@@ -60,11 +61,11 @@ export class GameRunner {
         this.message(text); this.publish();
     }
 
-    step(timestamp) {
+    step(timestamp, { hold = false } = {}) {
+        if (hold) { this.lastFrame = timestamp; return; }
         if (this.phase !== 'playing') { this.lastFrame = timestamp; return; }
         const gap = Math.max(0, (timestamp - this.lastFrame) / 1000);
         this.lastFrame = timestamp;
-        if (gap > 1) { this.pause('Paused after a slow frame. Resume when ready.'); return; }
         // At low FPS the simulation slows instead of jumping through collisions.
         let remaining = Math.min(.1, gap, this.description.duration - this.elapsed);
         while (remaining > .000001 && this.phase === 'playing') {

@@ -9,7 +9,7 @@
       "name": "Raise left wrist",
       "action": "left",
       "space": "body",
-      "cooldown_ms": 700,
+      "cooldown_ms": 500,
       "action_mode": "single_press",
       "steps": [
         {
@@ -23,7 +23,7 @@
                 -9,
                 3,
                 27,
-                3
+                1
               ],
               "type": "required",
               "priority": "high",
@@ -64,7 +64,7 @@
       "name": "Raise right wrist",
       "action": "right",
       "space": "body",
-      "cooldown_ms": 700,
+      "cooldown_ms": 500,
       "action_mode": "single_press",
       "steps": [
         {
@@ -78,7 +78,7 @@
                 -9,
                 3,
                 27,
-                3
+                1
               ],
               "type": "required",
               "priority": "high",

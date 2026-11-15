@@ -1,9 +1,9 @@
-import { games, gamesForTheme } from './catalog.js';
-import { engines } from './registry.js?v=tutorial-3';
+import { games, gamesForTheme } from './catalog.js?v=motion-6';
+import { engines } from './registry.js?v=motion-6';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js?v=controls-5';
+import { GameRoom } from './room.js?v=motion-6';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

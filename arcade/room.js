@@ -1,10 +1,11 @@
-import { engines } from './registry.js?v=tutorial-3';
-import { GameRunner } from './core/runner.js';
+import { engines } from './registry.js?v=motion-6';
+import { GameRunner } from './core/runner.js?v=motion-6';
 import { bindAlternativeControls } from './core/input.js';
-import { Painter, readPalette, loadArtwork } from './core/painter.js?v=tutorial-3';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=camera-2';
+import { Painter, readPalette, loadArtwork } from './core/painter.js?v=motion-6';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=motion-6';
+import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js';
+import { lessonFor } from './lessons.js?v=motion-6';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -14,6 +15,10 @@ export class GameRoom {
         this.$ = selector => dialog.querySelector(selector);
         this.canvas = this.$('#arcade-canvas');
         this.palette = readPalette();
+        this.dialog.dataset.engine = description.engine;
+        this.inputMode = 'motion';
+        this.sound = new ArcadeAudio(this.palette.theme);
+        this.sound.unlock();
         this.painter = new Painter(this.canvas.getContext('2d'), this.palette);
         this.painter.controls = description.controls;
         this.canvas.width = 1440; this.canvas.height = 840;
@@ -27,21 +32,26 @@ export class GameRoom {
         }
         this.runner = new GameRunner(description, engines[description.engine], {
             feedback: (kind, action) => this.feedback(kind, action),
-            message: text => this.message(text), changed: state => this.updateUI(state)
+            message: text => this.message(text), changed: state => this.updateUI(state),
+            sound: event => this.sound.play(event), reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches
         });
         this.instructions = lessonFor(description.engine);
         this.camera = new MotionCamera({
             onInput: (action, timestamp) => this.motionInput(action, timestamp),
-            onTracking: frame => this.tracking(frame), onStatus: text => this.cameraStatus(text)
+            onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
         });
         this.bindControls();
         this.cancelCountdown();
         this.showPlacement({ shoulders: false, left: null, right: null });
         this.dialog.dataset.camera = 'off';
         this.$('#arcade-feedback').textContent = 'Two buttons, or lower and lift one wrist.';
+        this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
         this.runner.publish();
         dialog.showModal();
+        this.resizeCanvas();
+        this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+        this.resizeObserver.observe(this.canvas.parentElement);
         this.$('#arcade-begin').focus({ preventScroll: true });
         this.toggleCamera();
         this.request = requestAnimationFrame(time => this.frame(time));
@@ -74,12 +84,33 @@ export class GameRoom {
             if (this.runner.phase === 'playing') this.runner.pause(); else if (this.runner.phase === 'paused') this.runner.play();
         });
         on('#arcade-camera', () => this.toggleCamera());
+        on('#arcade-sound', () => {
+            const enabled = this.sound.toggle();
+            this.$('#arcade-sound').setAttribute('aria-pressed', String(enabled));
+            this.$('#arcade-sound').setAttribute('aria-label', enabled ? 'Mute sound' : 'Enable sound');
+            if (enabled) this.sound.play({ kind: 'input' });
+        });
         on('#arcade-recalibrate', () => this.camera.recalibrate());
         this.dialog.addEventListener('close', () => this.dispose(), { signal });
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) { this.cancelCountdown(); this.runner.pause('Paused while the page is in the background.'); }
         }, { signal });
         window.addEventListener('pagehide', () => this.dispose(), { signal });
+    }
+
+    resizeCanvas() {
+        if (this.closed) return;
+        const box = this.canvas.parentElement.getBoundingClientRect();
+        // The rising-stack board grows vertically on narrow screens; UI text and
+        // arrows keep their proportions instead of stretching a landscape image.
+        const height = this.description.engine === 'popups' && box.width
+            ? Math.max(420, Math.round(720 * box.height / box.width)) : 420;
+        if (this.canvas.height !== height * 2) {
+            this.canvas.height = height * 2;
+            this.canvas.getContext('2d').setTransform(2, 0, 0, 2, 0, 0);
+        }
+        this.painter.h = height;
+        this.painter.compact = box.width < 480;
     }
 
     play() {
@@ -89,7 +120,7 @@ export class GameRoom {
     clearFeedback() {
         this.recognisedUntil = 0; this.messageUntil = 0; this.pulseUntil = 0;
         this.$('#arcade-recognition').textContent = '';
-        this.$('#arcade-feedback').textContent = 'Lower one wrist to waist level, then lift it for one action.';
+        this.$('#arcade-feedback').textContent = '';
     }
 
     restart() {
@@ -110,7 +141,10 @@ export class GameRoom {
     }
 
     input(action, details = {}) {
-        if (this.runner.phase !== 'tutorial') return this.runner.router.dispatch(action, details);
+        if (this.runner.phase !== 'tutorial') {
+            this.inputMode = details.source || 'keyboard';
+            return this.runner.router.dispatch(action, details);
+        }
         return false;
     }
 
@@ -120,11 +154,8 @@ export class GameRoom {
             this.input(action, { source: 'motion', timestamp });
             return;
         }
-        if (this.runner.phase === 'tutorial' && action !== 'right') {
-            this.$('#arcade-controls-status').textContent = 'Left input detected. Lower and lift your RIGHT wrist to start.';
-            return;
-        }
         if (this.navigation.request(this.runner.phase, this.visible, performance.now())) {
+            this.inputMode = 'motion';
             this.$('#arcade-cancel-countdown').hidden = false;
         }
     }
@@ -151,7 +182,7 @@ export class GameRoom {
         this.$('#arcade-restart').textContent = 'Restart';
         this.$('#arcade-begin').textContent = this.navigation.deadline ? 'Cancel countdown' : this.runner?.started ? 'Resume' : 'Start';
         if (!this.navigation.deadline) {
-            const instruction = `Lower and lift your RIGHT wrist to ${this.runner.started ? 'resume' : 'start'}, or press ${this.runner.started ? 'Resume' : 'Start'}.`;
+            const instruction = this.runner.started ? 'Lift to resume' : 'Lift to start';
             if (this.$('#arcade-controls-status').textContent !== instruction) this.$('#arcade-controls-status').textContent = instruction;
         }
         this.updateCameraLayout();
@@ -164,7 +195,7 @@ export class GameRoom {
 
     message(text) {
         if (!this.closed) {
-            this.$('#arcade-feedback').textContent = text;
+            this.$('#arcade-feedback').textContent = ''; // Outcomes belong beside the game objects.
             this.$('#arcade-playfield-message').textContent = text;
             this.messageUntil = performance.now() + 2200;
         }
@@ -177,11 +208,12 @@ export class GameRoom {
             this.$(`[data-arcade-input=${action}]`).dataset.pulse = 'true';
             this.pulseUntil = performance.now() + 180;
             this.recognisedUntil = performance.now() + 1800;
-            this.$('#arcade-recognition').textContent = `${action === 'left' ? 'Left' : 'Right'} input recognised: ${label}`;
+            this.$('#arcade-recognition').textContent = action === 'left' ? '←' : '→';
+            if (this.description.engine !== 'popups') this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
             if (points > 0) this.messageUntil = 0; // The target callout already shows the result.
-            this.$('#arcade-playfield-input').textContent = `${label}${points > 0 ? ` +${points}` : ' · input received'}`;
+            this.$('#arcade-playfield-input').textContent = `${label}${points > 0 ? ` +${points}` : ''}`;
             this.$('#arcade-playfield-input').dataset.action = action;
         } else if (kind === 'duplicate') this.message('Recognised. Lower your wrist before the next lift.');
         else if (kind === 'late') this.message('That input arrived too late. Try the next one.');
@@ -195,6 +227,7 @@ export class GameRoom {
         if (this.camera.session) this.camera.stop();
         const attempt = this.cameraAttempt = (this.cameraAttempt || 0) + 1;
         this.cameraStarting = true;
+        this.inputMode = 'motion';
         this.dialog.dataset.camera = 'loading';
         this.trackingAt = performance.now(); this.lostAt = null; this.visible = false;
         this.$('#arcade-camera').textContent = 'Stop camera';
@@ -202,28 +235,31 @@ export class GameRoom {
         if (this.closed || attempt !== this.cameraAttempt) return;
         this.cameraStarting = false;
         this.dialog.dataset.camera = this.camera.running ? 'live' : 'unavailable';
-        if (!this.camera.running) this.$('#arcade-camera').textContent = 'Retry camera';
+        if (!this.camera.running) { this.$('#arcade-camera').textContent = 'Retry camera'; this.inputMode = 'keyboard'; }
+        this.cameraStatus();
     }
 
     stopCamera() {
         this.cameraAttempt = (this.cameraAttempt || 0) + 1;
         this.cameraStarting = false; this.camera.stop(); this.cancelCountdown();
+        this.inputMode = 'keyboard';
         this.visible = false; this.dialog.dataset.camera = 'off';
         this.$('#arcade-camera').textContent = 'Use camera';
-        this.cameraStatus('Camera off. Keyboard and touch controls are ready.');
+        this.cameraStatus();
         this.showPlacement({ shoulders: false, left: null, right: null });
     }
 
-    cameraStatus(text) {
+    cameraStatus() {
         if (this.closed) return;
-        if (text === 'Lift one wrist at a time.') this.message('Both wrists lifted together. Try one wrist at a time.');
-        if (this.$('#arcade-camera-status').textContent !== text) this.$('#arcade-camera-status').textContent = text;
+        const short = this.camera.running ? (this.visible ? 'Ready' : 'Show a wrist')
+            : this.cameraStarting ? 'Starting…' : this.dialog.dataset.camera === 'off' ? 'Camera off' : 'Camera unavailable';
+        if (this.$('#arcade-camera-status').textContent !== short) this.$('#arcade-camera-status').textContent = short;
         if (this.dialog.dataset.camera === 'live' && !this.camera.running) {
             this.dialog.dataset.camera = 'unavailable';
             this.$('#arcade-camera').textContent = 'Retry camera';
             this.visible = false; this.cancelCountdown();
             this.showPlacement({ shoulders: false, left: null, right: null });
-            this.runner.pause('Camera stopped. Retry the camera or use the buttons.');
+            this.inputMode = 'keyboard';
         }
     }
 
@@ -236,10 +272,10 @@ export class GameRoom {
         this.trackingAt = frame.timestamp;
         if (frame.visible) {
             this.lostAt = null;
-            this.cameraStatus('Ready. Lower a wrist to waist level, then lift it toward your shoulder.');
+            this.cameraStatus();
         } else {
             this.lostAt ??= frame.timestamp;
-            this.cameraStatus('Bring both shoulders and wrists back into view.');
+            this.cameraStatus();
         }
         this.showPlacement(frame);
     }
@@ -248,7 +284,7 @@ export class GameRoom {
         for (const [part, visible] of [['shoulders', frame.shoulders], ['left', visiblePoint(frame.left)], ['right', visiblePoint(frame.right)]]) {
             const indicator = this.$(`[data-tracking=${part}]`);
             indicator.dataset.visible = String(Boolean(visible));
-            indicator.querySelector('span').textContent = visible ? 'Detected' : 'Not in view';
+            indicator.querySelector('span').textContent = visible ? '✓' : '—';
         }
         for (const side of ['left', 'right']) {
             const marker = this.$(`[data-wrist=${side}]`), point = frame[side];
@@ -259,26 +295,30 @@ export class GameRoom {
 
     frame(timestamp) {
         if (this.closed) return;
+        let trackingHold = false;
         if (this.camera.running) {
             const stale = this.trackingAt != null && timestamp - this.trackingAt > 1500;
-            const lost = this.lostAt != null && timestamp - this.lostAt > 700;
-            if (stale || lost) this.runner.pause('Tracking paused. Reposition, then lower and lift a wrist to resume.');
+            trackingHold = this.inputMode === 'motion' && (!this.visible || stale);
             if (stale) {
                 this.visible = false;
                 this.showPlacement({ shoulders: false, left: null, right: null });
-                this.cameraStatus('Tracking interrupted. Keep shoulders and wrists inside the camera view.');
+                this.cameraStatus();
             }
         }
+        if (this.cameraStarting && this.inputMode === 'motion') trackingHold = true;
+        this.dialog.dataset.tracking = trackingHold ? 'held' : 'ready';
+        this.$('#arcade-tracking-hint').textContent = this.cameraStarting ? 'Camera…' : 'Show a wrist';
+        this.$('#arcade-tracking-hint').hidden = !trackingHold || this.runner.phase !== 'playing';
         const navigation = this.navigation.step({ visible: this.visible, lastSeen: this.trackingAt, lostSince: this.lostAt }, timestamp);
-        if (navigation?.cancelled) { this.cancelCountdown(); this.cameraStatus('Reposition, then lower and lift a wrist to try again.'); }
+        if (navigation?.cancelled) { this.cancelCountdown(); }
         else if (navigation?.play) this.play();
         else if (navigation) {
-            const text = `${this.runner.started ? 'Resuming' : 'Starting'} in ${navigation.remaining}… Lower your hands.`;
+            const text = String(navigation.remaining);
             this.$('#arcade-countdown').textContent = text;
             this.$('#arcade-controls-status').textContent = text;
         }
         if (timestamp > (this.recognisedUntil || 0)) this.$('#arcade-recognition').textContent = '';
-        this.runner.step(timestamp);
+        this.runner.step(timestamp, { hold: trackingHold });
         this.painter.background();
         this.runner.game.render(this.painter);
         this.$('#arcade-playfield-input').hidden = timestamp > (this.recognisedUntil || 0);
@@ -294,7 +334,8 @@ export class GameRoom {
         if (this.closed) return;
         this.closed = true;
         cancelAnimationFrame(this.request); this.abort.abort();
-        this.camera.stop(); this.runner.dispose();
+        this.resizeObserver?.disconnect();
+        this.camera.stop(); this.runner.dispose(); this.sound.dispose();
         if (this.dialog.open) this.dialog.close();
         if (this.opener?.isConnected) this.opener.focus({ preventScroll: true });
     }

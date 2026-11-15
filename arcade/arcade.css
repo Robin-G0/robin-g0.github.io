@@ -66,6 +66,7 @@
 .arcade-controls details { font-size: 12px; }
 .arcade-controls summary { cursor: pointer; padding: 8px 0; }
 .arcade-controls details p { font-size: 12px; line-height: 1.5; margin: 8px 0; }
+
 .arcade-playfield-input { position: absolute; top: 45px; right: 10px; z-index: 2; max-width: calc(100% - 20px); padding: 9px 14px; background: var(--bg); color: var(--ink); border: 2px solid var(--accent); border-radius: var(--radius); font-size: 13px; font-weight: bold; pointer-events: none; }
 .arcade-playfield-message { position: absolute; bottom: 9px; left: 50%; translate: -50% 0; z-index: 2; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 9px 16px; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--bg); color: var(--ink); pointer-events: none; }
 #arcade-practice { min-height: 19px; font-size: 11px; color: var(--accent); }
@@ -96,7 +97,6 @@
 .camera-placement li { font-size: 11px; }
 .camera-placement span { display: block; font-size: 10px; font-weight: bold; color: var(--muted); }
 .camera-placement [data-visible=true] span { color: var(--accent); }
-.camera-placement [data-visible=true] span::before { content: '✓ '; }
 .camera-details .camera-positioning { font-size: 11px; color: var(--muted); }
 #arcade-recognition { color: var(--accent); min-height: 36px; font-weight: bold; }
 #arcade-countdown { min-height: 40px; }
@@ -159,7 +159,7 @@
     .arcade-room-header p:last-child { font-size: 11px; }
     .arcade-hud { padding: 10px 14px; gap: 22px; }
     .arcade-hud > div { gap: 7px; }
-    .arcade-hud dd { font-size: 16px; }
+    .arcade-hud dd { font-size: 28px; }
     .arcade-stage { min-height: 320px; }
     .arcade-overlay { padding: 12px; gap: 8px; }
     .gesture-lesson { gap: 16px; }
@@ -168,8 +168,8 @@
     #arcade-practice { font-size: 10px; max-width: 250px; }
     .arcade-inputs { padding: 12px 14px 0; gap: 10px; }
     .arcade-action { padding: 11px; gap: 10px; min-height: 65px; }
-    .arcade-action .action-name { font-size: 12px; }
-    .arcade-action .action-key { font-size: 17px; }
+    .arcade-action .action-name { font-size: 20px; }
+    .arcade-action .action-key { font-size: 30px; }
     #arcade-feedback { margin: 10px 14px; font-size: 11px; }
     .arcade-toolbar { padding: 0 14px 12px; gap: 5px 16px; }
     .arcade-toolbar a { margin-left: 0; }
@@ -185,5 +185,54 @@
     .arcade-camera-dock p { font-size: 11px; }
     .arcade-camera-dock.compact { grid-template-columns: 88px minmax(0, 1fr); }
     .compact .camera-placement { gap: 5px 10px; }
-    .compact .camera-placement li, .compact .camera-placement span { font-size: 9px; }
+    .compact .camera-placement li { font-size: 16px; }
+    .compact .camera-placement span { font-size: 24px; }
 }
+
+/* Read from a torso-camera distance: short labels, large targets, no blocking tracking menu. */
+.arcade-room-header #arcade-goal { display: none; }
+.arcade-room-header h2 { font-size: 30px; }
+.arcade-controls-trigger { font-size: 18px; }
+.arcade-hud { gap: 24px; }
+.arcade-hud > div { flex-direction: column; gap: 2px; align-items: flex-start; }
+.arcade-hud dt { font-size: 14px; }
+.arcade-hud dd { font-size: 32px; }
+[data-engine=popups] .arcade-hud > div:last-child { display: none; }
+[data-engine=popups] .arcade-hud dd { font-size: 36px; }
+.arcade-controls { gap: 12px; }
+.arcade-controls h3 { font-size: 28px; }
+.arcade-controls > p { font-size: 18px; }
+#arcade-controls-status { font-size: 24px; min-height: 32px; }
+.arcade-controls .gesture-lesson { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.arcade-controls .gesture-lesson > div { display: flex; flex-direction: column; align-items: center; gap: 4px; border: 0; padding: 0; text-align: center; }
+.arcade-controls .gesture-lesson strong { font-size: 23px; }
+.arcade-controls .gesture-lesson svg { width: 74px; height: 60px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.right-lift { transform: scaleX(-1); }
+.arcade-controls .gesture-lesson small { font-size: 16px; }
+.arcade-controls-heading .button, .arcade-overlay .button { font-size: 22px; min-height: 48px; }
+.arcade-controls details, .arcade-controls details p, .camera-alternative { font-size: 18px; }
+.arcade-action .action-name { font-size: 23px; }
+.arcade-action .action-key { font-size: 34px; }
+.arcade-inputs small, #arcade-feedback, .arcade-toolbar a { display: none; }
+.arcade-toolbar { padding-top: 16px; }
+.arcade-toolbar button { font-size: 20px; min-width: 44px; text-decoration: none; }
+#arcade-sound { font-size: 30px; }
+#arcade-sound[aria-pressed=false] { text-decoration: line-through; opacity: .6; }
+.camera-details #arcade-camera-status, .camera-placement li { font-size: 20px; }
+.camera-placement span { font-size: 24px; }
+.camera-details .camera-positioning { font-size: 18px; }
+.camera-heading .button, .arcade-camera-dock button:not(.button) { font-size: 18px; }
+#arcade-recognition, #arcade-countdown { font-size: 32px; }
+.arcade-tracking-hint { position: absolute; top: 10px; left: 12px; z-index: 2; margin: 0; padding: 8px 12px; font-size: 22px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); pointer-events: none; }
+[data-engine=popups] #arcade-playfield-input, [data-engine=popups] #arcade-playfield-message { display: none !important; }
+#arcade-paused { background: color-mix(in srgb, var(--bg) 70%, transparent); }
+#arcade-paused h3 { font-size: 36px; }
+#arcade-final-score { font-size: 52px; }
+
+[data-engine=popups] .arcade-inputs .action-key { display: none; }
+#arcade-begin, #arcade-resume, #arcade-again { font-size: 22px; min-height: 50px; }
+#arcade-camera { font-size: 18px; }
+.arcade-playfield-input { font-size: 22px; }
+.demo-forearm { transform-origin: 18px 49px; animation: wrist-lift 2.6s ease-in-out infinite; }
+@keyframes wrist-lift { 0%, 15%, 100% { transform: rotate(160deg); } 40%, 65% { transform: rotate(0); } }
+@media (prefers-reduced-motion: reduce) { .demo-forearm { animation: none; transform: rotate(0); } }

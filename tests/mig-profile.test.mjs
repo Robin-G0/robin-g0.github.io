@@ -12,7 +12,7 @@ function harness() {
     assert.equal(tracker.trackHands(), false);
     let time = 0, sequence = 0;
     const events = [];
-    const frame = (left, right = 8.5, gap = 40) => {
+    const frame = (left, right = 5.5, gap = 40) => {
         time += gap;
         const body = tracker.bodyBuffer(); body.fill(0);
         const put = (i, x, y) => body.set([x, y, 0, 1, 0, 0, 0, 1], i * 8);
@@ -23,7 +23,7 @@ function harness() {
         assert.ok(count >= 0);
         for (let i = 0; i < count; i++) events.push(tracker.eventAction(i));
     };
-    for (let i = 0; i < 30; i++) frame(8.5);
+    for (let i = 0; i < 30; i++) frame(5.5);
     return { tracker, frame, events, close: () => tracker.delete() };
 }
 
@@ -31,12 +31,12 @@ test('real packaged WASM recognizes broad fast sweeps, then waits for release', 
     for (const gap of [33, 100, 160, 180]) {
         const h = harness();
         try {
-            h.frame(5.5);
-            h.frame(2.5, 8.5, gap);
+            h.frame(3.5);
+            h.frame(2.5, 5.5, gap);
             assert.deepEqual(h.events, ['left']);
             for (let i = 0; i < 30; i++) h.frame(2.5);
             assert.equal(h.events.length, 1, 'A raised wrist is not a stream of presses');
-            h.frame(8.5); h.frame(8.5); h.frame(5.5); h.frame(2.5);
+            h.frame(5.5); h.frame(5.5); h.frame(3.5); h.frame(2.5);
             assert.equal(h.events.length, 2, 'A visible return rearms the next raise');
         } finally { h.close(); }
     }
@@ -48,7 +48,7 @@ test('real package coordinates support wrist placement feedback and disappear on
         const wrist = h.tracker.coordinate(15, 0);
         assert.equal(visiblePoint(wrist), true);
         assert.ok(Math.abs(wrist.x - .62) < .001);
-        assert.ok(Math.abs(wrist.y - .75) < .001);
+        assert.ok(Math.abs(wrist.y - .57) < .001);
         h.frame(null);
         assert.equal(visiblePoint(h.tracker.coordinate(15, 0)), false);
     } finally { h.close(); }
@@ -57,17 +57,28 @@ test('real package coordinates support wrist placement feedback and disappear on
 test('tracking loss, finish-only poses and cooldown paths do not invent actions', () => {
     const h = harness();
     try {
-        h.frame(5.5); h.frame(2.5, 8.5, 181);
+        h.frame(3.5); h.frame(2.5, 5.5, 181);
         assert.equal(h.events.length, 0, 'An overlong gap invalidates the sweep');
         for (let i = 0; i < 8; i++) h.frame(null);
         for (let i = 0; i < 8; i++) h.frame(2.5);
         assert.equal(h.events.length, 0, 'Reappearing at the finish is insufficient');
-        h.frame(8.5); h.frame(5.5); h.frame(2.5);
+        h.frame(5.5); h.frame(3.5); h.frame(2.5);
         assert.equal(h.events.length, 1);
-        h.frame(8.5); h.frame(5.5); h.frame(2.5);
+        h.frame(5.5); h.frame(3.5); h.frame(2.5);
         for (let i = 0; i < 30; i++) h.frame(2.5);
         assert.equal(h.events.length, 1, 'A path in cooldown is not queued');
-        h.frame(8.5); h.frame(8.5, 5.5); h.frame(8.5, 2.5);
+        h.frame(5.5); h.frame(5.5, 3.5); h.frame(5.5, 2.5);
         assert.deepEqual(h.events, ['left', 'right']);
+    } finally { h.close(); }
+});
+
+test('torso-only framing can rearm at chest height without observing the other wrist or legs', () => {
+    const h = harness();
+    try {
+        h.frame(5.5, null); h.frame(3.5, null); h.frame(2.5, null);
+        for (let i = 0; i < 25; i++) h.frame(2.5, null);
+        h.frame(5.5, null); h.frame(3.5, null); h.frame(2.5, null);
+        assert.deepEqual(h.events, ['left', 'left']);
+        assert.equal(h.tracker.coordinate(16, 0), null);
     } finally { h.close(); }
 });

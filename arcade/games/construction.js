@@ -1,49 +1,7 @@
 import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { integer } from '../core/random.js';
 
-export function popups(env) {
-    const state = { windows: [{ side: 'left', born: 0 }, { side: 'right', born: 0 }], next: 2, closed: null };
-    return game(state, {
-        feedback(s, event) {
-            const index = s.windows.findLastIndex(window => window.side === event.action);
-            const row = s.closed?.at === s.time && s.closed.side === event.action ? s.closed.row : Math.max(0, index) % 4;
-            return { x: event.action === 'left' ? 309 : 659, y: 112 + row * 45, hideLabel: true };
-        },
-        input(s, event) {
-            const index = s.windows.findLastIndex(window => window.side === event.action);
-            if (index >= 0) {
-                s.closed = { side: event.action, row: index % 4, at: s.time };
-                s.windows.splice(index, 1); reward(s, env, 10, `${event.action === 'left' ? 'Left' : 'Right'} window closed +10`);
-            }
-            else { s.closed = null; env.message('That side is clear.'); }
-        },
-        update(s) {
-            if (s.time > s.next) {
-                s.windows.push({ side: env.random() < .5 ? 'left' : 'right', born: s.time });
-                s.next = s.time + Math.max(1.4, 2.2 - s.score / 250) / env.pace;
-            }
-            const expired = s.windows.filter(window => s.time - window.born > 7);
-            if (expired.length) { hurt(s, env, 'The page is filling up.'); s.windows = s.windows.filter(window => !expired.includes(window)); }
-        },
-        render(s, p) {
-            hearts(s, p); p.text('PERSONAL HOMEPAGE', 360, 30, 25, 'gold', 'center');
-            p.text('Left windows', 180, 385, 21, 'ink', 'center'); p.text('Right windows', 540, 385, 21, 'ink', 'center');
-            s.windows.forEach((window, i) => {
-                const x = window.side === 'left' ? 45 : 395, y = 100 + i % 4 * 45;
-                p.rect(x, y, 280, 100, '#171148'); p.outline(x, y, 280, 100, '#af7dff', 3);
-                p.rect(x, y, 280, 25, '#5221a5'); p.text('A NEW WINDOW!', x + 12, y + 13, 16, '#fff');
-                p.rect(x + 253, y + 3, 22, 19, '#ffef00'); p.text('×', x + 264, y + 12, 19, '#000080', 'center');
-                p.text(`${window.side === 'left' ? 'LEFT' : 'RIGHT'} wrist ↑`, x + 140, y + 64, 25, '#62ffff', 'center');
-            });
-            if (s.closed && s.time - s.closed.at < 1) {
-                const x = s.closed.side === 'left' ? 45 : 395, y = 100 + s.closed.row * 45;
-                p.outline(x, y, 280, 100, '#62ffff', 4);
-                p.rect(x + 35, y + 35, 210, 36, '#171148');
-                p.text('CLOSED +10', x + 140, y + 54, 25, '#62ffff', 'center');
-            }
-        }
-    });
-}
+export { popups } from './popup-panic.js?v=motion-6';
 
 export function maze(env) {
     const state = { path: Array.from({ length: 6 }, () => env.random() < .5 ? 'left' : 'right'),

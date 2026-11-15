@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js';
+import { arcadeProfile } from './profile.js?v=motion-6';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -30,19 +30,19 @@ export class MotionCamera {
                 onFrame: frame => {
                     if (generation !== this.generation) return;
                     const points = [11, 12, 15, 16].map(index => frame.coordinate(index, 0));
-                    const visible = points.every(visiblePoint);
+                    const shoulders = points.slice(0, 2).every(visiblePoint);
+                    const visible = shoulders && points.slice(2).some(visiblePoint);
                     this.lastFrame = this.clock();
-                    this.onTracking({ visible, shoulders: points.slice(0, 2).every(visiblePoint),
+                    this.onTracking({ visible, shoulders,
                         left: points[2], right: points[3], timestamp: this.lastFrame });
                     const actions = this.pending.splice(0);
                     if (!visible) return;
-                    // Two contrary commands in one observation are ambiguous for
-                    // these two-button games. Ask for one wrist rather than guessing.
-                    if (new Set(actions.map(event => event.action)).size > 1) {
-                        this.onStatus('Lift one wrist at a time.');
-                        return;
+                    // MIG already recognised these pulses. An off-screen OTHER
+                    // wrist must not suppress an observed hand's valid command.
+                    for (const event of actions) {
+                        const wrist = event.action === 'left' ? points[2] : event.action === 'right' ? points[3] : null;
+                        if (visiblePoint(wrist)) this.onInput(event.action, event.timestamp);
                     }
-                    for (const event of actions) this.onInput(event.action, event.timestamp);
                 }
             });
             this.session = session;

@@ -20,10 +20,10 @@ test('camera refusal leaves keyboard play available', async ({ page }) => {
     await page.locator('#arcade-begin').click();
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
-    await expect(page.locator('[data-arcade-input=left]')).toHaveAttribute('data-pulse', 'true');
+    await expect(page.locator('#arcade-playfield-message')).toHaveText('Gate open');
 });
 
-test('blank camera pauses for tracking loss and releases the stream on exit', async ({ page }) => {
+test('blank camera quietly freezes play without a pause menu and releases the stream on exit', async ({ page }) => {
     test.setTimeout(90000);
     await page.evaluate(() => {
         navigator.mediaDevices.getUserMedia = async () => {
@@ -41,8 +41,12 @@ test('blank camera pauses for tracking loss and releases the stream on exit', as
     await expect.poll(() => page.evaluate(() => Boolean(document.querySelector('#arcade-video').srcObject)),
         { timeout: 60000 }).toBe(true);
     await page.locator('#arcade-begin').click();
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'paused', { timeout: 10000 });
-    await expect(page.locator('#arcade-camera-status')).toContainText('back into view');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held', { timeout: 10000 });
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
+    await expect(page.locator('#arcade-paused')).not.toBeVisible();
+    const time = await page.locator('#arcade-time').textContent();
+    await page.waitForTimeout(250);
+    await expect(page.locator('#arcade-time')).toHaveText(time);
     await page.locator('#arcade-close').click();
     expect(await page.evaluate(() => window.testCameraTrack.readyState)).toBe('ended');
     expect(await page.locator('#arcade-video').evaluate(video => video.srcObject)).toBe(null);
@@ -104,40 +108,40 @@ test('preview and individual wrist feedback are visible before starting', async 
     expect(camera.y).toBeGreaterThanOrEqual(field.y + field.height);
     await page.locator('#arcade-camera-dock').scrollIntoViewIfNeeded();
     await page.evaluate(() => window.motionTest.observe(true, 16));
-    await expect(page.locator('[data-tracking=left] span')).toHaveText('Detected');
-    await expect(page.locator('[data-tracking=right] span')).toHaveText('Not in view');
+    await expect(page.locator('[data-tracking=left]')).toHaveAttribute('data-visible', 'true');
+    await expect(page.locator('[data-tracking=right]')).toHaveAttribute('data-visible', 'false');
     await expect(page.locator('[data-wrist=left]')).toBeVisible();
     await expect(page.locator('[data-wrist=right]')).not.toBeVisible();
     expect(await page.locator('[data-wrist=left]').evaluate(marker => marker.style.left)).toBe('30%');
     await page.evaluate(() => window.motionTest.stop());
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'unavailable');
-    await expect(page.locator('[data-tracking=left] span')).toHaveText('Not in view');
+    await expect(page.locator('[data-tracking=left]')).toHaveAttribute('data-visible', 'false');
     await page.locator('#arcade-camera').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'live');
 });
 
-test('the controls window starts directly with a right-wrist gesture and resumes hands-free', async ({ page }) => {
+test('torso-only tracking starts with either wrist and recovers without a menu', async ({ page }) => {
     await openObservedCamera(page);
-    await expect(page.locator('#arcade-tutorial')).toBeVisible();
-    await expect(page.locator('#arcade-controls-status')).toContainText('RIGHT wrist');
-    await expect(page.locator('#arcade-practise')).toHaveCount(0);
-    await expect(page.locator('#arcade-ready')).toHaveCount(0);
-    await page.evaluate(() => { window.motionTest.observe(); window.motionTest.gesture('left'); });
-    await expect(page.locator('#arcade-countdown')).toBeEmpty();
-    await page.evaluate(() => window.motionTest.gesture('right'));
-    await expect(page.locator('#arcade-controls-status')).toContainText('Starting in');
-    await expect(page.locator('#arcade-begin')).toHaveText('Cancel countdown');
+    await expect(page.locator('#arcade-controls-status')).toHaveText('Lift to start');
+    await expect(page.locator('#arcade-practise, #arcade-ready')).toHaveCount(0);
+    await page.evaluate(() => { window.motionTest.observe(true, 16); window.motionTest.gesture('left'); });
+    await expect(page.locator('#arcade-controls-status')).toHaveText(/^[123]$/);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
-    await expect(page.locator('#arcade-tutorial')).not.toBeVisible();
     await expect(page.locator('#arcade-score')).toHaveText('0');
     await page.evaluate(() => window.motionTest.observe(false));
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'paused');
-    await page.evaluate(() => { window.motionTest.observe(); window.motionTest.gesture('right'); });
-    await expect(page.locator('#arcade-countdown')).toContainText('Resuming in');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
+    await expect(page.locator('#arcade-paused')).not.toBeVisible();
+    await page.evaluate(() => window.motionTest.observe(true, 15));
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'ready');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
+    await page.locator('#arcade-pause').click();
+    await page.evaluate(() => window.motionTest.gesture('right'));
+    await expect(page.locator('#arcade-countdown')).toHaveText(/^[123]$/);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
     await page.locator('#arcade-help').click();
     await page.evaluate(() => window.motionTest.gesture('right'));
-    await expect(page.locator('#arcade-controls-status')).toContainText('Resuming in');
+    await expect(page.locator('#arcade-controls-status')).toHaveText(/^[123]$/);
     await page.evaluate(() => window.motionTest.observe(false));
     await expect(page.locator('#arcade-countdown')).toBeEmpty();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'tutorial');
@@ -151,14 +155,27 @@ test('keyboard-only mode starts immediately and stops the camera', async ({ page
     expect(await page.locator('#arcade-video').evaluate(video => video.srcObject)).toBe(null);
 });
 
+test('keyboard input takes over during a tracking hold and sound can be muted', async ({ page }) => {
+    await openObservedCamera(page);
+    await page.locator('#arcade-begin').click();
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held');
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'ready');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
+    await page.locator('#arcade-sound').click();
+    await expect(page.locator('#arcade-sound')).toHaveAttribute('aria-pressed', 'false');
+    await page.locator('#arcade-sound').click();
+    await expect(page.locator('#arcade-sound')).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('Controls can be reopened without resetting score or consuming the resume gesture', async ({ page }) => {
     await page.goto('/?theme=construction#arcade');
     await openObservedCamera(page);
     await page.evaluate(() => window.motionTest.observe());
     await page.locator('#arcade-begin').click();
     await page.evaluate(() => window.motionTest.gesture('left'));
-    await expect(page.locator('#arcade-score')).toHaveText('10');
-    await expect(page.locator('#arcade-playfield-input')).toHaveText('Close left +10');
+    await expect(page.locator('#arcade-score')).toHaveText('90');
+    await expect(page.locator('#arcade-playfield-input')).toHaveText('Clear \u2190 +90');
     await page.locator('#arcade-help').click();
     await expect(page.locator('#arcade-tutorial')).toBeVisible();
     await expect(page.locator('#arcade-begin')).toHaveText('Resume');
@@ -167,9 +184,9 @@ test('Controls can be reopened without resetting score or consuming the resume g
     await expect(page.locator('#arcade-time')).toHaveText(time);
     await page.evaluate(() => window.motionTest.gesture('right'));
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
-    await expect(page.locator('#arcade-score')).toHaveText('10');
+    await expect(page.locator('#arcade-score')).toHaveText('90');
     await page.evaluate(() => window.motionTest.gesture('right'));
-    await expect(page.locator('#arcade-score')).toHaveText('20');
+    await expect(page.locator('#arcade-score')).toHaveText('303');
 });
 
 test('playfield stays above camera and keeps its position as detection feedback changes', async ({ page }) => {
@@ -184,7 +201,7 @@ test('playfield stays above camera and keeps its position as detection feedback 
         const field = page.locator('.arcade-stage');
         const before = await field.boundingBox();
         await page.evaluate(() => window.motionTest.gesture('left'));
-        await expect(page.locator('#arcade-playfield-input')).toHaveText('Close left +10');
+        await expect(page.locator('#arcade-playfield-input')).toHaveText('Clear \u2190 +90');
         const detected = await field.boundingBox();
         expect(detected.y).toBeCloseTo(before.y, 1);
         expect(detected.height).toBeCloseTo(before.height, 1);

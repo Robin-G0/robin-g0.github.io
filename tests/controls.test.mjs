@@ -12,17 +12,19 @@ test('every game has a specific two-control summary and optional game tips', () 
     }
 });
 
-test('closing a pop-up leaves an object-level confirmation and empty sides explain themselves', () => {
+test('one direction clears all matching arrows across both stacks without punishing empty moves', () => {
     const messages = [];
     const game = engines.popups({ random: seededRandom(123), pace: .8,
         message: text => messages.push(text), finish() {} });
     game.start(); game.input({ action: 'left' });
-    assert.equal(game.state.closed.side, 'left');
-    assert.equal(game.state.inputFeedback.points, 10);
-    assert.equal(game.state.windows.some(window => window.side === 'left'), false);
+    assert.equal(game.state.lastClear.count, 3);
+    assert.equal(game.state.inputFeedback.points, 90);
+    assert.equal(game.state.windows.some(window => window.action === 'left'), false);
+    const score = game.state.score, chain = game.state.chain;
     game.input({ action: 'left' });
-    assert.equal(messages.at(-1), 'That side is clear.');
+    assert.equal(game.state.score, score);
+    assert.equal(game.state.chain, chain);
     game.input({ action: 'right' });
-    assert.equal(game.state.score, 20);
+    assert.ok(game.state.score > 180, 'Chain and all-clear bonuses reward the next sweep');
     game.dispose();
 });

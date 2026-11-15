@@ -20,7 +20,12 @@ test('runner discards paused/tutorial inputs and bounds a slow simulation frame'
     runner.play();
     assert.equal(runner.game.state.hits, 1);
     now += 1500; runner.step(now);
-    assert.equal(runner.phase, 'paused', 'A stalled frame does not teleport the game');
+    assert.equal(runner.phase, 'playing', 'A slow frame must not create a blocking pause menu');
+    const held = runner.elapsed;
+    now += 5000; runner.step(now, { hold: true });
+    assert.equal(runner.elapsed, held, 'Tracking holds freeze gameplay and the round clock');
+    now += 20; runner.step(now);
+    assert.ok(runner.elapsed - held < .021, 'Recovery has no catch-up burst');
     runner.restart();
     assert.equal(runner.game.state.hits, 0);
     runner.finish(); runner.tutorial();
@@ -30,7 +35,7 @@ test('runner discards paused/tutorial inputs and bounds a slow simulation frame'
     assert.equal(runner.phase, 'closed');
 });
 
-test('camera uses public package callbacks and rejects ambiguous same-frame directions', async () => {
+test('camera accepts real package pulses with one visible wrist, including simultaneous actions', async () => {
     let options, disposed = 0;
     class Session {
         constructor(value) { options = value; this.state = { running: false }; }
@@ -48,14 +53,18 @@ test('camera uses public package callbacks and rejects ambiguous same-frame dire
     options.onAction({ action: 'left' }); options.onFrame(frame);
     assert.deepEqual(actions, ['left']);
     options.onAction({ action: 'left' }); options.onAction({ action: 'right' }); options.onFrame(frame);
-    assert.deepEqual(actions, ['left']);
-    assert.equal(statuses.at(-1), 'Lift one wrist at a time.');
+    assert.deepEqual(actions, ['left', 'left', 'right']);
+    const leftOnly = { coordinate: index => index === 16 ? null : ({ x: .5, y: .5, confidence: 1 }) };
+    options.onAction({ action: 'left' }); options.onFrame(leftOnly);
+    options.onAction({ action: 'right' }); options.onFrame(leftOnly);
+    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
+    assert.equal(frames.at(-1).visible, true);
     options.onAction({ action: 'right' }); options.onFrame({ coordinate: () => null });
-    assert.deepEqual(actions, ['left']);
+    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
     assert.equal(frames.at(-1).visible, false);
     camera.stop();
     options.onAction({ action: 'right' }); options.onFrame(frame);
-    assert.deepEqual(actions, ['left']);
+    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
     assert.equal(disposed, 1);
 });
 
