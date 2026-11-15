@@ -1,5 +1,5 @@
-import { arcadeProfile } from './profile.js?v=gestures-7';
-import { GestureGate } from './gesture-gate.js';
+import { arcadeProfile } from './profile.js?v=reach-9';
+import { GestureGate } from './gesture-gate.js?v=reach-9';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -39,8 +39,13 @@ export class MotionCamera {
                     const actions = this.gate.consume(this.pending.splice(0), {
                         left: shoulders && visiblePoint(points[2]), right: shoulders && visiblePoint(points[3])
                     });
-                    this.onTracking({ visible, shoulders,
-                        left: points[2], right: points[3], ready: { ...this.gate.ready }, timestamp: this.lastFrame });
+                    this.onTracking({ visible, shoulders, shoulderPoints: points.slice(0, 2),
+                        aspect: video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 1,
+                        left: points[2], right: points[3],
+                        active: arcadeProfile.inputs.filter((input, index) => shoulders &&
+                            visiblePoint(points[input.action.startsWith('left_') ? 2 : 3]) &&
+                            frame.tracker?.active?.(index)).map(input => input.action),
+                        timestamp: this.lastFrame });
                     if (!visible) return;
                     // MIG already recognised these pulses. An off-screen OTHER
                     // wrist must not suppress an observed hand's valid command.

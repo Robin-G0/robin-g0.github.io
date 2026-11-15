@@ -1,24 +1,21 @@
 import { WRISTS, decodeGesture } from '../core/commands.js';
 
-/** Sequence native MIG events; never classify coordinates or fabricate release. */
+/** Deduplicate native pulses. Native dwell and Single Press own physical rearming. */
 export class GestureGate {
     constructor() { this.reset(); }
-    reset() { this.ready = { left: false, right: false }; }
+    reset() { this.last = { left: null, right: null }; }
     consume(events, visible) {
         const accepted = [];
         for (const wrist of WRISTS) {
-            if (!visible[wrist]) { this.ready[wrist] = false; continue; }
+            if (!visible[wrist]) { this.last[wrist] = null; continue; }
             const gestures = events.map(event => ({ ...event, ...decodeGesture(event.action) }))
-                .filter(event => event.wrist === wrist);
-            if (gestures.some(event => event.direction === 'neutral')) {
-                this.ready[wrist] = true;
-                continue;
-            }
+                .filter(event => event.wrist === wrist && event.direction !== 'neutral');
             const commands = [...new Set(gestures.map(event => event.action))];
-            if (commands.length > 1) { this.ready[wrist] = false; continue; }
-            if (commands.length === 1 && this.ready[wrist]) {
-                this.ready[wrist] = false;
-                accepted.push(gestures[0]);
+            if (commands.length === 1) {
+                const event = gestures[0], previous = this.last[wrist];
+                if (previous?.action === event.action && previous.timestamp === event.timestamp) continue;
+                this.last[wrist] = event;
+                accepted.push(event);
             }
         }
         return accepted;

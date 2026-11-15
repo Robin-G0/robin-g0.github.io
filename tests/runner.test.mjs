@@ -36,7 +36,7 @@ test('runner discards paused/tutorial inputs and bounds a slow simulation frame'
 });
 
 test('camera adapter accepts native pulses with one visible wrist, including simultaneous actions', async () => {
-    let options, disposed = 0;
+    let options, disposed = 0, delivery = 1000;
     class Session {
         constructor(value) { options = value; this.state = { running: false }; }
         subscribe(listener) { this.listener = listener; listener(this.state); return () => {}; }
@@ -47,7 +47,7 @@ test('camera adapter accepts native pulses with one visible wrist, including sim
     const actions = [], statuses = [], frames = [];
     const camera = new MotionCamera({ onInput: action => actions.push(action),
         onTracking: frame => frames.push(frame), onStatus: text => statuses.push(text),
-        loadPackage: async () => ({ MIGSession: Session }), clock: () => 1000 });
+        loadPackage: async () => ({ MIGSession: Session }), clock: () => delivery += 150 });
     await camera.start({}, {});
     const frame = { coordinate: () => ({ x: .5, y: .5, confidence: 1 }) };
     options.onAction({ action: 'left_neutral' }); options.onFrame(frame); options.onAction({ action: 'left_up' }); options.onFrame(frame);

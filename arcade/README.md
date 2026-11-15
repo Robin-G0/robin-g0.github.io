@@ -4,8 +4,9 @@ These games consume **logical pulses** from the `motion-input-grid` npm package.
 They never infer a gesture themselves. Most games map left/right wrist raises to
 two actions. Pop-up Panic uses six commands: each anatomical wrist controls its
 own stack with screen-left, up and screen-right. The preview mirrors once.
-Return the acting wrist to chest height between commands; a lit dot confirms
-native neutral detection. Holding or moving between targets never repeats.
+Move into a direction box and settle briefly. Direct changes work without a home
+return; repeating one direction only needs an exit and re-entry. Held poses do not
+repeat. Lights acknowledge accepted moves rather than latching readiness.
 
 ## Run the site
 
@@ -35,7 +36,7 @@ The static site needs no server build.
 - `lessons.js`: short control explanations and optional game tips for every engine.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
-- `mig/profile.js`: native schema-v2 trigger regions, dwell and neutral confirmations.
+- `mig/profile.js`: native schema-v2 occupancy and trigger regions with continuous dwell.
 - `mig/camera.js`: `MIGSession`, frame health, status, recalibration and disposal.
 - `core/import-game.js`: strict validation of declarative game files.
 
@@ -64,14 +65,27 @@ The host owns those resources and destroys the game on exit or theme change.
 
 ## Recognition and timing
 
-The profile uses disjoint body-relative trigger regions with deadbands, native
-Single Press and occupancy dwell: 60 ms at a direction, 120 ms at neutral.
-Shoulders plus the acting wrist suffice; the other wrist and legs may be absent.
-The native recognizer emits six direction events and two internal neutral events.
-GestureGate sequences those events per wrist: neutral arms one direction; loss or
-ambiguity disarms it. It does not classify positions, invent releases or queue moves.
-Actual packaged WASM tests cover all six bindings, held targets, direct transitions,
-neutral return, observation loss and 33/100/160 ms frame intervals.
+The profile uses close, broad body-relative direction boxes with a small gap,
+native Single Press and 120 ms continuous occupancy. Each simultaneous step
+has Required and Trigger constraints in the same rectangle. In npm 1.1.0,
+a trigger-only step does not reset its hold timer on brief exits; the Required
+constraint is what makes dwell continuous. No finger inference is required.
+Shoulders and the acting wrist suffice; the other wrist and legs may be absent.
+GestureGate only deduplicates native deliveries and drops ambiguous same-wrist
+batches. There is no neutral readiness latch or mandatory home return.
+After observation loss, a reacquired wrist can produce one new settled pulse;
+continuous visible occupancy never streams repeated presses.
+Packaged-WASM tests cover close reaches for both wrists, 0.75/1.33/1.78 camera
+aspects, narrow/wide shoulder crops, short boundary jitter, holds and loss.
+
+The camera shows the six profile rectangles projected into the mirrored preview.
+The published session does not expose its calibrated grid, so TriggerView matches
+the shoulder-relative metric and 35 ms grid filter as a live alignment guide.
+Box activation comes from the SDK tracker's native active state, not hit testing
+in the page. The guide and native profile share their region definitions.
+MarkerMotion eases marker positions over display frames with an 85 ms time
+constant and a small deadband. Stable badge dimensions prevent label-size wobble.
+These visual filters never change points or timestamps sent into recognition.
 
 MIG owns recognition and dwell. The host ignores stale deliveries,
 duplicate callbacks, and commands outside active play. It never replays paused

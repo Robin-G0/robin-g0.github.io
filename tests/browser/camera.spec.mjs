@@ -101,23 +101,23 @@ async function openObservedCamera(page) {
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'live');
 }
 
-test('popup controls preserve all six wrist directions and require native neutral before another clear', async ({ page }) => {
+test('popup controls accept six directions without a home gate and lights acknowledge moves', async ({ page }) => {
     await page.goto('/?theme=construction#arcade');
     await openObservedCamera(page);
     await page.evaluate(() => window.motionTest.observe());
     await page.locator('#arcade-begin').click();
     await expect(page.locator('[data-arcade-input]')).toHaveCount(6);
-    await page.evaluate(() => window.motionTest.raw('left_neutral'));
-    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-ready', 'true');
     await page.evaluate(() => window.motionTest.raw('left_up'));
     await expect(page.locator('#arcade-score')).toHaveText('10');
-    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-ready', 'false');
+    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-pulse', 'true');
     await expect(page.locator('#arcade-recognition')).toHaveText('L ↑');
     await page.evaluate(() => window.motionTest.raw('left_right'));
-    await expect(page.locator('#arcade-score')).toHaveText('10');
+    await expect(page.locator('#arcade-score')).toHaveText('23');
     // The identical arrow in the other stack still exists.
     await page.evaluate(() => window.motionTest.gesture('right_up'));
-    await expect(page.locator('#arcade-score')).toHaveText('23');
+    await expect(page.locator('#arcade-score')).toHaveText('38');
+    await page.waitForTimeout(1000);
+    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-pulse', 'false');
     for (const [key, label] of [['a', 'L ←'], ['d', 'L →'], ['j', 'R ←'], ['l', 'R →']]) {
         await page.keyboard.press(key);
         await expect(page.locator('#arcade-recognition')).toHaveText(label);
@@ -136,6 +136,7 @@ test('preview and individual wrist feedback are visible before starting', async 
     await expect(page.locator('[data-tracking=right]')).toHaveAttribute('data-visible', 'false');
     await expect(page.locator('[data-wrist=left]')).toBeVisible();
     await expect(page.locator('[data-wrist=right]')).not.toBeVisible();
+    await expect(page.locator('#arcade-trigger-zones [data-trigger]')).toHaveCount(2);
     expect(await page.locator('[data-wrist=left]').evaluate(marker => marker.style.left)).toBe('30%');
     await page.evaluate(() => window.motionTest.stop());
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'unavailable');

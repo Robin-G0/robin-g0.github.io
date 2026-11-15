@@ -1,12 +1,14 @@
-import { engines } from './registry.js?v=maze-8';
-import { GameRunner } from './core/runner.js?v=maze-8';
-import { bindAlternativeControls } from './core/input.js?v=maze-8';
+import { engines } from './registry.js?v=reach-9';
+import { GameRunner } from './core/runner.js?v=reach-9';
+import { bindAlternativeControls } from './core/input.js?v=reach-9';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=motion-6';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=maze-8';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=reach-9';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=maze-8';
+import { lessonFor } from './lessons.js?v=reach-9';
+import { MarkerMotion } from './mig/marker-motion.js';
+import { TriggerView } from './mig/trigger-view.js';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -19,6 +21,9 @@ export class GameRoom {
         this.dialog.dataset.engine = description.engine;
         this.sixDirections = description.inputScheme === 'wrist-directions';
         this.wristPulseUntil = {};
+        this.markerMotion = Object.fromEntries(WRISTS.map(wrist => [wrist, new MarkerMotion()]));
+        this.triggerView = new TriggerView(this.$('#arcade-trigger-zones'), this.sixDirections ? DIRECTIONS : ['up']);
+        this.$('.camera-positioning').textContent = this.sixDirections ? 'Arrow boxes · no home return' : 'Lift into ↑ · lower to repeat';
         this.inputMode = 'motion';
         this.sound = new ArcadeAudio(this.palette.theme);
         this.sound.unlock();
@@ -185,8 +190,8 @@ export class GameRoom {
         if (!gesture || gesture.direction === 'neutral') return;
         this.$('#arcade-recognition').textContent = commandLabel(action);
         this.recognisedUntil = performance.now() + 1500;
-        this.wristPulseUntil[gesture.wrist] = performance.now() + 900;
-        this.$(`[data-wrist=${gesture.wrist}]`).textContent = commandLabel(action);
+        this.wristPulseUntil[gesture.wrist] = performance.now() + 240;
+        this.$(`.camera-wrist[data-wrist=${gesture.wrist}]`).textContent = commandLabel(action);
         if (this.runner.phase === 'playing') {
             if (this.sixDirections) this.input(action, { source: 'motion', timestamp });
             else if (gesture.direction === 'up') this.input(gesture.wrist, { source: 'motion', timestamp });
@@ -320,18 +325,16 @@ export class GameRoom {
     }
 
     showPlacement(frame) {
+        this.triggerView.update(frame);
         for (const [part, visible] of [['shoulders', frame.shoulders], ['left', visiblePoint(frame.left)], ['right', visiblePoint(frame.right)]]) {
             const indicator = this.$(`[data-tracking=${part}]`);
             indicator.dataset.visible = String(Boolean(visible));
             indicator.querySelector('span').textContent = visible ? '✓' : '—';
         }
         for (const side of ['left', 'right']) {
-            const marker = this.$(`[data-wrist=${side}]`), point = frame[side];
+            const marker = this.$(`.camera-wrist[data-wrist=${side}]`), point = frame[side];
             marker.hidden = !visiblePoint(point);
-            marker.dataset.ready = String(Boolean(frame.ready?.[side]));
-            const group = this.$(`[data-wrist-controls=${side}]`);
-            if (group) group.dataset.ready = marker.dataset.ready;
-            if (point) { marker.style.left = `${(1 - point.x) * 100}%`; marker.style.top = `${point.y * 100}%`; }
+            this.markerMotion[side].observe(visiblePoint(point) ? point : null);
         }
     }
 
@@ -361,7 +364,15 @@ export class GameRoom {
         }
         if (timestamp > (this.recognisedUntil || 0)) this.$('#arcade-recognition').textContent = '';
         for (const wrist of WRISTS) if (timestamp > (this.wristPulseUntil[wrist] || 0)) {
-            this.$(`[data-wrist=${wrist}]`).textContent = wrist === 'left' ? 'L' : 'R';
+            this.$(`.camera-wrist[data-wrist=${wrist}]`).textContent = wrist === 'left' ? 'L' : 'R';
+        }
+        for (const wrist of WRISTS) {
+            const marker = this.$(`.camera-wrist[data-wrist=${wrist}]`), point = this.markerMotion[wrist].step(timestamp);
+            if (point) { marker.style.left = `${(1 - point.x) * 100}%`; marker.style.top = `${point.y * 100}%`; }
+            const pulse = timestamp < (this.wristPulseUntil[wrist] || 0);
+            marker.dataset.pulse = String(pulse);
+            const group = this.$(`[data-wrist-controls=${wrist}]`);
+            if (group) group.dataset.pulse = String(pulse);
         }
         this.runner.step(timestamp, { hold: trackingHold });
         this.painter.background();
@@ -374,7 +385,7 @@ export class GameRoom {
         this.$('#arcade-playfield-message').hidden = timestamp > (this.messageUntil || 0);
         if (timestamp > (this.nextHUD || 0)) { this.runner.publish(); this.nextHUD = timestamp + 150; }
         if (timestamp > (this.pulseUntil || 0)) {
-            for (const button of this.dialog.querySelectorAll('[data-pulse]')) delete button.dataset.pulse;
+            for (const button of this.dialog.querySelectorAll('[data-arcade-input][data-pulse]')) delete button.dataset.pulse;
         }
         this.request = requestAnimationFrame(time => this.frame(time));
     }

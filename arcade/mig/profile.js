@@ -1,10 +1,10 @@
 import { WRISTS, DIRECTIONS } from '../core/commands.js';
 
 // Body cells use unmirrored image X; the preview is mirrored once. A screen-left
-// movement therefore increases grid X. Each anatomical wrist has its own home.
+// movement therefore increases grid X. Regions stay relative to the shoulders.
 export const wristZones = {
-    left: { neutral: [5, 4, 3, 3], up: [5, 1, 3, 2], left: [9, 4, 3, 3], right: [1, 4, 3, 3] },
-    right: { neutral: [1, 4, 3, 3], up: [1, 1, 3, 2], left: [5, 4, 3, 3], right: [-3, 4, 3, 3] }
+    left: { up: [4, -5, 5, 9], left: [7, 4, 8, 9], right: [-4, 4, 10, 9] },
+    right: { up: [0, -5, 5, 9], left: [3, 4, 10, 9], right: [-7, 4, 9, 9] }
 };
 
 function region(wrist, direction) {
@@ -14,16 +14,22 @@ function region(wrist, direction) {
         mirror: false, space: 'body', cooldown_ms: 0, action_mode: 'single_press',
         steps: [{
             id: `${action}_settle`, mode: 'simultaneous',
-            hold_ms: direction === 'neutral' ? 120 : 60,
-            constraints: [{ id: `${action}_zone`, landmark: `${wrist}_wrist`,
-                cell: wristZones[wrist][direction], type: 'trigger', priority: 'high' }]
+            hold_ms: 120,
+            constraints: [
+                // Required occupancy makes hold_ms continuous. A trigger alone
+                // does not reset the native step timer when the wrist leaves.
+                { id: `${action}_hold`, landmark: `${wrist}_wrist`,
+                    cell: wristZones[wrist][direction], type: 'required', priority: 'high' },
+                { id: `${action}_zone`, landmark: `${wrist}_wrist`,
+                    cell: wristZones[wrist][direction], type: 'trigger', priority: 'high' }
+            ]
         }]
     };
 }
 
-// Six directions plus two internal neutral confirmations. Native MIG owns the
-// dwell timers and current-occupancy checks; the host only sequences its events.
+// A small gap separates directions. Native dwell filters jitter, and Single Press
+// suppresses held repeats. Leaving a target is enough: no precise home return.
 export const arcadeProfile = {
     schema_version: 2, tracking: { hands: false },
-    inputs: WRISTS.flatMap(wrist => ['neutral', ...DIRECTIONS].map(direction => region(wrist, direction)))
+    inputs: WRISTS.flatMap(wrist => DIRECTIONS.map(direction => region(wrist, direction)))
 };

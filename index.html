@@ -12,10 +12,10 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=d2b3a085f9">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=maze-8">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=reach-9">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=135b4edf1e"></script>
-  <script type="module" src="./arcade/app.js?v=maze-8"></script>
+  <script type="module" src="./arcade/app.js?v=reach-9"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -95,7 +95,7 @@
           <div><svg viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="14" r="8"/><path d="M50 23V74M30 35H70M30 35L18 49M70 35L81 56L75 70"/><g class="demo-forearm"><path d="M18 49L10 25"/><circle cx="10" cy="25" r="5"/></g></svg><strong><span data-tutorial-action="left"></span><small>Left wrist</small></strong></div>
           <div><svg class="right-lift" viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="14" r="8"/><path d="M50 23V74M30 35H70M30 35L18 49M70 35L81 56L75 70"/><g class="demo-forearm"><path d="M18 49L10 25"/><circle cx="10" cy="25" r="5"/></g></svg><strong><span data-tutorial-action="right"></span><small>Right wrist</small></strong></div>
         </div>
-        <p id="arcade-neutral-cue" hidden>Chest → arrow → chest</p>
+        <p id="arcade-neutral-cue" hidden>Move between arrow boxes</p>
         <div class="lesson-actions"><button id="arcade-no-camera" class="camera-alternative" type="button">Keyboard / touch</button></div>
         <details id="arcade-controls-tips"><summary>Tips</summary><p data-tutorial-explanation="left"></p><p data-tutorial-explanation="right"></p><p id="arcade-lesson-tip"></p></details>
       </div>
@@ -107,12 +107,13 @@
     </div>
     <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
     <p id="arcade-feedback" role="status" aria-live="polite"></p>
-    <div class="arcade-toolbar"><button id="arcade-sound" type="button" aria-label="Mute sound" aria-pressed="true">&#9835;</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><a href="./arcade/profiles/wrist-raises.json?v=maze-8" download>Gesture profile ↗</a></div>
+    <div class="arcade-toolbar"><button id="arcade-sound" type="button" aria-label="Mute sound" aria-pressed="true">&#9835;</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><a href="./arcade/profiles/wrist-raises.json?v=reach-9" download>Gesture profile ↗</a></div>
     <section class="arcade-camera-dock" id="arcade-camera-dock" aria-label="Camera and positioning">
       <div class="camera-view">
         <video id="arcade-video" autoplay muted playsinline></video>
         <span class="camera-placeholder">Camera preview</span>
         <svg class="camera-guide" viewBox="0 0 240 180" aria-hidden="true"><ellipse cx="120" cy="38" rx="19" ry="24"/><path d="M81 73Q120 57 159 73L172 159M81 73L68 159M96 75L90 172M144 75L150 172"/></svg>
+        <svg id="arcade-trigger-zones" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Shoulder-relative trigger box guides" hidden></svg>
         <i class="camera-wrist" data-wrist="left" hidden>L</i><i class="camera-wrist" data-wrist="right" hidden>R</i>
       </div>
       <div class="camera-details">
@@ -123,7 +124,7 @@
           <li data-tracking="left">Left wrist <span>Not in view</span></li>
           <li data-tracking="right">Right wrist <span>Not in view</span></li>
         </ul>
-        <p class="camera-positioning">Chest = ready · arrows follow your mirror</p>
+        <p class="camera-positioning">Arrow boxes · no home return</p>
         <p id="arcade-recognition" role="status"></p>
         <p id="arcade-countdown" role="status"></p>
         <button id="arcade-cancel-countdown" type="button" hidden>Cancel countdown</button>

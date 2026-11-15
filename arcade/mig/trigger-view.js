@@ -1,0 +1,58 @@
+import { arcadeProfile } from './profile.js?v=reach-9';
+import { commandLabel } from '../core/commands.js';
+
+/** Project profile cells for display only; this module never emits game commands.
+ * npm 1.1.0 does not expose the calibrated grid. Match its shoulder-relative metric,
+ * axis and 35 ms smoothing; an initial live projection is an alignment guide.
+ */
+export class TriggerView {
+    constructor(svg, directions = ['left', 'up', 'right']) {
+        this.svg = svg; this.reset();
+        svg.replaceChildren();
+        this.boxes = arcadeProfile.inputs.filter(input => directions.includes(input.action.split('_')[1])).map(input => {
+            const group = document.createElementNS(svg.namespaceURI, 'g');
+            group.dataset.trigger = input.action;
+            group.dataset.triggerWrist = input.action.split('_')[0];
+            const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
+            const label = document.createElementNS(svg.namespaceURI, 'text');
+            label.textContent = commandLabel(input.action);
+            group.append(polygon, label); svg.append(group);
+            return { group, polygon, label, cell: input.steps[0].constraints[0].cell };
+        });
+    }
+    reset() { this.grid = null; this.time = null; this.svg.setAttribute('hidden', ''); }
+    update(frame) {
+        const shoulders = frame.shoulderPoints;
+        if (!frame.shoulders || !shoulders) { this.reset(); return; }
+        const aspect = frame.aspect || 1;
+        const a = { x: shoulders[1].x * aspect, y: shoulders[1].y };
+        const b = { x: shoulders[0].x * aspect, y: shoulders[0].y };
+        const width = Math.hypot(b.x - a.x, b.y - a.y);
+        if (width < .08 || b.x <= a.x) { this.reset(); return; }
+        const next = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2,
+            ax: (b.x - a.x) / width, ay: (b.y - a.y) / width, scale: width * .2 };
+        const gap = this.time == null ? Infinity : frame.timestamp - this.time;
+        const blend = gap > 180 || gap < 0 ? 1 : 1 - Math.exp(-gap / 35);
+        if (!this.grid) this.grid = next;
+        else for (const key of Object.keys(next)) this.grid[key] += (next[key] - this.grid[key]) * blend;
+        const axis = Math.hypot(this.grid.ax, this.grid.ay);
+        this.grid.ax /= axis; this.grid.ay /= axis;
+        this.time = frame.timestamp;
+        this.svg.removeAttribute('hidden');
+        const project = (x, y) => {
+            const g = this.grid, dx = (x - 4.5) * g.scale, dy = (y - 3.5) * g.scale;
+            return [(1 - (g.x + g.ax * dx - g.ay * dy) / aspect) * 1000,
+                (g.y + g.ay * dx + g.ax * dy) * 1000];
+        };
+        for (const { group, polygon, label, cell: [x, y, w, h] } of this.boxes) {
+            polygon.setAttribute('points', [[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(p => project(...p).join(',')).join(' '));
+            const corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(p => project(...p));
+            // Keep labels inside the visible portion of even a partly clipped region.
+            const cx = (Math.max(0, Math.min(...corners.map(p => p[0]))) + Math.min(1000, Math.max(...corners.map(p => p[0])))) / 2;
+            const cy = (Math.max(0, Math.min(...corners.map(p => p[1]))) + Math.min(1000, Math.max(...corners.map(p => p[1])))) / 2;
+            const offset = group.dataset.trigger.endsWith('_up') ? 0 : group.dataset.triggerWrist === 'left' ? -55 : 55;
+            label.setAttribute('x', cx); label.setAttribute('y', Math.max(45, Math.min(955, cy + offset)));
+            group.dataset.active = String(Boolean(frame.active?.includes(group.dataset.trigger)));
+        }
+    }
+}
