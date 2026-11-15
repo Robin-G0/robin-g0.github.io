@@ -26,21 +26,26 @@ test('different simultaneous wrist directions clear both stacks and keep both re
     const labels=await page.evaluate(()=>window.resultLabels);
     expect(labels).toContain('← 1×');expect(labels).toContain('↑ 1×');
     await batch(page,['left_up','right_right']);
-    await expect(page.locator('#arcade-score')).toHaveText('23');
+    await expect(page.locator('#arcade-score')).toHaveText('56');
     await page.clock.runFor(200);
-    // Waiting alone never replays a rejected command.
-    await expect(page.locator('#arcade-score')).toHaveText('23');
+    // Holding or waiting alone never delivers additional commands.
+    await expect(page.locator('#arcade-score')).toHaveText('56');
     await batch(page,['left_up','right_right']);
     await expect(page.locator('#arcade-score')).toHaveText('56');
 });
 
-test('one cooling wrist never blocks the other and direction changes share a wrist cooldown',async({page})=>{
+test('direction changes are immediate while repeating that same wrist/direction remains throttled',async({page})=>{
     await batch(page,['left_left']);await page.clock.runFor(100);
-    await batch(page,['left_up','right_up']);
+    await batch(page,['left_up']);
     await expect(page.locator('#arcade-score')).toHaveText('23');
-    await page.clock.runFor(110);
-    await batch(page,['left_up','right_right']);
-    await expect(page.locator('#arcade-score')).toHaveText('38');
-    await page.clock.runFor(100);await batch(page,['right_right']);
+    await expect(page.locator('#arcade-recognition')).toHaveText('L \u2191');
+    await batch(page,['left_left']);
+    await expect(page.locator('#arcade-recognition')).toHaveText('L \u2191');
+    await batch(page,['right_left']);await batch(page,['right_up']);
     await expect(page.locator('#arcade-score')).toHaveText('56');
+    await expect(page.locator('#arcade-recognition')).toHaveText('R \u2191');
+    await page.clock.runFor(101);await batch(page,['left_left']);
+    await expect(page.locator('#arcade-recognition')).toHaveText('L \u2190');
+    await batch(page,['right_up']);
+    await expect(page.locator('#arcade-recognition')).toHaveText('L \u2190');
 });

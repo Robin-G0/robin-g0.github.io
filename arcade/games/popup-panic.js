@@ -4,7 +4,7 @@ import { clamp } from '../core/random.js';
 
 export const STACK_LIMIT = 9;
 export const CHAIN_SECONDS = 4.5;
-export const WRIST_COOLDOWN_MS = 200;
+export const WRIST_DIRECTION_COOLDOWN_MS = 200;
 
 /** Paired arrivals accelerate with simulation time, independently of score. */
 export function spawnInterval(elapsed, pace = 1) {

@@ -1,5 +1,5 @@
 import { arcadeProfile } from './profile.js?v=targets-12';
-import { GestureGate } from './gesture-gate.js?v=tempo-15';
+import { GestureGate } from './gesture-gate.js?v=directions-16';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)

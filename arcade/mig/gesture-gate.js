@@ -1,9 +1,9 @@
 import { WRISTS, decodeGesture } from '../core/commands.js';
 
-/** Filter native deliveries, optionally spacing commands per wrist. MIG owns rearming. */
+/** Space repeated wrist/direction commands independently. MIG owns physical rearming. */
 export class GestureGate {
     constructor({ cooldownMs = 0 } = {}) { this.cooldownMs = cooldownMs; this.reset(); }
-    reset() { this.last = { left: null, right: null }; }
+    reset() { this.last = new Map(); this.latest = { left: -Infinity, right: -Infinity }; }
     consume(events, visible) {
         const accepted = [];
         if (!events.length) return accepted;
@@ -19,10 +19,11 @@ export class GestureGate {
             const gestures = grouped[wrist];
             const commands = [...new Set(gestures.map(event => event.action))];
             if (commands.length === 1) {
-                const event = gestures[0], previous = this.last[wrist];
-                if (previous?.action === event.action && previous.timestamp === event.timestamp) continue;
-                if (previous && event.timestamp - previous.timestamp < this.cooldownMs) continue;
-                this.last[wrist] = event;
+                const event = gestures[0], key = `${wrist}_${event.direction}`, previous = this.last.get(key);
+                if (event.timestamp < this.latest[wrist]) continue;
+                if (previous != null && (event.timestamp === previous || event.timestamp - previous < this.cooldownMs)) continue;
+                this.last.set(key, event.timestamp);
+                this.latest[wrist] = event.timestamp;
                 accepted.push(event);
             }
         }

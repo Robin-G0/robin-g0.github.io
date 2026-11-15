@@ -73,8 +73,9 @@ a trigger-only step does not reset its hold timer on brief exits; the Required
 constraint is what makes dwell continuous. No finger inference is required.
 Shoulders and the acting wrist suffice; the other wrist and legs may be absent.
 GestureGate deduplicates native deliveries and drops ambiguous same-wrist
-batches. Pop-up Panic also selects a 200 ms cooldown per wrist across all three
-directions; one wrist never blocks the other. Rejected events are discarded rather
+batches. Pop-up Panic also selects a 200 ms cooldown for each wrist/direction pair.
+Changing direction never waits for another direction's cooldown, and one wrist
+never blocks the other. Rejected events are discarded rather
 than replayed, and tracking flicker does not reset the cooldown. Other games keep
 the default zero extra cooldown. There is no neutral readiness latch or mandatory home return.
 After observation loss, a reacquired wrist can produce one new settled pulse;
