@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js?v=power-11';
+import { arcadeProfile } from './profile.js?v=targets-12';
 import { GestureGate } from './gesture-gate.js?v=power-11';
 
 export function visiblePoint(point) {
@@ -9,8 +9,8 @@ export function visiblePoint(point) {
 /** Public npm API only; the application never reconstructs MIG gesture rules. */
 export class MotionCamera {
     constructor({ onInput, onTracking, onStatus, loadPackage = () => import('motion-input-grid'),
-        clock = () => performance.now() }) {
-        Object.assign(this, { onInput, onTracking, onStatus, loadPackage, clock });
+        clock = () => performance.now(), profile = arcadeProfile }) {
+        Object.assign(this, { onInput, onTracking, onStatus, loadPackage, clock, profile });
         this.session = null;
         this.generation = 0;
         this.pending = [];
@@ -46,7 +46,7 @@ export class MotionCamera {
                     this.onTracking({ visible, shoulders, shoulderPoints: points.slice(0, 2),
                         aspect: video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 1,
                         left: points[2], right: points[3],
-                        active: arcadeProfile.inputs.filter((input, index) => shoulders &&
+                        active: this.profile.inputs.filter((input, index) => shoulders &&
                             visiblePoint(points[input.action.startsWith('left_') ? 2 : 3]) &&
                             frame.tracker?.active?.(index)).map(input => input.action),
                         timestamp: this.lastFrame });
@@ -66,7 +66,7 @@ export class MotionCamera {
                 if (state.busy) this.onStatus('Loading camera models. Allow camera access when your browser asks.');
                 if (!state.busy && !state.running) this.onStatus('Camera stopped. Keyboard and touch are available.');
             });
-            await session.importJSON(JSON.stringify(arcadeProfile));
+            await session.importJSON(JSON.stringify(this.profile));
             if (generation !== this.generation) return;
             await session.start(video, overlay);
             if (generation !== this.generation) return;

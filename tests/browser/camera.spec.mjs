@@ -125,6 +125,33 @@ test('popup controls accept six directions without a home gate and lights acknow
     expect(Number(await page.locator('#arcade-score').textContent())).toBeGreaterThan(100);
 });
 
+test('popup camera guides and downloaded profile use the higher Up and side bands', async ({ page }) => {
+    await page.goto('/?theme=construction#arcade');
+    await openObservedCamera(page);
+    await page.evaluate(() => window.motionTest.observe());
+    const profile = await page.locator('#arcade-player a[download]').getAttribute('href');
+    expect(profile).toContain('popup-directions.json');
+    const response = await page.request.get(profile);
+    const inputs = (await response.json()).inputs;
+    expect(await page.evaluate(() => window.motionTest.profile.inputs)).toEqual(inputs);
+    // The mock's active state is indexed by the profile actually imported into MIG.
+    await page.evaluate(() => window.motionTest.raw('right_left'));
+    await expect(page.locator('[data-trigger=right_left]')).toHaveAttribute('data-active','true');
+    const polygons = await page.locator('#arcade-trigger-zones [data-trigger]').evaluateAll(groups =>
+        Object.fromEntries(groups.map(g => [g.dataset.trigger, Array.from(g.querySelector('polygon').points,p=>({x:p.x,y:p.y}))])));
+    for(const wrist of ['left','right']){
+        const up=polygons[`${wrist}_up`],side=polygons[`${wrist}_left`];
+        const upBottom=Math.max(...up.map(p=>p.y)),sideTop=Math.min(...side.map(p=>p.y));
+        expect(upBottom).toBeLessThan(sideTop);
+        expect(upBottom).toBeCloseTo(150,0); // shoulders y=.35, scale=.06, Up ends at cell 1
+        expect(sideTop).toBeCloseTo(230,0); // side band starts at cell 2
+        expect(inputs.find(i=>i.action===`${wrist}_up`).steps[0].constraints[0].cell).toEqual([-9,-9,27,10]);
+    }
+    await page.locator('#arcade-close').click();
+    await page.locator('[data-game=construction-maze]').click();
+    expect(await page.locator('#arcade-player a[download]').getAttribute('href')).toContain('wrist-raises.json');
+});
+
 test('preview and individual wrist feedback are visible before starting', async ({ page }) => {
     await openObservedCamera(page);
     const field = await page.locator('.arcade-stage').boundingBox();

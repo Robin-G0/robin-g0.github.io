@@ -27,7 +27,7 @@ export class MIGSession {
     }
     subscribe(listener) { this.listener = listener; listener(this.state); return () => {}; }
     setInferenceFps(fps) { window.motionTest.fps = fps; }
-    async importJSON(text) { this.inputs = JSON.parse(text).inputs; }
+    async importJSON(text) { window.motionTest.profile = JSON.parse(text); this.inputs = window.motionTest.profile.inputs; }
     async start(video) {
         const canvas = document.createElement('canvas'); canvas.width = 640; canvas.height = 480;
         canvas.getContext('2d').fillRect(0, 0, 640, 480);

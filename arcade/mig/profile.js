@@ -7,7 +7,14 @@ export const wristZones = {
     right: { up: [-9, -9, 27, 13], left: [3, 4, 15, 14], right: [-9, 4, 11, 14] }
 };
 
-function region(wrist, direction) {
+// Pop-up Panic reserves the high band for deliberate raises. Side sweeps can
+// travel above the shoulders without entering Up; one cell separates the bands.
+export const popupZones = {
+    left: { up: [-9, -9, 27, 10], left: [7, 2, 11, 16], right: [-9, 2, 15, 16] },
+    right: { up: [-9, -9, 27, 10], left: [3, 2, 15, 16], right: [-9, 2, 11, 16] }
+};
+
+function region(wrist, direction, zones) {
     const action = `${wrist}_${direction}`;
     return {
         id: action, name: `${wrist} wrist ${direction}`, action,
@@ -19,9 +26,9 @@ function region(wrist, direction) {
                 // Required occupancy makes hold_ms continuous. A trigger alone
                 // does not reset the native step timer when the wrist leaves.
                 { id: `${action}_hold`, landmark: `${wrist}_wrist`,
-                    cell: wristZones[wrist][direction], type: 'required', priority: 'high' },
+                    cell: zones[wrist][direction], type: 'required', priority: 'high' },
                 { id: `${action}_zone`, landmark: `${wrist}_wrist`,
-                    cell: wristZones[wrist][direction], type: 'trigger', priority: 'high' }
+                    cell: zones[wrist][direction], type: 'trigger', priority: 'high' }
             ]
         }]
     };
@@ -30,7 +37,10 @@ function region(wrist, direction) {
 // A small gap separates directions. Native dwell filters jitter, and Single Press
 // suppresses held repeats. Leaving a target is enough: no precise home return.
 // Extend outward to the schema's [-9,18) limits, rather than adding far-edge misses.
-export const arcadeProfile = {
-    schema_version: 2, tracking: { hands: false },
-    inputs: WRISTS.flatMap(wrist => DIRECTIONS.map(direction => region(wrist, direction)))
-};
+function profile(zones) {
+    return { schema_version: 2, tracking: { hands: false },
+        inputs: WRISTS.flatMap(wrist => DIRECTIONS.map(direction => region(wrist, direction, zones))) };
+}
+
+export const arcadeProfile = profile(wristZones);
+export const popupProfile = profile(popupZones);

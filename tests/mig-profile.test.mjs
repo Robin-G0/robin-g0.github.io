@@ -1,16 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import createMIG from '../vendor/motion-input-grid/runtime/mig.mjs';
-import { arcadeProfile } from '../arcade/mig/profile.js';
+import { arcadeProfile, popupProfile } from '../arcade/mig/profile.js';
 import { GestureGate } from '../arcade/mig/gesture-gate.js';
 import { visiblePoint } from '../arcade/mig/camera.js';
 const wasm = await createMIG();
 const home = {left:[6.5,5.5], right:[2.5,5.5]};
 const targets = {left_up:[6.5,2], left_left:[10,5.5], left_right:[2.5,5.5],
     right_up:[2.5,2], right_left:[6.5,5.5], right_right:[-1,5.5]};
-function harness({aspect=1,width=.3,shoulderY=.3}={}) {
+function harness({aspect=1,width=.3,shoulderY=.3,profile=arcadeProfile}={}) {
     const tracker = new wasm.Tracker(), gate = new GestureGate(), events = [];
-    assert.equal(tracker.load(JSON.stringify(arcadeProfile)), '');
+    assert.equal(tracker.load(JSON.stringify(profile)), '');
     assert.equal(tracker.trackHands(), false);
     let time = 0, seq = 0;
     const frame = (left=home.left, right=home.right, gap=40) => {
@@ -114,5 +114,36 @@ test('direction regions retain input beyond the old far edges and near visible i
             }
         }
         assert.deepEqual(h.events,Object.keys(far));
+    }finally{h.close();}
+});
+
+test('popup side sweeps above shoulder height do not fire Up, for either wrist',()=>{
+    for(const wrist of ['left','right'])for(const gap of [50,100]){
+        const h=harness({profile:popupProfile,aspect:4/3,width:.2});
+        const move=point=>h.dwell(wrist==='left'?point:null,wrist==='right'?point:null,gap);
+        try{
+            // Start centrally below Up, then sweep through the old Up band.
+            move([wrist==='left'?6.5:2.5,2.5]);
+            assert.deepEqual(h.events,[],'A shoulder-height preparation is neutral');
+            move([10,2.5]);move([-1,2.5]);
+            assert.deepEqual(h.events,[`${wrist}_left`,`${wrist}_right`]);
+            move([wrist==='left'?6.5:2.5,.5]);
+            assert.equal(h.events.at(-1),`${wrist}_up`,'Deliberate higher raises still work');
+            const count=h.events.length;
+            move([10,.5]);assert.equal(h.events.length,count,'Holding Up never repeats');
+            move([16.8,2.5]);move([-7.8,2.5]);
+            assert.deepEqual(h.events.slice(-2),[`${wrist}_left`,`${wrist}_right`]);
+        }finally{h.close();}
+    }
+});
+
+test('popup direction boundaries have a neutral band and retain continuous native dwell',()=>{
+    const h=harness({profile:popupProfile});
+    try{
+        for(let i=0;i<24;i++)h.frame([10,i%2?.9:1.5],null);
+        assert.deepEqual(h.events,[],'Brief visits to Up cannot accumulate dwell across the gap');
+        h.dwell([10,1.5],null);assert.deepEqual(h.events,[],'The vertical gap is neutral');
+        h.dwell([10,2.1],null);assert.deepEqual(h.events,['left_left']);
+        h.dwell([10,.5],null);assert.deepEqual(h.events,['left_left','left_up']);
     }finally{h.close();}
 });

@@ -1,0 +1,260 @@
+{
+  "schema_version": 2,
+  "tracking": {
+    "hands": false
+  },
+  "inputs": [
+    {
+      "id": "left_left",
+      "name": "left wrist left",
+      "action": "left_left",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_left_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "left_left_hold",
+              "landmark": "left_wrist",
+              "cell": [
+                7,
+                2,
+                11,
+                16
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "left_left_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                7,
+                2,
+                11,
+                16
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "left_up",
+      "name": "left wrist up",
+      "action": "left_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "left_up_hold",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                10
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "left_up_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                10
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "left_right",
+      "name": "left wrist right",
+      "action": "left_right",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_right_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "left_right_hold",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                2,
+                15,
+                16
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "left_right_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                2,
+                15,
+                16
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_left",
+      "name": "right wrist left",
+      "action": "right_left",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_left_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "right_left_hold",
+              "landmark": "right_wrist",
+              "cell": [
+                3,
+                2,
+                15,
+                16
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "right_left_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                3,
+                2,
+                15,
+                16
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_up",
+      "name": "right wrist up",
+      "action": "right_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "right_up_hold",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                10
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "right_up_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                10
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_right",
+      "name": "right wrist right",
+      "action": "right_right",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_right_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "right_right_hold",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                2,
+                11,
+                16
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "right_right_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                2,
+                11,
+                16
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

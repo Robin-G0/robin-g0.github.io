@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js?v=power-11';
+import { arcadeProfile } from './profile.js?v=targets-12';
 import { commandLabel } from '../core/commands.js';
 
 function attribute(element, name, value) {
@@ -11,10 +11,10 @@ function attribute(element, name, value) {
  * axis and 35 ms smoothing; an initial live projection is an alignment guide.
  */
 export class TriggerView {
-    constructor(svg, directions = ['left', 'up', 'right']) {
+    constructor(svg, directions = ['left', 'up', 'right'], profile = arcadeProfile) {
         this.svg = svg; this.reset();
         svg.replaceChildren();
-        this.boxes = arcadeProfile.inputs.filter(input => directions.includes(input.action.split('_')[1])).map(input => {
+        this.boxes = profile.inputs.filter(input => directions.includes(input.action.split('_')[1])).map(input => {
             const group = document.createElementNS(svg.namespaceURI, 'g');
             group.dataset.trigger = input.action;
             group.dataset.triggerWrist = input.action.split('_')[0];

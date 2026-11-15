@@ -3,12 +3,13 @@ import { GameRunner } from './core/runner.js?v=power-11';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=power-11';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=targets-12';
+import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
 import { lessonFor } from './lessons.js?v=power-11';
 import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js?v=power-11';
+import { TriggerView } from './mig/trigger-view.js?v=targets-12';
 import { FrameBudget } from './core/frame-budget.js';
 
 export class GameRoom {
@@ -26,9 +27,11 @@ export class GameRoom {
         this.palette = readPalette();
         this.dialog.dataset.engine = description.engine;
         this.sixDirections = description.inputScheme === 'wrist-directions';
+        const profile = description.engine === 'popups' ? popupProfile : arcadeProfile;
+        this.$('a[download]').href = `./arcade/profiles/${description.engine === 'popups' ? 'popup-directions' : 'wrist-raises'}.json?v=targets-12`;
         this.wristPulseUntil = {};
         this.markerMotion = Object.fromEntries(WRISTS.map(wrist => [wrist, new MarkerMotion()]));
-        this.triggerView = new TriggerView(this.$('#arcade-trigger-zones'), this.sixDirections ? DIRECTIONS : ['up']);
+        this.triggerView = new TriggerView(this.$('#arcade-trigger-zones'), this.sixDirections ? DIRECTIONS : ['up'], profile);
         this.$('.camera-positioning').textContent = this.sixDirections ? 'Arrow boxes · no home return' : 'Lift into ↑ · lower to repeat';
         this.inputMode = 'motion';
         this.sound = new ArcadeAudio(this.palette.theme);
@@ -48,6 +51,7 @@ export class GameRoom {
         });
         this.instructions = lessonFor(description.engine);
         this.camera = new MotionCamera({
+            profile,
             onInput: (action, timestamp) => this.motionInput(action, timestamp),
             onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
         });
