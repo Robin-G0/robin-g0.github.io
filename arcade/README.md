@@ -66,7 +66,8 @@ The host owns those resources and destroys the game on exit or theme change.
 ## Recognition and timing
 
 The profile uses close, broad body-relative direction boxes with a small gap,
-native Single Press and 120 ms continuous occupancy. Each simultaneous step
+native Single Press and 120 ms continuous occupancy. Terminal regions extend
+outward to the schema limits so travelling farther does not create a far-edge miss. Each simultaneous step
 has Required and Trigger constraints in the same rectangle. In npm 1.1.0,
 a trigger-only step does not reset its hold timer on brief exits; the Required
 constraint is what makes dwell continuous. No finger inference is required.
@@ -153,10 +154,17 @@ local random stream. The generator creates a binary tree with one shared exit.
 Every branch terminates; shortcuts and longer routes have different costs.
 Trees grow across three levels, then retain the third level's size bounds.
 
-The full map and a cyan short route appear for 9/11/13 seconds. Memorisation
+The full map grows upward from START at the bottom to END at the top. Screen-left
+and screen-right keep their horizontal meaning in both preview and navigation.
+The map and a cyan short route appear for 9/11/13 seconds. Memorisation
 and the short arrival celebration do not spend the time bank. The hidden map
 then accepts left/right native MIG pulses, keyboard or touch. Link backgrounds
 highlight in the colour of the effect, without a circle over their text.
+
+Six original pixel-art effects have looping GIF companions in assets/art and PNG
+frame strips used by the canvas. The renderer selects frames using simulation
+time and freezes the first frame for reduced motion. Regenerate them with
+Python and Pillow: scripts/create-link-maze-art.py.
 
 A run starts with 45 seconds. Home adds 8 seconds and points, then generates a
 new map. Pages can add 40 points or 5 seconds, reveal destinations for two

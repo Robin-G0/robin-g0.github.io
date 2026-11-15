@@ -1,13 +1,14 @@
 import { LINK_EFFECTS } from './link-maze-map.js';
+import { drawLinkEffect } from './link-maze-art.js';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
 const arrow = side => side === 0 ? '←' : '→';
 
-function overview(s, p) {
+function overview(s, p, reducedMotion) {
     const { map } = s, safe = new Set(map.route);
-    const top = 112, bottom = p.h - 150, step = (bottom - top) / map.maxDepth;
+    const top = 148, bottom = p.h - 126, step = (bottom - top) / map.maxDepth;
     const x = node => 38 + node.x * 644;
-    const y = node => top + node.depth * step;
+    const y = node => bottom - node.depth * step;
     // Muted branches first; the suggested short route remains legible above them.
     for (const highlight of [false, true]) for (const node of map.nodes) {
         for (const childId of node.children) {
@@ -25,45 +26,54 @@ function overview(s, p) {
             p.rect(x(node) - w / 2, y(node) - height / 2, w, height, navy);
             p.outline(x(node) - w / 2, y(node) - height / 2, w, height, effect.color);
             p.text(effect.label, x(node), y(node), p.compact ? 30 : 18, effect.color, 'center');
+            if (node.effect !== 'none') drawLinkEffect(p, node.effect,
+                x(node) + w / 2 + 17, y(node), p.compact ? 38 : 28, s.time, reducedMotion);
         }
-        if (!node.children.length) p.line([[x(node), y(node) + 5], [x(node), bottom + 22]], '#4e386d', 1);
+        if (!node.children.length) p.line([[x(node), y(node) - 5], [x(node), top - 28]], '#4e386d', 1);
     }
     const labelWidth = p.compact ? 128 : 84;
-    p.rect(x(map.nodes[0]) - labelWidth / 2, top - 19, labelWidth, p.compact ? 38 : 29, yellow);
-    p.text('START', x(map.nodes[0]), top - 2, p.compact ? 34 : 23, navy, 'center');
-    p.line([[38, bottom + 22], [682, bottom + 22]], yellow, 2);
-    p.rect(360 - labelWidth / 2, bottom + 14, labelWidth, p.compact ? 40 : 30, yellow);
-    p.text('END', 360, bottom + 29, p.compact ? 36 : 25, navy, 'center');
+    p.rect(x(map.nodes[0]) - labelWidth / 2, bottom - 3, labelWidth, p.compact ? 38 : 29, yellow);
+    p.text('START', x(map.nodes[0]), bottom + 12, p.compact ? 34 : 23, navy, 'center');
+    p.line([[38, top - 28], [682, top - 28]], yellow, 2);
+    p.rect(360 - labelWidth / 2, top - 43, labelWidth, p.compact ? 40 : 30, yellow);
+    p.text('END', 360, top - 28, p.compact ? 36 : 25, navy, 'center');
     p.text('QUICK ROUTE', 360, p.h - 82, p.compact ? 31 : 23, cyan, 'center');
     const spacing = 82, origin = 360 - (map.shortRoute.length - 1) * spacing / 2;
     map.shortRoute.forEach((side, i) => p.text(arrow(side), origin + i * spacing, p.h - 44, 54, ink, 'center'));
 }
 
 function links(s, p, reducedMotion) {
-    const { h } = p, top = h - 155, active = s.flipped > 0;
+    const { h } = p, top = Math.max(132, Math.round(h * .28)), active = s.flipped > 0;
+    const playerY = h - 76;
     const pulse = !reducedMotion ? Math.sin(s.time * 3) * 2 : 0;
     p.text(`/LOCAL/${String(s.completed + 1).padStart(2, '0')}/PAGE-${s.current}`, 44, 107, p.compact ? 30 : 23, '#b7a5dc');
-    p.rect(316, 147 + pulse, 88, 96, '#241747');
-    p.outline(316, 147 + pulse, 88, 96, cyan, 3);
-    p.text('@', 360, 192 + pulse, 60, cyan, 'center');
     const recent = s.outcome && s.time - s.outcome.at < 1.6;
     const effect = recent ? LINK_EFFECTS[s.outcome.effect] : null;
-    if (effect && effect !== LINK_EFFECTS.none) {
-        p.rect(245, 159, 230, 65, navy);
-        p.text(effect.label, 360, 192, p.compact ? 54 : 43, effect.color, 'center');
-    }
-    if (active || s.peek) p.text(active ? `↔ ${s.flipped}` : `PEEK ${s.peek}`, 590, 135, 35, active ? '#ffbe70' : cyan, 'center');
+    if (active || s.peek) p.text(active ? `↔ ${s.flipped}` : `PEEK ${s.peek}`, 590, 107, 35, active ? '#ffbe70' : cyan, 'center');
     for (let side = 0; side < 2; side++) {
         const left = side ? 380 : 40, center = left + 150;
         const selected = s.flash?.action === (side ? 'right' : 'left') && s.time - s.flash.at < .55;
-        p.line([[active ? center : 360, active ? top - 60 : 245], [active ? (side ? 190 : 530) : center, top]], active ? '#ffbe70' : '#4e386d', 3);
+        const wire = active
+            ? [[360, playerY - 43], [center, playerY - 78], [side ? 190 : 530, top + 110]]
+            : [[360, playerY - 43], [center, top + 110]];
+        p.line(wire, active ? '#ffbe70' : '#4e386d', 3);
         const next = s.map.nodes[s.map.nodes[s.current].children[active ? 1 - side : side]];
         const content = s.peek ? LINK_EFFECTS[next.effect] : null;
         const flashColor = selected ? LINK_EFFECTS[s.flash.effect].color : cyan;
         p.rect(left, top, 300, 110, selected ? flashColor : '#241747');
         p.outline(left, top, 300, 110, selected ? ink : active ? '#ffbe70' : cyan, selected ? 5 : 2);
         p.text(arrow(side), center, top + 33, 60, selected ? navy : cyan, 'center');
-        p.text(content?.label || 'LINK ?', center, top + 82, p.compact ? 44 : 33, selected ? navy : content?.color || ink, 'center');
+        const illustrated = content && drawLinkEffect(p, next.effect, left + 50, top + 79, 45, s.time, reducedMotion);
+        p.text(content?.label || 'LINK ?', center + (illustrated ? 15 : 0), top + 82, p.compact ? 44 : 33, selected ? navy : content?.color || ink, 'center');
+    }
+    p.rect(306, playerY - 43 + pulse, 108, 86, '#241747');
+    p.outline(306, playerY - 43 + pulse, 108, 86, cyan, 3);
+    const illustrated = effect && effect !== LINK_EFFECTS.none &&
+        drawLinkEffect(p, s.outcome.effect, 360, playerY + pulse, 82, s.time, reducedMotion);
+    if (!illustrated) p.text('@', 360, playerY + pulse, 60, cyan, 'center');
+    if (effect && effect !== LINK_EFFECTS.none) {
+        p.rect(245, playerY - 105, 230, 58, navy);
+        p.text(effect.label, 360, playerY - 76, p.compact ? 54 : 43, effect.color, 'center');
     }
     // Only the route already taken remains visible; no hidden map or future effects leak.
     p.text(s.history.map(side => side === 'left' ? '←' : '→').join('  ') || 'START', 360, h - 17, p.compact ? 38 : 26, '#b7a5dc', 'center');
@@ -75,7 +85,7 @@ export function renderMaze(s, p, reducedMotion = false) {
     p.text(`LINK MAZE   /   LEVEL ${s.level}`, 32, 77, 16, '#b7a5dc');
     if (s.stage === 'preview') {
         p.text(`MEMORISE  ${Math.max(0, Math.ceil(s.until - s.time))}`, 360, 34, p.compact ? 48 : 35, yellow, 'center');
-        overview(s, p);
+        overview(s, p, reducedMotion);
     } else if (s.stage === 'arrival') {
         p.text('HOMEPAGE!', 360, p.h * .36, 60, yellow, 'center');
         p.text('+8s', 360, p.h * .54, 70, cyan, 'center');

@@ -36,7 +36,7 @@ test('memory preview, link highlights, time reward and fresh next map form one c
     await page.keyboard.press(first?'ArrowRight':'ArrowLeft');await page.clock.runFor(100);
     const pixel=await page.locator('#arcade-canvas').evaluate((canvas,side)=>{
         const c=canvas.getContext('2d'),h=canvas.height/2;
-        return [...c.getImageData((side?390:50)*2,(h-145)*2,1,1).data].slice(0,3);
+        return [...c.getImageData((side?390:50)*2,(Math.max(132,Math.round(h*.28))+10)*2,1,1).data].slice(0,3);
     },first);
     const hex=LINK_EFFECTS[map.nodes[map.route[1]].effect].color;
     expect(pixel).toEqual([1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)));
@@ -75,4 +75,19 @@ test('native MIG wrist events navigate the remembered route without another came
     }
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-maze-stage','arrival');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
+});
+
+test('original powerup art animates in the map and freezes visually for reduced motion',async({page})=>{
+    await open(page);
+    await page.evaluate(async()=>{const {loadArtwork}=await import('./arcade/core/painter.js?v=upward-10');await loadArtwork('construction');});
+    await page.clock.runFor(32);
+    const checksum=()=>page.locator('#arcade-canvas').evaluate(canvas=>{
+        const data=canvas.getContext('2d').getImageData(0,180,canvas.width,canvas.height-180).data;
+        let hash=2166136261;for(const value of data)hash=Math.imul(hash^value,16777619);return hash>>>0;
+    });
+    const before=await checksum();await page.clock.runFor(250);expect(await checksum()).not.toBe(before);
+    await expect(page.locator('#arcade-time')).toHaveText('45s');
+    await page.locator('#arcade-close').click();await page.emulateMedia({reducedMotion:'reduce'});
+    await page.locator('[data-game=construction-maze]').click();await page.locator('#arcade-begin').click();await page.clock.runFor(32);
+    const still=await checksum();await page.clock.runFor(250);expect(await checksum()).toBe(still);
 });

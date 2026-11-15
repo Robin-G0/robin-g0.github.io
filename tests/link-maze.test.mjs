@@ -107,3 +107,18 @@ test('host honors a game-owned clock beyond its fixed duration and freezes it on
     runner.pause();now+=1000;runner.step(now);assert.equal(runner.game.state.remaining,budget);
     runner.dispose();
 });
+
+test('preview and navigation both advance upward with screen-left and screen-right choices',async()=>{
+    const {renderMaze}=await import('../arcade/games/link-maze-view.js');
+    for(const height of [420,780]){
+        const {g}=create(),texts=[];
+        const painter=new Proxy({h:height,images:new Map(),text:(text,x,y)=>texts.push({text,x,y})},{get:(o,k)=>k in o?o[k]:()=>{}});
+        renderMaze(g.state,painter,true);
+        assert.ok(texts.find(t=>t.text==='START').y>texts.find(t=>t.text==='END').y);
+        texts.length=0;g.state.stage='navigate';renderMaze(g.state,painter,true);
+        const player=texts.find(t=>t.text==='@');
+        const left=texts.find(t=>t.text==='\u2190'),right=texts.find(t=>t.text==='\u2192');
+        assert.ok(player.y>left.y&&player.y>right.y);
+        assert.ok(left.x<player.x&&right.x>player.x);
+    }
+});

@@ -24,8 +24,8 @@
               "cell": [
                 7,
                 4,
-                8,
-                9
+                11,
+                14
               ],
               "type": "required",
               "priority": "high"
@@ -36,8 +36,8 @@
               "cell": [
                 7,
                 4,
-                8,
-                9
+                11,
+                14
               ],
               "type": "trigger",
               "priority": "high"
@@ -64,10 +64,10 @@
               "id": "left_up_hold",
               "landmark": "left_wrist",
               "cell": [
-                4,
-                -5,
-                5,
-                9
+                -9,
+                -9,
+                27,
+                13
               ],
               "type": "required",
               "priority": "high"
@@ -76,10 +76,10 @@
               "id": "left_up_zone",
               "landmark": "left_wrist",
               "cell": [
-                4,
-                -5,
-                5,
-                9
+                -9,
+                -9,
+                27,
+                13
               ],
               "type": "trigger",
               "priority": "high"
@@ -106,10 +106,10 @@
               "id": "left_right_hold",
               "landmark": "left_wrist",
               "cell": [
-                -4,
+                -9,
                 4,
-                10,
-                9
+                15,
+                14
               ],
               "type": "required",
               "priority": "high"
@@ -118,10 +118,10 @@
               "id": "left_right_zone",
               "landmark": "left_wrist",
               "cell": [
-                -4,
+                -9,
                 4,
-                10,
-                9
+                15,
+                14
               ],
               "type": "trigger",
               "priority": "high"
@@ -150,8 +150,8 @@
               "cell": [
                 3,
                 4,
-                10,
-                9
+                15,
+                14
               ],
               "type": "required",
               "priority": "high"
@@ -162,8 +162,8 @@
               "cell": [
                 3,
                 4,
-                10,
-                9
+                15,
+                14
               ],
               "type": "trigger",
               "priority": "high"
@@ -190,10 +190,10 @@
               "id": "right_up_hold",
               "landmark": "right_wrist",
               "cell": [
-                0,
-                -5,
-                5,
-                9
+                -9,
+                -9,
+                27,
+                13
               ],
               "type": "required",
               "priority": "high"
@@ -202,10 +202,10 @@
               "id": "right_up_zone",
               "landmark": "right_wrist",
               "cell": [
-                0,
-                -5,
-                5,
-                9
+                -9,
+                -9,
+                27,
+                13
               ],
               "type": "trigger",
               "priority": "high"
@@ -232,10 +232,10 @@
               "id": "right_right_hold",
               "landmark": "right_wrist",
               "cell": [
-                -7,
+                -9,
                 4,
-                9,
-                9
+                11,
+                14
               ],
               "type": "required",
               "priority": "high"
@@ -244,10 +244,10 @@
               "id": "right_right_zone",
               "landmark": "right_wrist",
               "cell": [
-                -7,
+                -9,
                 4,
-                9,
-                9
+                11,
+                14
               ],
               "type": "trigger",
               "priority": "high"

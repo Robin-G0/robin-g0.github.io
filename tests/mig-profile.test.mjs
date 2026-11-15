@@ -96,3 +96,23 @@ test('event delivery rejects ambiguous batches and duplicates without latching e
     assert.equal(send(['left_left','left_left'],600).length,1);
     assert.equal(send(['left_right','right_left'],800).length,2);
 });
+
+test('direction regions retain input beyond the old far edges and near visible image borders',()=>{
+    const h=harness({aspect:4/3,width:.2});
+    const far={left_left:[16.8,6],left_right:[-7.8,6],right_left:[16.8,6],right_right:[-7.8,6],left_up:[-7.8,1],right_up:[16.8,1]};
+    try{
+        for(const[action,target]of Object.entries(far)){
+            h.dwell(action.startsWith('left')?target:home.left,action.startsWith('right')?target:home.right);
+            assert.equal(h.events.at(-1),action);
+            const point=h.tracker.coordinate(action.startsWith('left')?15:16,0);
+            assert.equal(visiblePoint(point),true,'The tested far target remains visible');
+            const count=h.events.length;
+            if(!action.endsWith('_up')){
+                const farther=[target[0]>4.5?16.9:-7.9,13.5];
+                h.dwell(action.startsWith('left')?farther:home.left,action.startsWith('right')?farther:home.right);
+                assert.equal(h.events.length,count,'Moving farther within the same area does not retrigger');
+            }
+        }
+        assert.deepEqual(h.events,Object.keys(far));
+    }finally{h.close();}
+});

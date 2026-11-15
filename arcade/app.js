@@ -1,9 +1,9 @@
-import { games, gamesForTheme } from './catalog.js?v=reach-9';
-import { engines } from './registry.js?v=reach-9';
+import { games, gamesForTheme } from './catalog.js?v=upward-10';
+import { engines } from './registry.js?v=upward-10';
 import { seededRandom } from './core/random.js';
-import { Painter, readPalette, loadArtwork } from './core/painter.js';
+import { Painter, readPalette, loadArtwork } from './core/painter.js?v=upward-10';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js?v=reach-9';
+import { GameRoom } from './room.js?v=upward-10';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

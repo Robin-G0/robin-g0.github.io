@@ -1,14 +1,14 @@
-import { engines } from './registry.js?v=reach-9';
-import { GameRunner } from './core/runner.js?v=reach-9';
-import { bindAlternativeControls } from './core/input.js?v=reach-9';
+import { engines } from './registry.js?v=upward-10';
+import { GameRunner } from './core/runner.js?v=upward-10';
+import { bindAlternativeControls } from './core/input.js?v=upward-10';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork } from './core/painter.js?v=motion-6';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=reach-9';
+import { Painter, readPalette, loadArtwork } from './core/painter.js?v=upward-10';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=upward-10';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=reach-9';
+import { lessonFor } from './lessons.js?v=upward-10';
 import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js';
+import { TriggerView } from './mig/trigger-view.js?v=upward-10';
 
 export class GameRoom {
     constructor(dialog, description, opener) {

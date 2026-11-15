@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js?v=reach-9';
+import { arcadeProfile } from './profile.js?v=upward-10';
 import { commandLabel } from '../core/commands.js';
 
 /** Project profile cells for display only; this module never emits game commands.
@@ -50,8 +50,12 @@ export class TriggerView {
             // Keep labels inside the visible portion of even a partly clipped region.
             const cx = (Math.max(0, Math.min(...corners.map(p => p[0]))) + Math.min(1000, Math.max(...corners.map(p => p[0])))) / 2;
             const cy = (Math.max(0, Math.min(...corners.map(p => p[1]))) + Math.min(1000, Math.max(...corners.map(p => p[1])))) / 2;
-            const offset = group.dataset.trigger.endsWith('_up') ? 0 : group.dataset.triggerWrist === 'left' ? -55 : 55;
-            label.setAttribute('x', cx); label.setAttribute('y', Math.max(45, Math.min(955, cy + offset)));
+            const upper = group.dataset.trigger.endsWith('_up');
+            const offset = upper ? 0 : group.dataset.triggerWrist === 'left' ? -55 : 55;
+            // The broad upward region is shared by both wrists; separate its labels.
+            const labelX = upper ? cx + (group.dataset.triggerWrist === 'left' ? -120 : 120) : cx;
+            label.setAttribute('x', Math.max(70, Math.min(930, labelX)));
+            label.setAttribute('y', Math.max(45, Math.min(955, cy + offset)));
             group.dataset.active = String(Boolean(frame.active?.includes(group.dataset.trigger)));
         }
     }

@@ -3,8 +3,8 @@ import { WRISTS, DIRECTIONS } from '../core/commands.js';
 // Body cells use unmirrored image X; the preview is mirrored once. A screen-left
 // movement therefore increases grid X. Regions stay relative to the shoulders.
 export const wristZones = {
-    left: { up: [4, -5, 5, 9], left: [7, 4, 8, 9], right: [-4, 4, 10, 9] },
-    right: { up: [0, -5, 5, 9], left: [3, 4, 10, 9], right: [-7, 4, 9, 9] }
+    left: { up: [-9, -9, 27, 13], left: [7, 4, 11, 14], right: [-9, 4, 15, 14] },
+    right: { up: [-9, -9, 27, 13], left: [3, 4, 15, 14], right: [-9, 4, 11, 14] }
 };
 
 function region(wrist, direction) {
@@ -29,6 +29,7 @@ function region(wrist, direction) {
 
 // A small gap separates directions. Native dwell filters jitter, and Single Press
 // suppresses held repeats. Leaving a target is enough: no precise home return.
+// Extend outward to the schema's [-9,18) limits, rather than adding far-edge misses.
 export const arcadeProfile = {
     schema_version: 2, tracking: { hands: false },
     inputs: WRISTS.flatMap(wrist => DIRECTIONS.map(direction => region(wrist, direction)))
