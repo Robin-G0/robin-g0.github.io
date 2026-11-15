@@ -1,38 +1,8 @@
 import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
-import { integer } from '../core/random.js';
 
 export { popups } from './popup-panic.js?v=gestures-7';
 
-export function maze(env) {
-    const state = { path: Array.from({ length: 6 }, () => env.random() < .5 ? 'left' : 'right'),
-        depth: 0, dead: new Map(), visits: [], wrong: 0 };
-    return game(state, {
-        feedback(s, event) { return { x: event.action === 'left' ? 195 : 525, y: 275 }; },
-        input(s, event) {
-            s.visits.push({ depth: s.depth, action: event.action });
-            if (event.action === s.path[s.depth]) {
-                s.depth++; reward(s, env, 20, 'Link found');
-                if (s.depth === s.path.length) env.finish('Homepage found');
-            } else { s.dead.set(s.depth, event.action); s.wrong++; env.message('404. Try the other link.'); }
-        },
-        render(s, p) {
-            p.text('FIND THE HOMEPAGE', 360, 35, 26, 'gold', 'center');
-            for (let i = 0; i < 6; i++) {
-                const x = 110 + i * 100;
-                if (i) p.line([[x - 80, 120], [x, 120]], 'muted', 2);
-                p.circle(x, 120, 18, i < s.depth ? 'accent' : 'soft');
-                p.text(i + 1, x, 120, 20, i < s.depth ? 'bg' : 'ink', 'center');
-            }
-            p.text(`PAGE ${Math.min(6, s.depth + 1)} / 6`, 360, 185, 20, 'ink', 'center');
-            for (const [side, x] of [['left', 195], ['right', 525]]) {
-                const broken = s.dead.get(s.depth) === side;
-                p.outline(x - 120, 235, 240, 80, broken ? 'gold' : 'accent', 3);
-                p.text(broken ? '404 / BROKEN' : 'ENTER >>', x, 275, 24, broken ? 'gold' : 'accent', 'center');
-            }
-            p.text('Broken links stay marked.', 360, 365, 20, 'muted', 'center');
-        }
-    });
-}
+export { maze } from './link-maze.js?v=maze-8';
 
 export function juggle(env) {
     const state = { balls: [{ x: 205, y: 205, velocity: -90 }, { x: 515, y: 110, velocity: 15 }] };

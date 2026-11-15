@@ -1,12 +1,12 @@
-import { engines } from './registry.js?v=gestures-7';
-import { GameRunner } from './core/runner.js?v=gestures-7';
-import { bindAlternativeControls } from './core/input.js?v=gestures-7';
+import { engines } from './registry.js?v=maze-8';
+import { GameRunner } from './core/runner.js?v=maze-8';
+import { bindAlternativeControls } from './core/input.js?v=maze-8';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=motion-6';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=gestures-7';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=maze-8';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=gestures-7';
+import { lessonFor } from './lessons.js?v=maze-8';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -133,7 +133,7 @@ export class GameRoom {
         const box = this.canvas.parentElement.getBoundingClientRect();
         // The rising-stack board grows vertically on narrow screens; UI text and
         // arrows keep their proportions instead of stretching a landscape image.
-        const height = this.description.engine === 'popups' && box.width
+        const height = ['popups', 'maze'].includes(this.description.engine) && box.width
             ? Math.max(420, Math.round(720 * box.height / box.width)) : 420;
         if (this.canvas.height !== height * 2) {
             this.canvas.height = height * 2;
@@ -248,7 +248,7 @@ export class GameRoom {
             this.pulseUntil = performance.now() + 180;
             this.recognisedUntil = performance.now() + 1800;
             this.$('#arcade-recognition').textContent = decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
-            if (this.description.engine !== 'popups') this.sound.play({ action });
+            if (!['popups', 'maze'].includes(this.description.engine)) this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
             if (points > 0) this.messageUntil = 0; // The target callout already shows the result.
@@ -366,6 +366,10 @@ export class GameRoom {
         this.runner.step(timestamp, { hold: trackingHold });
         this.painter.background();
         this.runner.game.render(this.painter);
+        if (this.description.engine === 'maze') {
+            this.dialog.dataset.mazeStage = this.runner.game.state.stage;
+            this.dialog.dataset.mazeLevel = this.runner.game.state.level;
+        }
         this.$('#arcade-playfield-input').hidden = timestamp > (this.recognisedUntil || 0);
         this.$('#arcade-playfield-message').hidden = timestamp > (this.messageUntil || 0);
         if (timestamp > (this.nextHUD || 0)) { this.runner.publish(); this.nextHUD = timestamp + 150; }

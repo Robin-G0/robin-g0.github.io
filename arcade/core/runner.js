@@ -30,7 +30,7 @@ export class GameRunner {
     publish() {
         this.changed({ phase: this.phase, score: Math.floor(this.game.state.score),
             lives: Math.max(0, this.game.state.lives),
-            remaining: Math.max(0, Math.ceil(this.description.duration - this.elapsed)) });
+            remaining: Math.max(0, Math.ceil(this.game.remainingSeconds?.() ?? (this.description.duration - this.elapsed))) });
     }
 
     play() {
@@ -67,12 +67,12 @@ export class GameRunner {
         const gap = Math.max(0, (timestamp - this.lastFrame) / 1000);
         this.lastFrame = timestamp;
         // At low FPS the simulation slows instead of jumping through collisions.
-        let remaining = Math.min(.1, gap, this.description.duration - this.elapsed);
+        let remaining = Math.min(.1, gap, this.game.remainingSeconds ? Infinity : this.description.duration - this.elapsed);
         while (remaining > .000001 && this.phase === 'playing') {
             const dt = Math.min(1 / 60, remaining);
             this.game.update(dt); this.elapsed += dt; remaining -= dt;
         }
-        if (this.elapsed >= this.description.duration - .000001) this.finish();
+        if (!this.game.remainingSeconds && this.elapsed >= this.description.duration - .000001) this.finish();
     }
 
     dispose() {

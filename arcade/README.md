@@ -131,6 +131,31 @@ Keep the hook visual: it must not change game rules. Rule messages also appear
 inside the playfield, including reasons why a recognised input cannot act yet.
 Pop-up clears use local arrow/count plates, settling windows and short bursts.
 
+## Link Maze memory loop
+
+The host seeds game randomness from the visitor's local `Date.now()` when a room
+opens; explicit imported seeds remain reproducible. Each new maze consumes that
+local random stream. The generator creates a binary tree with one shared exit.
+Every branch terminates; shortcuts and longer routes have different costs.
+Trees grow across three levels, then retain the third level's size bounds.
+
+The full map and a cyan short route appear for 9/11/13 seconds. Memorisation
+and the short arrival celebration do not spend the time bank. The hidden map
+then accepts left/right native MIG pulses, keyboard or touch. Link backgrounds
+highlight in the colour of the effect, without a circle over their text.
+
+A run starts with 45 seconds. Home adds 8 seconds and points, then generates a
+new map. Pages can add 40 points or 5 seconds, reveal destinations for two
+choices, subtract 25 points or 5 seconds, or swap the next two destinations.
+A peek displays the destinations actually selected by the current swap state.
+The bank caps at 90 seconds and score floors at zero; time exhaustion ends play.
+
+A trusted engine may expose `remainingSeconds()` to own a replenishable clock.
+The runner displays that value and lets the engine end the round; engines without
+it retain their fixed duration. All clocks and previews still freeze on pause,
+Controls or tracking hold. Tests exercise real game rules separately from browser
+SDK-event fixtures; the latter do not establish physical recognition accuracy.
+
 ## Add or import a game
 
 To add trusted executable code, write a factory in `games/`, register it in
