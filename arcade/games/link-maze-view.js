@@ -1,4 +1,4 @@
-import { LINK_EFFECTS } from './link-maze-map.js';
+import { LINK_EFFECTS } from './link-maze-map.js?v=mobile-14';
 import { drawLinkEffect } from './link-maze-art.js';
 import { Painter } from '../core/painter.js?v=power-11';
 
@@ -27,11 +27,12 @@ function mapDrawing(s, p) {
     for (const node of map.nodes) {
         const effect = LINK_EFFECTS[node.effect], width = 8;
         p.rect(x(node) - width / 2, y(node) - width / 2, width, width, effect.color);
-        if (node.id && node.children.length && node.depth <= 2) {
-            const w = 78, height = 28;
+        if (node.id && node.children.length) {
+            const w = 56, height = p.compact ? 32 : 26;
             p.rect(x(node) - w / 2, y(node) - height / 2, w, height, navy);
             p.outline(x(node) - w / 2, y(node) - height / 2, w, height, effect.color);
-            p.text(effect.label, x(node), y(node), 22, effect.color, 'center');
+            const label = { none: '·', reveal: 'P2', flip: '↔2' }[node.effect] || effect.label;
+            p.text(label, x(node), y(node), p.compact ? 28 : 22, effect.color, 'center');
         }
         if (!node.children.length) p.line([[x(node), y(node) - 5], [x(node), top - 28]], '#4e386d', 1);
     }
@@ -61,9 +62,9 @@ function overview(s, p, reducedMotion) {
     // Animate only the small sprites above the cached tree. Neither path consumes RNG.
     for (const node of s.map.nodes) {
         if (!node.id || !node.children.length || node.depth > 2 || node.effect === 'none') continue;
-        const point = mapPoint(s.map, node, p.h), width = 78;
+        const point = mapPoint(s.map, node, p.h), width = 56;
         drawLinkEffect(p, node.effect, point.x + width / 2 + 17, point.y,
-            28, s.time, reducedMotion);
+            22, s.time, reducedMotion);
     }
 }
 

@@ -1,4 +1,4 @@
-import { engines } from './registry.js?v=maze-13';
+import { engines } from './registry.js?v=mobile-14';
 import { GameRunner } from './core/runner.js?v=power-11';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';

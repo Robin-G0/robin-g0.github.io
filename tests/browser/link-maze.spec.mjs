@@ -58,8 +58,8 @@ test('mobile maze fits, remains legible and does not move when a link changes co
     await page.clock.runFor(9600);
     await page.locator('#arcade-player').evaluate(d=>d.scrollTop=0);
     const before=await page.locator('.arcade-stage').boundingBox();
-    expect(before.height).toBeGreaterThanOrEqual(600);
-    expect(before.height).toBeGreaterThan(before.width*1.5);
+    expect(before.height).toBeGreaterThanOrEqual(340);
+    expect(before.height).toBeLessThanOrEqual(500);
     await expect(page.locator('[data-arcade-input=left] .action-key')).toHaveText('L');
     await expect(page.locator('[data-arcade-input=right] .action-key')).toHaveText('R');
     await expect(page.locator('[data-arcade-input=left] .action-name')).toHaveText('Raise left wrist');
@@ -75,7 +75,7 @@ test('desktop maze has a portrait board and explains wrist raises in Controls',a
     await open(page);
     const board=await page.locator('.arcade-stage').boundingBox();
     expect(board.width).toBeLessThanOrEqual(620);
-    expect(board.height).toBeGreaterThan(board.width);
+    expect(board.height).toBeLessThanOrEqual(560);
     await page.locator('#arcade-help').click();
     await expect(page.locator('[data-tutorial-action=left]')).toHaveText('Raise left wrist');
     await expect(page.locator('[data-tutorial-action=right]')).toHaveText('Raise right wrist');

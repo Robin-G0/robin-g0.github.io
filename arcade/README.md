@@ -150,15 +150,17 @@ Pop-up clears use local arrow/count plates, settling windows and short bursts.
 
 The host seeds game randomness from the visitor's local `Date.now()` when a room
 opens; explicit imported seeds remain reproducible. Each new maze consumes that
-local random stream. The generator creates a binary tree with one shared exit.
+local random stream. Forward-only branches can rejoin shared pages, with at most
+six pages per row. This bounds rendering and keeps deeper maps readable on phones.
 Every branch terminates; shortcuts and longer routes have different costs.
-Trees grow across three levels, then retain the third level's size bounds.
+Maps grow to 8, 10 and 12 rows, then retain the third level's size bounds.
 
 The full map grows upward from START at the bottom to END at the top. Screen-left
 and screen-right keep their horizontal meaning in both preview and navigation.
-The map and a cyan short route appear for 9/11/13 seconds. Memorisation
+The map appears for 9/11/13 seconds, without a written or highlighted solution. Memorisation
 and the short arrival celebration do not spend the time bank. The hidden map
-then accepts left/right native MIG pulses, keyboard or touch. Link backgrounds
+then accepts left/right wrist raises, keyboard or touch. L/R labels identify the
+wrist to raise rather than suggesting sideways hand motion. Link backgrounds
 highlight in the colour of the effect, without a circle over their text.
 
 Six original pixel-art effects have looping GIF companions in assets/art and PNG

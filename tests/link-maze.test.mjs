@@ -13,27 +13,28 @@ function create(seed=8) {
 function advance(g,seconds) { for(let i=0;i<Math.ceil(seconds*60);i++)g.update(1/60); }
 function nextEffect(g,effect,side=0) {g.state.map.nodes[g.state.map.nodes[g.state.current].children[side]].effect=effect;}
 
-test('time-seeded trees are reproducible, strictly grow by level, and every route reaches the common exit',()=>{
-    const bounds=MAZE_LEVELS.map(()=>({min:Infinity,max:0}));
+test('time-seeded mazes get deeper with bounded width and every route reaches the common exit',()=>{
     for(let seed=0;seed<50;seed++)for(let level=1;level<=3;level++) {
         const map=generateMaze(seededRandom(seed),level);
         assert.deepEqual(map,generateMaze(seededRandom(seed),level));
         const seen=new Set(),lengths=[];
         function walk(id) {
-            assert.equal(seen.has(id),false,'No cycles or reused branches');seen.add(id);
+            if(seen.has(id))return;seen.add(id);
             const node=map.nodes[id];
             assert.ok(node.x>=0&&node.x<=1);
             if(!node.children.length){assert.equal(node.effect,'exit');lengths.push(node.depth);return;}
-            assert.equal(node.children.length,2);for(const child of node.children)walk(child);
+            assert.equal(node.children.length,2);
+            assert.ok(map.nodes[node.children[0]].x<node.x&&map.nodes[node.children[1]].x>node.x,'Choices match visible left/right');
+            for(const child of node.children){assert.equal(map.nodes[child].depth,node.depth+1,'Every move advances one row; no cycles');walk(child);}
         }
         walk(0);assert.equal(seen.size,map.nodes.length);
         assert.equal(Math.min(...lengths),map.minDepth);assert.equal(Math.max(...lengths),map.maxDepth);
         for(const effect of ['points','seconds','reveal','tax','delay','flip'])assert.ok(map.nodes.some(n=>n.effect===effect));
         for(const id of map.route)assert.ok(!['tax','delay','flip'].includes(map.nodes[id].effect));
-        bounds[level-1].min=Math.min(bounds[level-1].min,map.nodes.length);
-        bounds[level-1].max=Math.max(bounds[level-1].max,map.nodes.length);
+        assert.ok(map.nodes.length<=1+6*map.maxDepth,'Mobile maps do not grow exponentially');
+        for(let depth=1;depth<=map.maxDepth;depth++)assert.ok(map.nodes.filter(n=>n.depth===depth).length<=6);
     }
-    assert.ok(bounds[0].max<bounds[1].min&&bounds[1].max<bounds[2].min);
+    assert.deepEqual(MAZE_LEVELS.map(r=>r.maxDepth),[8,10,12]);
     assert.notDeepEqual(generateMaze(seededRandom(1700000000),2),generateMaze(seededRandom(1700000001),2));
 });
 
