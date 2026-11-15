@@ -175,9 +175,9 @@ test('preview and individual wrist feedback are visible before starting', async 
 
 test('torso-only tracking starts with either wrist and recovers without a menu', async ({ page }) => {
     await openObservedCamera(page);
-    await expect(page.locator('#arcade-controls-status')).toHaveText('Lift to start');
+    await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi (with hand) to start');
     await expect(page.locator('#arcade-practise, #arcade-ready')).toHaveCount(0);
-    await page.evaluate(() => { window.motionTest.observe(true, 16); window.motionTest.gesture('left'); });
+    await page.evaluate(() => window.motionTest.observe(true, 16));
     await expect(page.locator('#arcade-controls-status')).toHaveText(/^[123]$/);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
     await expect(page.locator('#arcade-score')).toHaveText('0');

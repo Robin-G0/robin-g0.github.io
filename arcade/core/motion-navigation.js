@@ -1,4 +1,4 @@
-/** A recognised MIG pulse can confirm a screen, never become a queued game move. */
+/** Wrist presence can start a round; recognised pulses can resume it. No queued moves. */
 export class MotionNavigation {
     request(phase, visible, now) {
         if (!visible || this.deadline || !['tutorial', 'paused'].includes(phase)) return false;

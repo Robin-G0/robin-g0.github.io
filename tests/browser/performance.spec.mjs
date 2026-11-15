@@ -23,8 +23,9 @@ test('idle canvases stop repainting while hands-free resume and active-rate infe
     await open(page);expect(await page.evaluate(()=>window.motionTest.fps)).toBe(10);
     await page.evaluate(()=>window.gamePaints=0);await page.clock.runFor(1000);expect(await page.evaluate(()=>window.gamePaints)).toBe(0);
     await page.locator('#arcade-begin').click();expect(await page.evaluate(()=>window.motionTest.fps)).toBe(20);
-    await page.evaluate(()=>window.gamePaints=0);await page.clock.runFor(1000);
-    const paints=await page.evaluate(()=>window.gamePaints);expect(paints).toBeGreaterThan(45);expect(paints).toBeLessThanOrEqual(61);
+    const start=await page.evaluate(()=>{window.gamePaints=0;return performance.now();});await page.clock.runFor(1000);
+    const sample=await page.evaluate(start=>({paints:window.gamePaints,elapsed:performance.now()-start}),start);
+    expect(sample.paints).toBeGreaterThan(45);expect(sample.paints).toBeLessThanOrEqual(Math.ceil(sample.elapsed*60/1000)+1);
     await page.locator('#arcade-pause').click();await page.clock.runFor(32);
     expect(await page.evaluate(()=>window.motionTest.fps)).toBe(10);
     await page.evaluate(()=>window.gamePaints=0);await page.clock.runFor(1000);expect(await page.evaluate(()=>window.gamePaints)).toBe(0);

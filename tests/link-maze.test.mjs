@@ -97,15 +97,18 @@ test('time exhaustion ends play, including a time trap at low budget',()=>{
     }
 });
 
-test('host honors a game-owned clock beyond its fixed duration and freezes it on tracking loss',t=>{
+test('maze clock outlives the fixed duration, keeps running on tracking loss and respects manual pause',t=>{
     t.mock.method(Date,'now',()=>1700000000123);
     let now=1000,last;
     const runner=new GameRunner({duration:1,difficulty:'gentle'},maze,{clock:()=>now,changed:s=>last=s});
     assert.equal(runner.seed,1700000000123>>>0);
     runner.play();for(let i=0;i<100;i++){now+=100;runner.step(now);}runner.publish();
     assert.equal(runner.phase,'playing');assert.ok(last.remaining>=43);
-    const budget=runner.game.state.remaining;now+=5000;runner.step(now,{hold:true});runner.publish();assert.equal(runner.game.state.remaining,budget);
-    runner.pause();now+=1000;runner.step(now);assert.equal(runner.game.state.remaining,budget);
+    const budget=runner.game.state.remaining;
+    for(let i=0;i<20;i++){now+=100;runner.step(now,{hold:true});}
+    assert.ok(runner.game.state.remaining<budget-1.9,'Hiding a wrist cannot stop the countdown');
+    const paused=runner.game.state.remaining;
+    runner.pause();now+=1000;runner.step(now);assert.equal(runner.game.state.remaining,paused);
     runner.dispose();
 });
 

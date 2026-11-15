@@ -107,13 +107,18 @@ a fixed viewport height, feedback reserves space, and gesture-driven focus does
 not scroll the page. The camera mirrors the video and wrist markers
 together, and reports shoulders and each wrist separately using confident public
 `coordinate()` observations inside the image. It does not invent finger tracking.
-A sustained tracking loss freezes the simulation and round clock without opening
-a pause menu. A returning wrist resumes immediately with no catch-up burst.
+A sustained tracking loss normally holds simulation without opening a pause menu.
+Link Maze opts out through `holdOnTrackingLoss: false`, respected by both the room
+and runner: its map preview and active countdown continue while hands are missing.
+Missing-input feedback remains visible without granting extra thinking time.
+A returning wrist in games that hold resumes with no catch-up burst.
 Keyboard/touch input takes over without a camera gate. Slow frames are bounded,
 not turned into pause dialogs. Manual Pause and Controls remain explicit choices.
-The controls window starts directly:
-press Start, or lower and raise either wrist for a visible three-second
-countdown. There are no practice or readiness gates. Controls pauses an existing
+The initial screen shows one large "Say hi (with hand) to start" prompt.
+Showing either wrist starts a three-second countdown, without an Up gesture.
+Start and keyboard/touch remain direct fallbacks; disappearing hands cancel the
+countdown. Presence starts only the initial screen, never auto-closes Controls
+or resumes manual Pause. There are no practice or readiness gates. Controls pauses an existing
 round without resetting its score or position; Start becomes Resume. A wrist raise
 can also resume a paused round. The confirmation pulse never enters the game. Loss of
 tracking cancels the countdown. `core/motion-navigation.js` keeps that small flow
@@ -189,8 +194,8 @@ The bank caps at 90 seconds and score floors at zero; time exhaustion ends play.
 
 A trusted engine may expose `remainingSeconds()` to own a replenishable clock.
 The runner displays that value and lets the engine end the round; engines without
-it retain their fixed duration. All clocks and previews still freeze on pause,
-Controls or tracking hold. Tests exercise real game rules separately from browser
+it retain their fixed duration. All clocks and previews freeze on manual Pause
+or Controls; tracking-loss holds are an explicit per-game policy. Tests exercise real game rules separately from browser
 SDK-event fixtures; the latter do not establish physical recognition accuracy.
 
 ## Add or import a game

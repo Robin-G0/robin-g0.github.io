@@ -63,7 +63,7 @@ export class GameRunner {
     }
 
     step(timestamp, { hold = false } = {}) {
-        if (hold) { this.lastFrame = timestamp; return; }
+        if (hold && this.game.holdOnTrackingLoss !== false) { this.lastFrame = timestamp; return; }
         if (this.phase !== 'playing') { this.lastFrame = timestamp; return; }
         const gap = Math.max(0, (timestamp - this.lastFrame) / 1000);
         this.lastFrame = timestamp;

@@ -47,7 +47,7 @@ test('mobile touch controls fit at 320 px and survive orientation changes', asyn
     for (const theme of new Set(games.map(game => game.theme))) {
         await page.goto(`/?theme=${theme}#arcade`);
         await page.locator('.arcade-play').first().click();
-        const lesson = await page.locator('.gesture-lesson').boundingBox();
+        const lesson = await page.locator('#arcade-controls-status').boundingBox();
         const stage = await page.locator('.arcade-stage').boundingBox();
         expect(lesson.x + lesson.width).toBeLessThanOrEqual(stage.x + stage.width + 1);
         await startRound(page);

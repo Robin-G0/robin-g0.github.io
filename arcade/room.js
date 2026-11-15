@@ -1,12 +1,12 @@
-import { engines } from './registry.js?v=survival-17';
-import { GameRunner } from './core/runner.js?v=survival-17';
+import { engines } from './registry.js?v=greeting-18';
+import { GameRunner } from './core/runner.js?v=greeting-18';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=directions-16';
 import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
-import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
+import { MotionNavigation } from './core/motion-navigation.js?v=greeting-18';
 import { lessonFor } from './lessons.js?v=maze-13';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-12';
@@ -27,6 +27,9 @@ export class GameRoom {
         this.canvas = this.$('#arcade-canvas');
         this.palette = readPalette();
         this.dialog.dataset.engine = description.engine;
+        this.dialog.dataset.brief = 'start';
+        this.$('#arcade-tutorial').removeAttribute('aria-labelledby');
+        this.$('#arcade-tutorial').setAttribute('aria-label', 'Start game');
         this.sixDirections = description.inputScheme === 'wrist-directions';
         const profile = description.engine === 'popups' ? popupProfile : arcadeProfile;
         this.$('a[download]').href = `./arcade/profiles/${description.engine === 'popups' ? 'popup-directions' : 'wrist-raises'}.json?v=targets-12`;
@@ -83,7 +86,7 @@ export class GameRoom {
         const on = (selector, handler) => this.$(selector).addEventListener('click', handler, { signal });
         bindAlternativeControls(this.dialog, { dispatch: (action, details) => this.input(action, details) }, signal, this.description.inputScheme);
         on('#arcade-close', () => this.dialog.close());
-        on('#arcade-begin', () => { if (this.navigation.deadline) this.cancelCountdown(); else this.play(); });
+        on('#arcade-begin', () => this.play());
         on('#arcade-resume', () => this.play());
         on('#arcade-no-camera', () => {
             this.stopCamera();
@@ -93,6 +96,9 @@ export class GameRoom {
         on('#arcade-again', () => this.restart());
         on('#arcade-restart', () => this.restart());
         on('#arcade-help', () => {
+            this.dialog.dataset.brief = 'controls';
+            this.$('#arcade-tutorial').removeAttribute('aria-label');
+            this.$('#arcade-tutorial').setAttribute('aria-labelledby', 'arcade-lesson-title');
             this.cancelCountdown(); this.clearFeedback(); this.runner.tutorial();
             this.$('#arcade-tutorial').scrollTop = 0;
             this.$('#arcade-begin').focus({ preventScroll: true });
@@ -218,7 +224,11 @@ export class GameRoom {
             return;
         }
         if (gesture.direction !== 'up') return;
-        if (this.navigation.request(this.runner.phase, this.visible, performance.now())) {
+        this.requestCountdown(this.visible, performance.now());
+    }
+
+    requestCountdown(visible, now) {
+        if (this.navigation.request(this.runner.phase, visible, now)) {
             this.inputMode = 'motion';
             this.$('#arcade-cancel-countdown').hidden = false;
         }
@@ -248,9 +258,9 @@ export class GameRoom {
         this.text('#arcade-pause', state.phase === 'paused' ? 'Resume' : 'Pause');
         this.$('#arcade-pause').disabled = ['tutorial', 'finished'].includes(state.phase);
         this.text('#arcade-restart', 'Restart');
-        this.text('#arcade-begin', this.navigation.deadline ? 'Cancel countdown' : this.runner?.started ? 'Resume' : 'Start');
+        this.text('#arcade-begin', this.runner?.started ? 'Resume' : 'Start');
         if (!this.navigation.deadline) {
-            const instruction = this.runner.started ? 'Lift to resume' : 'Lift to start';
+            const instruction = this.dialog.dataset.brief === 'start' ? 'Say hi (with hand) to start' : this.runner.started ? 'Lift to resume' : 'Lift to start';
             if (this.$('#arcade-controls-status').textContent !== instruction) this.$('#arcade-controls-status').textContent = instruction;
         }
         this.updateCameraLayout();
@@ -312,6 +322,7 @@ export class GameRoom {
         this.cameraStarting = false; this.camera.stop(); this.cancelCountdown();
         this.inputMode = 'keyboard';
         this.visible = false; this.dialog.dataset.camera = 'off';
+        this.startWristVisible = false; this.startLostAt = null;
         this.$('#arcade-camera').textContent = 'Use camera';
         this.cameraStatus();
         this.showPlacement({ shoulders: false, left: null, right: null });
@@ -326,6 +337,7 @@ export class GameRoom {
             this.dialog.dataset.camera = 'unavailable';
             this.$('#arcade-camera').textContent = 'Retry camera';
             this.visible = false; this.cancelCountdown();
+            this.startWristVisible = false; this.startLostAt = null;
             this.showPlacement({ shoulders: false, left: null, right: null });
             this.inputMode = 'keyboard';
         }
@@ -338,6 +350,14 @@ export class GameRoom {
         }
         this.visible = frame.visible;
         this.trackingAt = frame.timestamp;
+        const wristVisible = visiblePoint(frame.left) || visiblePoint(frame.right);
+        const wristEntered = wristVisible && !this.startWristVisible;
+        this.startWristVisible = wristVisible;
+        if (wristVisible) this.startLostAt = null;
+        else this.startLostAt ??= frame.timestamp;
+        if (wristEntered && this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start' && !document.hidden) {
+            this.requestCountdown(true, frame.timestamp);
+        }
         if (frame.visible) {
             this.lostAt = null;
             this.cameraStatus();
@@ -377,15 +397,20 @@ export class GameRoom {
             trackingHold = this.inputMode === 'motion' && (!this.visible || stale);
             if (stale) {
                 this.visible = false;
+                this.startWristVisible = false;
                 this.showPlacement({ shoulders: false, left: null, right: null });
                 this.cameraStatus();
             }
         }
         if (this.cameraStarting && this.inputMode === 'motion') trackingHold = true;
-        this.dialog.dataset.tracking = trackingHold ? 'held' : 'ready';
+        const trackingMissing = trackingHold;
+        trackingHold &&= this.runner.game.holdOnTrackingLoss !== false;
+        this.dialog.dataset.tracking = trackingMissing ? trackingHold ? 'held' : 'missing' : 'ready';
         this.text('#arcade-tracking-hint', this.cameraStarting ? 'Camera…' : 'Show a wrist');
-        this.$('#arcade-tracking-hint').hidden = !trackingHold || this.runner.phase !== 'playing';
-        const navigation = this.navigation.step({ visible: this.visible, lastSeen: this.trackingAt, lostSince: this.lostAt }, timestamp);
+        this.$('#arcade-tracking-hint').hidden = !trackingMissing || this.runner.phase !== 'playing';
+        const initialStart = this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start';
+        const navigation = this.navigation.step({ visible: initialStart ? this.startWristVisible : this.visible,
+            lastSeen: this.trackingAt, lostSince: initialStart ? this.startLostAt : this.lostAt }, timestamp);
         if (navigation?.cancelled) { this.cancelCountdown(); }
         else if (navigation?.play) this.play();
         else if (navigation) {

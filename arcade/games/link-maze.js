@@ -64,5 +64,5 @@ export function maze(env) {
         render(s, painter) { renderMaze(s, painter, env.reducedMotion); }
     });
     // An endless time-bank game owns its clock. Other engines keep the host's fixed round.
-    return { ...instance, remainingSeconds: () => state.remaining };
+    return { ...instance, remainingSeconds: () => state.remaining, holdOnTrackingLoss: false };
 }

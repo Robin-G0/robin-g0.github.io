@@ -287,6 +287,12 @@
 }
 #arcade-begin, #arcade-resume, #arcade-again { font-size: 22px; min-height: 50px; }
 #arcade-camera { font-size: 18px; }
+[data-brief=start] #arcade-tutorial { align-items: center; justify-content: center; text-align: center; }
+[data-brief=start] #arcade-tutorial > :not(#arcade-controls-status):not(.arcade-controls-heading):not(.lesson-actions) { display: none; }
+[data-brief=start] .arcade-controls-heading { order: 2; justify-content: center; }
+[data-brief=start] .arcade-controls-heading h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[data-brief=start] #arcade-controls-status { order: 1; font-size: clamp(30px, 5vw, 54px); line-height: 1.15; max-width: 540px; }
+[data-brief=start] #arcade-tutorial .lesson-actions { order: 3; justify-content: center; }
 .arcade-playfield-input { font-size: 22px; }
 .demo-forearm { transform-origin: 18px 49px; animation: wrist-lift 2.6s ease-in-out infinite; }
 @keyframes wrist-lift { 0%, 15%, 100% { transform: rotate(160deg); } 40%, 65% { transform: rotate(0); } }

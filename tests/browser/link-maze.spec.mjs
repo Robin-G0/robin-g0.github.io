@@ -92,6 +92,18 @@ test('native MIG wrist events navigate the remembered route without another came
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
 });
 
+test('hiding both wrists neither extends maze memorisation nor freezes the countdown',async({page})=>{
+    await open(page,true);
+    await page.evaluate(()=>window.motionTest.observe(false));
+    await page.clock.runFor(9600);
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-maze-stage','navigate');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking','missing');
+    const before=parseInt(await page.locator('#arcade-time').textContent());
+    await page.clock.runFor(3000);
+    expect(parseInt(await page.locator('#arcade-time').textContent())).toBeLessThanOrEqual(before-2);
+    await expect(page.locator('#arcade-paused')).not.toBeVisible();
+});
+
 test('original powerup art animates in the map and freezes visually for reduced motion',async({page})=>{
     await open(page);
     await page.evaluate(async()=>{const {loadArtwork}=await import('./arcade/core/painter.js?v=power-11');await loadArtwork('construction');});
