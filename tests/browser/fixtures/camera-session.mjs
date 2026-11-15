@@ -8,7 +8,12 @@ export class MIGSession {
                     : ({ x: index === 15 ? .7 : .3, y: index < 15 ? .35 : .65, confidence: .95 })) : [];
                 this.options.onFrame(this);
             },
-            gesture: action => { this.options.onAction({ action }); this.options.onFrame(this); },
+            raw: action => { this.options.onAction({ action }); this.options.onFrame(this); },
+            gesture: action => {
+                const command = action.includes('_') ? action : action + '_up';
+                this.options.onAction({ action: command.split('_')[0] + '_neutral' }); this.options.onFrame(this);
+                this.options.onAction({ action: command }); this.options.onFrame(this);
+            },
             stop: () => {
                 this.dispose(); this.state.running = false; this.listener(this.state);
             }

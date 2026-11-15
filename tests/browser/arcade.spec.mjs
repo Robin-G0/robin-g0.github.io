@@ -51,7 +51,7 @@ test('mobile touch controls fit at 320 px and survive orientation changes', asyn
         const stage = await page.locator('.arcade-stage').boundingBox();
         expect(lesson.x + lesson.width).toBeLessThanOrEqual(stage.x + stage.width + 1);
         await startRound(page);
-        const left = page.locator('[data-arcade-input=left]');
+        const left = page.locator('[data-arcade-input]').first();
         const box = await left.boundingBox();
         expect(box.height).toBeGreaterThanOrEqual(44);
         await left.click();

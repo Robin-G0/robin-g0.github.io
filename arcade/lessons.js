@@ -6,7 +6,7 @@ const instructions = {
     sort: ['Send the current file to Images.', 'Send the current file to Text.', 'PNG and JPG belong in Images. TXT and MD belong in Text. Watch the deadline bar.'],
     stack: ['Drop the moving window onto the stack.', 'Reverse its horizontal movement.', 'Wait until the moving window overlaps the one below. Poor overlap costs an attempt.'],
     ski: ['Move one lane left.', 'Move one lane right.', 'Choose the empty lane before the row of trees reaches the skier.'],
-    popups: ['Clear every left arrow in both stacks.', 'Clear every right arrow in both stacks.', 'Let matching arrows build, then sweep them all. Bigger groups score more. Chain clears for a bonus; clear both stacks for +100. Empty gestures cost nothing.'],
+    popups: ['Left wrist clears the left stack.', 'Right wrist clears the right stack.', 'Match the arrow. Return to chest height between moves; the dot lights when ready. Bigger groups score more. Empty moves cost nothing.'],
     maze: ['Follow the left link.', 'Follow the right link.', 'A wrong link is marked 404. Try the other one and remember the route.'],
     juggle: ['Bounce the falling GIF in the left lane.', 'Bounce the falling GIF in the right lane.', 'Lift when a GIF is coming down through the lower half, before it reaches the yellow platform.'],
     parry: ['Raise the left guard briefly.', 'Raise the right guard briefly.', 'Watch which side the attack comes from. Raise that guard near impact, not when the attack first appears.'],

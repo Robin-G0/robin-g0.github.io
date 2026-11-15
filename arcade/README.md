@@ -1,9 +1,11 @@
-# Two-input arcade
+# Motion arcade
 
 These games consume **logical pulses** from the `motion-input-grid` npm package.
-They never infer a gesture themselves. A left or right wrist raise produces one
-command. Lower the wrist below the green start band before raising it again;
-holding it at the finish does not produce more commands.
+They never infer a gesture themselves. Most games map left/right wrist raises to
+two actions. Pop-up Panic uses six commands: each anatomical wrist controls its
+own stack with screen-left, up and screen-right. The preview mirrors once.
+Return the acting wrist to chest height between commands; a lit dot confirms
+native neutral detection. Holding or moving between targets never repeats.
 
 ## Run the site
 
@@ -33,7 +35,7 @@ The static site needs no server build.
 - `lessons.js`: short control explanations and optional game tips for every engine.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
-- `mig/profile.js`: a readable schema-v2 profile derived from MIG's wrist-raise example.
+- `mig/profile.js`: native schema-v2 trigger regions, dwell and neutral confirmations.
 - `mig/camera.js`: `MIGSession`, frame health, status, recalibration and disposal.
 - `core/import-game.js`: strict validation of declarative game files.
 
@@ -46,7 +48,7 @@ A trusted factory receives an environment with a seeded `random()` function,
 {
     state: { score: 0, lives: 3, time: 0 },
     start(),
-    input({ action, source, timestamp }), // action is "left" or "right"
+    input({ action, source, timestamp }), // action comes from catalog.controls; six commands also include wrist/direction
     update(seconds),                    // simulation time, never wall-clock timers
     render(painter),
     pause(),
@@ -62,15 +64,16 @@ The host owns those resources and destroys the game on exit or theme change.
 
 ## Recognition and timing
 
-The profile uses body-relative wrist regions, no finger-sign requirement, ordered
-Required → Trigger regions, a Low tolerance, Single Press and a 500 ms cooldown.
-The published package requires a visible return **below** the start band to rearm;
-the custom start band permits that return at chest height inside a torso crop.
-Shoulders plus the acting wrist suffice; the other wrist and legs may be out of
-view. Staying in the start band is insufficient. Synthetic tests exercise the actual
-packaged WASM, including gaps of 33–180 ms, loss of observations and cooldown.
+The profile uses disjoint body-relative trigger regions with deadbands, native
+Single Press and occupancy dwell: 60 ms at a direction, 120 ms at neutral.
+Shoulders plus the acting wrist suffice; the other wrist and legs may be absent.
+The native recognizer emits six direction events and two internal neutral events.
+GestureGate sequences those events per wrist: neutral arms one direction; loss or
+ambiguity disarms it. It does not classify positions, invent releases or queue moves.
+Actual packaged WASM tests cover all six bindings, held targets, direct transitions,
+neutral return, observation loss and 33/100/160 ms frame intervals.
 
-MIG owns recognition and physical rearming. The host ignores stale deliveries,
+MIG owns recognition and dwell. The host ignores stale deliveries,
 duplicate callbacks, and commands outside active play. It never replays paused
 inputs. It does not turn coordinates into a second recognizer. Rhythm games use
 explicit generous scoring windows; other games respond immediately. The render
@@ -100,13 +103,13 @@ separate from the game input router and never recognises a gesture itself.
 ## Pop-up Panic loop
 
 Both stacks receive windows. Each window has a direction independent of its stack.
-One gesture clears every matching arrow in both stacks; empty gestures cost nothing
+Each wrist clears matching up, left or right arrows in its own stack; empty gestures cost nothing
 and do not break a chain. Bigger batches earn `10 × count² × chain multiplier × level`.
 Consecutive successful clears within 4.5 simulation seconds increase the multiplier,
 and an empty board earns another `100 × level`. Waiting builds valuable groups but
 risks the visible stack ceiling. Overflow allows 1.2 seconds to recover.
 
-A shuffled four-left/four-right bag and visible upcoming arrows make planning
+A shuffled three-of-each-direction bag and visible upcoming arrows make planning
 possible. Clears speed up paired arrivals gradually. Clearing gaps makes remaining
 windows settle; large sweeps get a burst and a short rising chiptune. Reduced-motion
 rendering keeps the rules and random sequence unchanged. A deterministic test
@@ -126,7 +129,7 @@ Each engine supplies a small `feedback(state, event)` hook returning a logical
 action and score change, and the painter displays a short callout at that target.
 Keep the hook visual: it must not change game rules. Rule messages also appear
 inside the playfield, including reasons why a recognised input cannot act yet.
-Pop-up closures additionally leave a one-second outline and CLOSED +10 trace.
+Pop-up clears use local arrow/count plates, settling windows and short bursts.
 
 ## Add or import a game
 

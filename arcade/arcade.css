@@ -229,7 +229,18 @@
 #arcade-paused h3 { font-size: 36px; }
 #arcade-final-score { font-size: 52px; }
 
-[data-engine=popups] .arcade-inputs .action-key { display: none; }
+.wrist-controls { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.wrist-title { font-size: 28px; }
+.wrist-title::after { content: ''; display: block; width: 10px; height: 10px; margin: 5px auto; border: 2px solid var(--accent); border-radius: 50%; }
+[data-ready=true] > .wrist-title::after { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.wrist-buttons { display: grid; grid-template-columns: repeat(3, minmax(44px, 1fr)); gap: 6px; flex: 1; }
+.wrist-buttons .arcade-action { display: flex; flex-direction: column; gap: 0; align-items: center; justify-content: center; padding: 4px; min-height: 58px; }
+.wrist-buttons kbd { font: 12px monospace; opacity: .7; }
+.camera-wrist { width: auto; min-width: 28px; padding: 2px 5px; }
+.camera-wrist[data-ready=true] { outline: 3px solid #9dff99; outline-offset: 3px; }
+[data-engine=popups] .gesture-lesson svg { display: none; }
+[data-engine=popups] .gesture-lesson [data-tutorial-action] { font-size: 34px; }
+@media (max-width: 480px) { [data-engine=popups] .arcade-inputs { grid-template-columns: 1fr; } }
 #arcade-begin, #arcade-resume, #arcade-again { font-size: 22px; min-height: 50px; }
 #arcade-camera { font-size: 18px; }
 .arcade-playfield-input { font-size: 22px; }

@@ -35,7 +35,7 @@ test('runner discards paused/tutorial inputs and bounds a slow simulation frame'
     assert.equal(runner.phase, 'closed');
 });
 
-test('camera accepts real package pulses with one visible wrist, including simultaneous actions', async () => {
+test('camera adapter accepts native pulses with one visible wrist, including simultaneous actions', async () => {
     let options, disposed = 0;
     class Session {
         constructor(value) { options = value; this.state = { running: false }; }
@@ -50,21 +50,22 @@ test('camera accepts real package pulses with one visible wrist, including simul
         loadPackage: async () => ({ MIGSession: Session }), clock: () => 1000 });
     await camera.start({}, {});
     const frame = { coordinate: () => ({ x: .5, y: .5, confidence: 1 }) };
-    options.onAction({ action: 'left' }); options.onFrame(frame);
-    assert.deepEqual(actions, ['left']);
-    options.onAction({ action: 'left' }); options.onAction({ action: 'right' }); options.onFrame(frame);
-    assert.deepEqual(actions, ['left', 'left', 'right']);
+    options.onAction({ action: 'left_neutral' }); options.onFrame(frame); options.onAction({ action: 'left_up' }); options.onFrame(frame);
+    assert.deepEqual(actions, ['left_up']);
+    options.onAction({ action: 'left_neutral' }); options.onAction({ action: 'right_neutral' }); options.onFrame(frame);
+    options.onAction({ action: 'left_up' }); options.onAction({ action: 'right_up' }); options.onFrame(frame);
+    assert.deepEqual(actions, ['left_up', 'left_up', 'right_up']);
     const leftOnly = { coordinate: index => index === 16 ? null : ({ x: .5, y: .5, confidence: 1 }) };
-    options.onAction({ action: 'left' }); options.onFrame(leftOnly);
-    options.onAction({ action: 'right' }); options.onFrame(leftOnly);
-    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
+    options.onAction({ action: 'left_neutral' }); options.onFrame(frame); options.onAction({ action: 'left_up' }); options.onFrame(leftOnly);
+    options.onAction({ action: 'right_neutral' }); options.onFrame(frame); options.onAction({ action: 'right_up' }); options.onFrame(leftOnly);
+    assert.deepEqual(actions, ['left_up', 'left_up', 'right_up', 'left_up']);
     assert.equal(frames.at(-1).visible, true);
-    options.onAction({ action: 'right' }); options.onFrame({ coordinate: () => null });
-    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
+    options.onAction({ action: 'right_neutral' }); options.onFrame(frame); options.onAction({ action: 'right_up' }); options.onFrame({ coordinate: () => null });
+    assert.deepEqual(actions, ['left_up', 'left_up', 'right_up', 'left_up']);
     assert.equal(frames.at(-1).visible, false);
     camera.stop();
-    options.onAction({ action: 'right' }); options.onFrame(frame);
-    assert.deepEqual(actions, ['left', 'left', 'right', 'left']);
+    options.onAction({ action: 'right_neutral' }); options.onFrame(frame); options.onAction({ action: 'right_up' }); options.onFrame(frame);
+    assert.deepEqual(actions, ['left_up', 'left_up', 'right_up', 'left_up']);
     assert.equal(disposed, 1);
 });
 

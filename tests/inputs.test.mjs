@@ -3,6 +3,18 @@ import assert from 'node:assert/strict';
 import { InputRouter } from '../arcade/core/input.js';
 import { parseGameFile } from '../arcade/core/import-game.js';
 import { games } from '../arcade/catalog.js';
+import { WRIST_COMMANDS } from '../arcade/core/commands.js';
+
+test('six-command routing keeps wrist identity separate from direction', () => {
+    const accepted = [];
+    const router = new InputRouter({ actions: WRIST_COMMANDS, accept: e => accepted.push(e), clock: () => 1000 });
+    router.setPhase('playing');
+    for (const action of WRIST_COMMANDS) assert.equal(router.dispatch(action, { source: 'motion' }), true);
+    assert.equal(router.dispatch('left_up', { source: 'motion' }), false);
+    assert.equal(router.dispatch('left'), false);
+    assert.equal(router.dispatch('left_neutral'), false);
+    assert.deepEqual(accepted.map(({ wrist, direction }) => `${wrist}_${direction}`), WRIST_COMMANDS);
+});
 
 test('inputs are immediate, phase-gated, and never replayed on resume', () => {
     let now = 1000;

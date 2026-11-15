@@ -1,4 +1,5 @@
-import { arcadeProfile } from './profile.js?v=motion-6';
+import { arcadeProfile } from './profile.js?v=gestures-7';
+import { GestureGate } from './gesture-gate.js';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -13,10 +14,12 @@ export class MotionCamera {
         this.session = null;
         this.generation = 0;
         this.pending = [];
+        this.gate = new GestureGate();
     }
 
     async start(video, overlay) {
         const generation = ++this.generation;
+        this.gate.reset();
         this.onStatus('Loading motion tracking. First start may take a few seconds…');
         try {
             const { MIGSession } = await this.loadPackage();
@@ -33,14 +36,16 @@ export class MotionCamera {
                     const shoulders = points.slice(0, 2).every(visiblePoint);
                     const visible = shoulders && points.slice(2).some(visiblePoint);
                     this.lastFrame = this.clock();
+                    const actions = this.gate.consume(this.pending.splice(0), {
+                        left: shoulders && visiblePoint(points[2]), right: shoulders && visiblePoint(points[3])
+                    });
                     this.onTracking({ visible, shoulders,
-                        left: points[2], right: points[3], timestamp: this.lastFrame });
-                    const actions = this.pending.splice(0);
+                        left: points[2], right: points[3], ready: { ...this.gate.ready }, timestamp: this.lastFrame });
                     if (!visible) return;
                     // MIG already recognised these pulses. An off-screen OTHER
                     // wrist must not suppress an observed hand's valid command.
                     for (const event of actions) {
-                        const wrist = event.action === 'left' ? points[2] : event.action === 'right' ? points[3] : null;
+                        const wrist = event.wrist === 'left' ? points[2] : points[3];
                         if (visiblePoint(wrist)) this.onInput(event.action, event.timestamp);
                     }
                 }
@@ -72,6 +77,7 @@ export class MotionCamera {
 
     recalibrate() {
         this.pending.length = 0;
+        this.gate.reset();
         this.session?.recalibrate();
         this.onStatus('Lower your hands and keep both shoulders visible.');
     }
@@ -79,6 +85,7 @@ export class MotionCamera {
     stop() {
         ++this.generation;
         this.pending.length = 0;
+        this.gate.reset();
         this.running = false;
         this.unsubscribe?.();
         this.unsubscribe = null;

@@ -12,19 +12,18 @@ test('every game has a specific two-control summary and optional game tips', () 
     }
 });
 
-test('one direction clears all matching arrows across both stacks without punishing empty moves', () => {
-    const messages = [];
-    const game = engines.popups({ random: seededRandom(123), pace: .8,
-        message: text => messages.push(text), finish() {} });
-    game.start(); game.input({ action: 'left' });
-    assert.equal(game.state.lastClear.count, 3);
-    assert.equal(game.state.inputFeedback.points, 90);
-    assert.equal(game.state.windows.some(window => window.action === 'left'), false);
-    const score = game.state.score, chain = game.state.chain;
-    game.input({ action: 'left' });
-    assert.equal(game.state.score, score);
-    assert.equal(game.state.chain, chain);
-    game.input({ action: 'right' });
-    assert.ok(game.state.score > 180, 'Chain and all-clear bonuses reward the next sweep');
-    game.dispose();
+test('every popup command clears only the matching direction in its own stack', () => {
+    const g = engines.popups({ random: seededRandom(123), pace: .8, message() {}, finish() {} });
+    g.start();
+    for (const wrist of ['left', 'right']) for (const direction of ['left', 'up', 'right']) {
+        const other = structuredClone(g.state.windows.filter(w => w.stack !== (wrist === 'left' ? 0 : 1)));
+        g.input({ action: wrist + '_' + direction });
+        assert.equal(g.state.lastClear.count, 1);
+        assert.deepEqual(g.state.windows.filter(w => w.stack !== (wrist === 'left' ? 0 : 1)), other);
+        const score = g.state.score, chain = g.state.chain;
+        g.input({ action: wrist + '_' + direction });
+        assert.equal(g.state.score, score); assert.equal(g.state.chain, chain);
+    }
+    assert.equal(g.state.lastClear.perfect, true);
+    g.dispose();
 });

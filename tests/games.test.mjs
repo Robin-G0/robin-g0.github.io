@@ -33,7 +33,7 @@ for (const description of games) {
             const g = run.game, p = painter();
             g.render(p);
             for (let frame = 0; frame < 1200 && !run.finished; frame++) {
-                if (frame % 31 === 0) g.input({ action: frame % 62 ? 'left' : 'right', source: 'motion' });
+                if (frame % 31 === 0) g.input({ action: Object.keys(description.controls)[Math.floor(frame / 31) % Object.keys(description.controls).length], source: 'motion' });
                 g.update(1 / 30);
                 if (frame % 60 === 0) g.render(p);
                 assert.ok(Number.isFinite(g.state.score));

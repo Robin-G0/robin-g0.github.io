@@ -5,110 +5,240 @@
   },
   "inputs": [
     {
-      "id": "arcade_left",
-      "name": "Raise left wrist",
-      "action": "left",
+      "id": "left_neutral",
+      "name": "left wrist neutral",
+      "action": "left_neutral",
+      "mirror": false,
       "space": "body",
-      "cooldown_ms": 500,
+      "cooldown_ms": 0,
       "action_mode": "single_press",
       "steps": [
         {
-          "id": "left_raise",
-          "mode": "ordered",
+          "id": "left_neutral_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
           "constraints": [
             {
-              "id": "left_rest",
+              "id": "left_neutral_zone",
               "landmark": "left_wrist",
               "cell": [
-                -9,
+                5,
+                4,
                 3,
-                27,
-                1
-              ],
-              "type": "required",
-              "priority": "high",
-              "order": 1
-            },
-            {
-              "id": "left_finish",
-              "landmark": "left_wrist",
-              "cell": [
-                -9,
-                1,
-                27,
-                2
-              ],
-              "type": "trigger",
-              "priority": "high",
-              "order": 2
-            },
-            {
-              "id": "left_tolerance",
-              "landmark": "left_wrist",
-              "cell": [
-                -9,
-                0,
-                27,
                 3
               ],
               "type": "trigger",
-              "priority": "low",
-              "tolerance_for": "left_finish"
+              "priority": "high"
             }
           ]
         }
       ]
     },
     {
-      "id": "arcade_right",
-      "name": "Raise right wrist",
-      "action": "right",
+      "id": "left_left",
+      "name": "left wrist left",
+      "action": "left_left",
+      "mirror": false,
       "space": "body",
-      "cooldown_ms": 500,
+      "cooldown_ms": 0,
       "action_mode": "single_press",
       "steps": [
         {
-          "id": "right_raise",
-          "mode": "ordered",
+          "id": "left_left_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
           "constraints": [
             {
-              "id": "right_rest",
-              "landmark": "right_wrist",
+              "id": "left_left_zone",
+              "landmark": "left_wrist",
               "cell": [
-                -9,
+                9,
+                4,
                 3,
-                27,
-                1
-              ],
-              "type": "required",
-              "priority": "high",
-              "order": 1
-            },
-            {
-              "id": "right_finish",
-              "landmark": "right_wrist",
-              "cell": [
-                -9,
-                1,
-                27,
-                2
-              ],
-              "type": "trigger",
-              "priority": "high",
-              "order": 2
-            },
-            {
-              "id": "right_tolerance",
-              "landmark": "right_wrist",
-              "cell": [
-                -9,
-                0,
-                27,
                 3
               ],
               "type": "trigger",
-              "priority": "low",
-              "tolerance_for": "right_finish"
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "left_up",
+      "name": "left wrist up",
+      "action": "left_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
+          "constraints": [
+            {
+              "id": "left_up_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                5,
+                1,
+                3,
+                2
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "left_right",
+      "name": "left wrist right",
+      "action": "left_right",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_right_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
+          "constraints": [
+            {
+              "id": "left_right_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                1,
+                4,
+                3,
+                3
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_neutral",
+      "name": "right wrist neutral",
+      "action": "right_neutral",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_neutral_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "right_neutral_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                1,
+                4,
+                3,
+                3
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_left",
+      "name": "right wrist left",
+      "action": "right_left",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_left_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
+          "constraints": [
+            {
+              "id": "right_left_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                5,
+                4,
+                3,
+                3
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_up",
+      "name": "right wrist up",
+      "action": "right_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
+          "constraints": [
+            {
+              "id": "right_up_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                1,
+                1,
+                3,
+                2
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_right",
+      "name": "right wrist right",
+      "action": "right_right",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_right_settle",
+          "mode": "simultaneous",
+          "hold_ms": 60,
+          "constraints": [
+            {
+              "id": "right_right_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                -3,
+                4,
+                3,
+                3
+              ],
+              "type": "trigger",
+              "priority": "high"
             }
           ]
         }

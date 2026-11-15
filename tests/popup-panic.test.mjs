@@ -19,16 +19,16 @@ test('batch rewards favour planned large clears over repeated single-window clea
     assert.ok(batchPoints(4, 3) > batchPoints(4, 1));
     assert.equal(batchPoints(0, 5), 0);
     const run = create(), g = run.game;
-    g.input({ action: 'left' });
-    assert.equal(g.state.lastClear.count, 3);
-    assert.ok(g.state.windows.every(window => window.action === 'right'));
+    g.input({ action: 'left_left' });
+    assert.equal(g.state.lastClear.count, 1);
+    assert.ok(g.state.windows.every(window => window.stack !== 0 || window.direction !== 'left'));
     const before = { score: g.state.score, chain: g.state.chain, next: g.state.next };
-    g.input({ action: 'left' });
+    g.input({ action: 'left_left' });
     assert.deepEqual({ score: g.state.score, chain: g.state.chain, next: g.state.next }, before);
     assert.equal(run.sounds.length, 1, 'Empty gestures create no error sound or penalty');
-    g.input({ action: 'right' });
+    for (const action of ['left_up', 'left_right', 'right_left', 'right_up', 'right_right']) g.input({ action });
     assert.equal(g.state.lastClear.perfect, true);
-    assert.equal(g.state.lastClear.points, batchPoints(3, 2) + 100);
+    assert.equal(g.state.lastClear.points, batchPoints(1, 6) + 100);
 });
 
 test('both stacks grow with a preview, settle after clears and retain an overflow recovery window', () => {
@@ -37,10 +37,11 @@ test('both stacks grow with a preview, settle after clears and retain an overflo
     for (const stack of [0, 1]) assert.equal(g.state.windows.filter(window => window.stack === stack).length, 4);
     assert.equal(g.state.queue.length, 4);
     for (const stack of [0, 1]) for (let i = 0; i < STACK_LIMIT + 1; i++) {
-        g.state.windows.push({ id: 100 + stack * 30 + i, stack, action: 'left', row: i, born: g.state.time });
+        g.state.windows.push({ id: 100 + stack * 30 + i, stack, direction: 'left', row: i, born: g.state.time });
     }
     advance(run, .5); assert.equal(run.finished, false, 'Near-overflow allows a last-second recovery');
-    g.input({ action: 'left' });
+    g.input({ action: 'left_left' });
+    g.input({ action: 'right_left' });
     advance(run, .3); assert.equal(g.state.fullAt, null); assert.equal(run.finished, false);
     assert.ok(g.state.bursts.length > 0);
     advance(run, .7); assert.equal(g.state.bursts.length, 0);
@@ -56,14 +57,16 @@ test('comfortable discrete inputs can sustain a round, and reduced-motion render
             run.game.update(1 / 60);
             const s = run.game.state;
             if (s.time >= next) {
-                const left = s.windows.filter(window => window.action === 'left').length;
-                run.game.input({ action: left >= s.windows.length - left ? 'left' : 'right' });
+                const counts = new Map();
+                for (const w of s.windows) { const action = (w.stack ? 'right_' : 'left_') + w.direction; counts.set(action, (counts.get(action) || 0) + 1); }
+                const action = [...counts].sort((a,b) => b[1] - a[1])[0]?.[0];
+                if (action) run.game.input({ action });
                 next += 1.7;
             }
         }
         assert.equal(run.finished, false, 'One comfortable pulse every 1.7 seconds should remain viable');
         assert.ok(run.game.state.level > 2);
-        assert.ok(run.game.state.score > 2000);
+        assert.ok(run.game.state.score > 1000);
     }
     assert.equal(runs[0].game.state.score, runs[1].game.state.score);
     assert.deepEqual(runs[0].game.state.queue, runs[1].game.state.queue);

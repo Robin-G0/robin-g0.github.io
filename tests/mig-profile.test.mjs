@@ -2,83 +2,78 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import createMIG from '../vendor/motion-input-grid/runtime/mig.mjs';
 import { arcadeProfile } from '../arcade/mig/profile.js';
+import { GestureGate } from '../arcade/mig/gesture-gate.js';
 import { visiblePoint } from '../arcade/mig/camera.js';
-
 const wasm = await createMIG();
-
+const home = {left:[6.5,5.5], right:[2.5,5.5]};
+const targets = {left_up:[6.5,2], left_left:[10,5.5], left_right:[2.5,5.5],
+    right_up:[2.5,2], right_left:[6.5,5.5], right_right:[-1,5.5]};
 function harness() {
-    const tracker = new wasm.Tracker();
+    const tracker = new wasm.Tracker(), gate = new GestureGate(), events = [];
     assert.equal(tracker.load(JSON.stringify(arcadeProfile)), '');
     assert.equal(tracker.trackHands(), false);
-    let time = 0, sequence = 0;
-    const events = [];
-    const frame = (left, right = 5.5, gap = 40) => {
-        time += gap;
-        const body = tracker.bodyBuffer(); body.fill(0);
-        const put = (i, x, y) => body.set([x, y, 0, 1, 0, 0, 0, 1], i * 8);
-        put(11, .65, .45); put(12, .35, .45);
-        if (left != null) put(15, .62, .45 + (left - 3.5) * .06);
-        if (right != null) put(16, .38, .45 + (right - 3.5) * .06);
-        const count = tracker.update(time, ++sequence, 1, 0, 0);
-        assert.ok(count >= 0);
-        for (let i = 0; i < count; i++) events.push(tracker.eventAction(i));
+    let time = 0, seq = 0;
+    const frame = (left=home.left, right=home.right, gap=40) => {
+        time += gap; const body = tracker.bodyBuffer(); body.fill(0);
+        const put = (index,x,y) => body.set([x,y,0,1,0,0,0,1],index*8);
+        put(11,.65,.45); put(12,.35,.45);
+        for (const [index,point] of [[15,left],[16,right]]) if(point) put(index,.5+(point[0]-4.5)*.06,.45+(point[1]-3.5)*.06);
+        const count = tracker.update(time,++seq,1,0,0), native=[];
+        assert.ok(count>=0);
+        for(let i=0;i<count;i++) native.push({action:tracker.eventAction(i),timestamp:time});
+        events.push(...gate.consume(native,{left:!!left,right:!!right}).map(e=>e.action));
     };
-    for (let i = 0; i < 30; i++) frame(5.5);
-    return { tracker, frame, events, close: () => tracker.delete() };
+    const dwell=(left,right,gap=40,n=8)=>{for(let i=0;i<n;i++)frame(left,right,gap);};
+    dwell(home.left,home.right,40,35);
+    return {tracker,gate,events,frame,dwell,close:()=>tracker.delete()};
 }
-
-test('real packaged WASM recognizes broad fast sweeps, then waits for release', () => {
-    for (const gap of [33, 100, 160, 180]) {
-        const h = harness();
+test('packaged WASM distinguishes all six anatomical-wrist and mirrored-screen commands',()=>{
+    for(const gap of [33,100,160]) {
+        const h=harness();
         try {
-            h.frame(3.5);
-            h.frame(2.5, 5.5, gap);
-            assert.deepEqual(h.events, ['left']);
-            for (let i = 0; i < 30; i++) h.frame(2.5);
-            assert.equal(h.events.length, 1, 'A raised wrist is not a stream of presses');
-            h.frame(5.5); h.frame(5.5); h.frame(3.5); h.frame(2.5);
-            assert.equal(h.events.length, 2, 'A visible return rearms the next raise');
-        } finally { h.close(); }
+            for(const [action,target] of Object.entries(targets)) {
+                h.dwell(home.left,home.right,gap);
+                h.dwell(action.startsWith('left')?target:home.left,action.startsWith('right')?target:home.right,gap);
+                assert.equal(h.events.at(-1),action);
+                const count=h.events.length;
+                h.dwell(action.startsWith('left')?target:home.left,action.startsWith('right')?target:home.right,gap,25);
+                assert.equal(h.events.length,count,'Holding a destination never repeats');
+            }
+            assert.deepEqual(h.events,Object.keys(targets));
+        } finally {h.close();}
     }
 });
-
-test('real package coordinates support wrist placement feedback and disappear on loss', () => {
-    const h = harness();
+test('native neutral confirmation prevents direct transitions and reappearance from clearing',()=>{
+    const h=harness();
     try {
-        const wrist = h.tracker.coordinate(15, 0);
-        assert.equal(visiblePoint(wrist), true);
-        assert.ok(Math.abs(wrist.x - .62) < .001);
-        assert.ok(Math.abs(wrist.y - .57) < .001);
-        h.frame(null);
-        assert.equal(visiblePoint(h.tracker.coordinate(15, 0)), false);
-    } finally { h.close(); }
+        h.dwell(targets.left_up,home.right);
+        h.dwell(targets.left_left,home.right);
+        assert.deepEqual(h.events,['left_up']);
+        h.dwell(home.left,home.right); h.dwell(targets.left_left,home.right);
+        assert.deepEqual(h.events,['left_up','left_left']);
+        h.dwell(null,home.right); h.dwell(targets.left_up,home.right);
+        assert.equal(h.events.length,2);
+        h.dwell(home.left,home.right); h.dwell(targets.left_up,home.right);
+        assert.deepEqual(h.events,['left_up','left_left','left_up']);
+    }finally{h.close();}
 });
-
-test('tracking loss, finish-only poses and cooldown paths do not invent actions', () => {
-    const h = harness();
+test('one visible wrist and shoulders suffice; neutral jitter and diagonal deadbands do nothing',()=>{
+    const h=harness();
     try {
-        h.frame(3.5); h.frame(2.5, 5.5, 181);
-        assert.equal(h.events.length, 0, 'An overlong gap invalidates the sweep');
-        for (let i = 0; i < 8; i++) h.frame(null);
-        for (let i = 0; i < 8; i++) h.frame(2.5);
-        assert.equal(h.events.length, 0, 'Reappearing at the finish is insufficient');
-        h.frame(5.5); h.frame(3.5); h.frame(2.5);
-        assert.equal(h.events.length, 1);
-        h.frame(5.5); h.frame(3.5); h.frame(2.5);
-        for (let i = 0; i < 30; i++) h.frame(2.5);
-        assert.equal(h.events.length, 1, 'A path in cooldown is not queued');
-        h.frame(5.5); h.frame(5.5, 3.5); h.frame(5.5, 2.5);
-        assert.deepEqual(h.events, ['left', 'right']);
-    } finally { h.close(); }
+        for(let i=0;i<20;i++)h.frame([6.5+(i%2)*.2,5.5],null);
+        h.dwell([8.5,3.5],null); assert.deepEqual(h.events,[]);
+        h.dwell(home.left,null); h.dwell(targets.left_up,null);
+        assert.deepEqual(h.events,['left_up']);
+        assert.equal(h.tracker.coordinate(16,0),null);
+        assert.equal(visiblePoint(h.tracker.coordinate(15,0)),true);
+        h.frame(null,null); assert.equal(visiblePoint(h.tracker.coordinate(15,0)),false);
+    }finally{h.close();}
 });
-
-test('torso-only framing can rearm at chest height without observing the other wrist or legs', () => {
-    const h = harness();
-    try {
-        h.frame(5.5, null); h.frame(3.5, null); h.frame(2.5, null);
-        for (let i = 0; i < 25; i++) h.frame(2.5, null);
-        h.frame(5.5, null); h.frame(3.5, null); h.frame(2.5, null);
-        assert.deepEqual(h.events, ['left', 'left']);
-        assert.equal(h.tracker.coordinate(16, 0), null);
-    } finally { h.close(); }
+test('event gate drops ambiguous callbacks and never transfers readiness to the other wrist',()=>{
+    const gate=new GestureGate(), visible={left:true,right:true};
+    const send=(...actions)=>gate.consume(actions.map(action=>({action})),visible);
+    send('left_neutral'); assert.deepEqual(send('right_up'),[]);
+    assert.deepEqual(send('left_up','left_right'),[]);
+    assert.deepEqual(send('left_left'),[]);
+    send('left_neutral'); assert.equal(send('left_up','left_up').length,1);
 });

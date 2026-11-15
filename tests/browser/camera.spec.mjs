@@ -101,6 +101,30 @@ async function openObservedCamera(page) {
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'live');
 }
 
+test('popup controls preserve all six wrist directions and require native neutral before another clear', async ({ page }) => {
+    await page.goto('/?theme=construction#arcade');
+    await openObservedCamera(page);
+    await page.evaluate(() => window.motionTest.observe());
+    await page.locator('#arcade-begin').click();
+    await expect(page.locator('[data-arcade-input]')).toHaveCount(6);
+    await page.evaluate(() => window.motionTest.raw('left_neutral'));
+    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-ready', 'true');
+    await page.evaluate(() => window.motionTest.raw('left_up'));
+    await expect(page.locator('#arcade-score')).toHaveText('10');
+    await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-ready', 'false');
+    await expect(page.locator('#arcade-recognition')).toHaveText('L ↑');
+    await page.evaluate(() => window.motionTest.raw('left_right'));
+    await expect(page.locator('#arcade-score')).toHaveText('10');
+    // The identical arrow in the other stack still exists.
+    await page.evaluate(() => window.motionTest.gesture('right_up'));
+    await expect(page.locator('#arcade-score')).toHaveText('23');
+    for (const [key, label] of [['a', 'L ←'], ['d', 'L →'], ['j', 'R ←'], ['l', 'R →']]) {
+        await page.keyboard.press(key);
+        await expect(page.locator('#arcade-recognition')).toHaveText(label);
+    }
+    expect(Number(await page.locator('#arcade-score').textContent())).toBeGreaterThan(100);
+});
+
 test('preview and individual wrist feedback are visible before starting', async ({ page }) => {
     await openObservedCamera(page);
     const field = await page.locator('.arcade-stage').boundingBox();
@@ -174,8 +198,8 @@ test('Controls can be reopened without resetting score or consuming the resume g
     await page.evaluate(() => window.motionTest.observe());
     await page.locator('#arcade-begin').click();
     await page.evaluate(() => window.motionTest.gesture('left'));
-    await expect(page.locator('#arcade-score')).toHaveText('90');
-    await expect(page.locator('#arcade-playfield-input')).toHaveText('Clear \u2190 +90');
+    await expect(page.locator('#arcade-score')).toHaveText('10');
+    await expect(page.locator('#arcade-playfield-input')).toHaveText('L \u2191 +10');
     await page.locator('#arcade-help').click();
     await expect(page.locator('#arcade-tutorial')).toBeVisible();
     await expect(page.locator('#arcade-begin')).toHaveText('Resume');
@@ -184,9 +208,9 @@ test('Controls can be reopened without resetting score or consuming the resume g
     await expect(page.locator('#arcade-time')).toHaveText(time);
     await page.evaluate(() => window.motionTest.gesture('right'));
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
-    await expect(page.locator('#arcade-score')).toHaveText('90');
+    await expect(page.locator('#arcade-score')).toHaveText('10');
     await page.evaluate(() => window.motionTest.gesture('right'));
-    await expect(page.locator('#arcade-score')).toHaveText('303');
+    await expect(page.locator('#arcade-score')).toHaveText('23');
 });
 
 test('playfield stays above camera and keeps its position as detection feedback changes', async ({ page }) => {
@@ -201,7 +225,7 @@ test('playfield stays above camera and keeps its position as detection feedback 
         const field = page.locator('.arcade-stage');
         const before = await field.boundingBox();
         await page.evaluate(() => window.motionTest.gesture('left'));
-        await expect(page.locator('#arcade-playfield-input')).toHaveText('Clear \u2190 +90');
+        await expect(page.locator('#arcade-playfield-input')).toHaveText('L \u2191 +10');
         const detected = await field.boundingBox();
         expect(detected.y).toBeCloseTo(before.y, 1);
         expect(detected.height).toBeCloseTo(before.height, 1);

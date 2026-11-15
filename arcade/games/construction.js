@@ -1,7 +1,7 @@
 import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 import { integer } from '../core/random.js';
 
-export { popups } from './popup-panic.js?v=motion-6';
+export { popups } from './popup-panic.js?v=gestures-7';
 
 export function maze(env) {
     const state = { path: Array.from({ length: 6 }, () => env.random() < .5 ? 'left' : 'right'),

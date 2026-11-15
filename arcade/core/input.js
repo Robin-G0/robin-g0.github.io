@@ -1,11 +1,14 @@
+import { decodeGesture } from './commands.js';
+
 /** Only accepted logical commands enter a game. No pose recognition lives here. */
 export class InputRouter {
-    constructor({ accept, feedback = () => {}, clock = () => performance.now() }) {
+    constructor({ accept, feedback = () => {}, clock = () => performance.now(), actions = ['left', 'right'] }) {
         this.accept = accept;
         this.feedback = feedback;
         this.clock = clock;
         this.phase = 'tutorial';
         this.lastMotion = new Map();
+        this.actions = new Set(actions);
     }
 
     setPhase(phase) {
@@ -14,7 +17,7 @@ export class InputRouter {
     }
 
     dispatch(action, { source = 'keyboard', timestamp = this.clock() } = {}) {
-        if (action !== 'left' && action !== 'right') return false;
+        if (!this.actions.has(action)) return false;
         const age = this.clock() - timestamp;
         if (age < -50 || age > 250) {
             this.feedback('late', action);
@@ -34,17 +37,20 @@ export class InputRouter {
             }
             this.lastMotion.set(action, timestamp);
         }
-        this.accept({ action, source, timestamp });
+        this.accept({ action, source, timestamp, ...decodeGesture(action) });
         this.feedback('accepted', action);
         return true;
     }
 }
 
-export function bindAlternativeControls(element, router, signal) {
-    const keyActions = { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right', A: 'left', D: 'right' };
+export function bindAlternativeControls(element, router, signal, scheme = 'wrist-up') {
+    const keyActions = scheme === 'wrist-directions'
+        ? { a: 'left_left', w: 'left_up', d: 'left_right', j: 'right_left', i: 'right_up', l: 'right_right',
+            ArrowLeft: 'right_left', ArrowUp: 'right_up', ArrowRight: 'right_right' }
+        : { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right' };
     element.addEventListener('keydown', event => {
         if (event.target.matches('input, select, textarea') || event.ctrlKey || event.metaKey) return;
-        const action = keyActions[event.key];
+        const action = keyActions[event.key.length === 1 ? event.key.toLowerCase() : event.key];
         if (!action) return;
         event.preventDefault();
         if (!event.repeat) router.dispatch(action);

@@ -1,4 +1,4 @@
-import { InputRouter } from './input.js';
+import { InputRouter } from './input.js?v=gestures-7';
 import { seededRandom } from './random.js';
 
 /** Owns simulation time. Games never own timers, animation loops or cameras. */
@@ -7,7 +7,7 @@ export class GameRunner {
         message = () => {}, changed = () => {}, sound = () => {}, reducedMotion = false } = {}) {
         Object.assign(this, { description, factory, clock, message, changed, sound, reducedMotion });
         this.seed = description.seed ?? (Date.now() >>> 0);
-        this.router = new InputRouter({ clock, feedback, accept: event => {
+        this.router = new InputRouter({ clock, feedback, actions: description.controls ? Object.keys(description.controls) : undefined, accept: event => {
             const lag = Math.max(0, this.clock() - event.timestamp) / 1000;
             this.game.input({ ...event, at: Math.max(0, this.game.state.time - lag) });
             this.publish();

@@ -1,11 +1,12 @@
-import { engines } from './registry.js?v=motion-6';
-import { GameRunner } from './core/runner.js?v=motion-6';
-import { bindAlternativeControls } from './core/input.js';
+import { engines } from './registry.js?v=gestures-7';
+import { GameRunner } from './core/runner.js?v=gestures-7';
+import { bindAlternativeControls } from './core/input.js?v=gestures-7';
+import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=motion-6';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=motion-6';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=gestures-7';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=motion-6';
+import { lessonFor } from './lessons.js?v=gestures-7';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -16,6 +17,8 @@ export class GameRoom {
         this.canvas = this.$('#arcade-canvas');
         this.palette = readPalette();
         this.dialog.dataset.engine = description.engine;
+        this.sixDirections = description.inputScheme === 'wrist-directions';
+        this.wristPulseUntil = {};
         this.inputMode = 'motion';
         this.sound = new ArcadeAudio(this.palette.theme);
         this.sound.unlock();
@@ -26,10 +29,7 @@ export class GameRoom {
         this.canvas.setAttribute('aria-label', `${description.title}. ${description.goal}`);
         this.$('#arcade-game-title').textContent = description.title;
         this.$('#arcade-goal').textContent = description.goal;
-        for (const side of ['left', 'right']) {
-            this.$(`[data-tutorial-action=${side}]`).textContent = description.controls[side];
-            this.$(`[data-arcade-input=${side}] .action-name`).textContent = description.controls[side];
-        }
+        this.buildControls();
         this.runner = new GameRunner(description, engines[description.engine], {
             feedback: (kind, action) => this.feedback(kind, action),
             message: text => this.message(text), changed: state => this.updateUI(state),
@@ -44,7 +44,7 @@ export class GameRoom {
         this.cancelCountdown();
         this.showPlacement({ shoulders: false, left: null, right: null });
         this.dialog.dataset.camera = 'off';
-        this.$('#arcade-feedback').textContent = 'Two buttons, or lower and lift one wrist.';
+        this.$('#arcade-feedback').textContent = this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
         this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
         this.runner.publish();
@@ -63,7 +63,7 @@ export class GameRoom {
     bindControls() {
         const signal = this.abort.signal;
         const on = (selector, handler) => this.$(selector).addEventListener('click', handler, { signal });
-        bindAlternativeControls(this.dialog, { dispatch: (action, details) => this.input(action, details) }, signal);
+        bindAlternativeControls(this.dialog, { dispatch: (action, details) => this.input(action, details) }, signal, this.description.inputScheme);
         on('#arcade-close', () => this.dialog.close());
         on('#arcade-begin', () => { if (this.navigation.deadline) this.cancelCountdown(); else this.play(); });
         on('#arcade-resume', () => this.play());
@@ -96,6 +96,36 @@ export class GameRoom {
             if (document.hidden) { this.cancelCountdown(); this.runner.pause('Paused while the page is in the background.'); }
         }, { signal });
         window.addEventListener('pagehide', () => this.dispose(), { signal });
+    }
+
+    buildControls() {
+        const area = this.$('.arcade-inputs');
+        area.replaceChildren();
+        for (const wrist of WRISTS) {
+            this.$(`[data-tutorial-action=${wrist}]`).textContent = this.sixDirections ? '← ↑ →' : this.description.controls[wrist];
+            if (this.sixDirections) {
+                const group = document.createElement('div'); group.className = 'wrist-controls';
+                group.dataset.wristControls = wrist; group.setAttribute('role', 'group');
+                group.setAttribute('aria-label', `${wrist} wrist controls`);
+                const title = document.createElement('strong'); title.className = 'wrist-title'; title.textContent = wrist === 'left' ? 'L' : 'R';
+                const buttons = document.createElement('div'); buttons.className = 'wrist-buttons';
+                DIRECTIONS.forEach((direction, index) => {
+                    const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
+                    button.dataset.arcadeInput = `${wrist}_${direction}`;
+                    button.setAttribute('aria-label', `${wrist} wrist ${direction}`);
+                    const arrow = document.createElement('span'); arrow.className = 'action-key'; arrow.textContent = ARROWS[direction];
+                    const key = document.createElement('kbd'); key.textContent = (wrist === 'left' ? ['A', 'W', 'D'] : ['J', 'I', 'L'])[index];
+                    button.append(arrow, key); buttons.append(button);
+                });
+                group.append(title, buttons); area.append(group);
+            } else {
+                const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
+                button.dataset.arcadeInput = wrist;
+                const arrow = document.createElement('span'); arrow.className = 'action-key'; arrow.textContent = ARROWS[wrist];
+                const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.description.controls[wrist];
+                button.append(arrow, label); area.append(button);
+            }
+        }
     }
 
     resizeCanvas() {
@@ -132,6 +162,7 @@ export class GameRoom {
 
     fillControls() {
         this.$('#arcade-tutorial').scrollTop = 0;
+        this.$('#arcade-neutral-cue').hidden = !this.sixDirections;
         this.$('#arcade-lesson-goal').textContent = this.description.goal;
         this.$('#arcade-lesson-tip').textContent = this.instructions.tip;
         this.$('#arcade-controls-tips').open = false;
@@ -150,10 +181,18 @@ export class GameRoom {
 
     motionInput(action, timestamp) {
         if (this.closed || document.hidden || performance.now() - timestamp > 250) return;
+        const gesture = decodeGesture(action);
+        if (!gesture || gesture.direction === 'neutral') return;
+        this.$('#arcade-recognition').textContent = commandLabel(action);
+        this.recognisedUntil = performance.now() + 1500;
+        this.wristPulseUntil[gesture.wrist] = performance.now() + 900;
+        this.$(`[data-wrist=${gesture.wrist}]`).textContent = commandLabel(action);
         if (this.runner.phase === 'playing') {
-            this.input(action, { source: 'motion', timestamp });
+            if (this.sixDirections) this.input(action, { source: 'motion', timestamp });
+            else if (gesture.direction === 'up') this.input(gesture.wrist, { source: 'motion', timestamp });
             return;
         }
+        if (gesture.direction !== 'up') return;
         if (this.navigation.request(this.runner.phase, this.visible, performance.now())) {
             this.inputMode = 'motion';
             this.$('#arcade-cancel-countdown').hidden = false;
@@ -208,7 +247,7 @@ export class GameRoom {
             this.$(`[data-arcade-input=${action}]`).dataset.pulse = 'true';
             this.pulseUntil = performance.now() + 180;
             this.recognisedUntil = performance.now() + 1800;
-            this.$('#arcade-recognition').textContent = action === 'left' ? '←' : '→';
+            this.$('#arcade-recognition').textContent = decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
             if (this.description.engine !== 'popups') this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
@@ -289,6 +328,9 @@ export class GameRoom {
         for (const side of ['left', 'right']) {
             const marker = this.$(`[data-wrist=${side}]`), point = frame[side];
             marker.hidden = !visiblePoint(point);
+            marker.dataset.ready = String(Boolean(frame.ready?.[side]));
+            const group = this.$(`[data-wrist-controls=${side}]`);
+            if (group) group.dataset.ready = marker.dataset.ready;
             if (point) { marker.style.left = `${(1 - point.x) * 100}%`; marker.style.top = `${point.y * 100}%`; }
         }
     }
@@ -318,6 +360,9 @@ export class GameRoom {
             this.$('#arcade-controls-status').textContent = text;
         }
         if (timestamp > (this.recognisedUntil || 0)) this.$('#arcade-recognition').textContent = '';
+        for (const wrist of WRISTS) if (timestamp > (this.wristPulseUntil[wrist] || 0)) {
+            this.$(`[data-wrist=${wrist}]`).textContent = wrist === 'left' ? 'L' : 'R';
+        }
         this.runner.step(timestamp, { hold: trackingHold });
         this.painter.background();
         this.runner.game.render(this.painter);
