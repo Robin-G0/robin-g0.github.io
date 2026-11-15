@@ -1,21 +1,27 @@
-import { engines } from './registry.js?v=upward-10';
-import { GameRunner } from './core/runner.js?v=upward-10';
-import { bindAlternativeControls } from './core/input.js?v=upward-10';
+import { engines } from './registry.js?v=power-11';
+import { GameRunner } from './core/runner.js?v=power-11';
+import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork } from './core/painter.js?v=upward-10';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=upward-10';
+import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=power-11';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=upward-10';
+import { lessonFor } from './lessons.js?v=power-11';
 import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js?v=upward-10';
+import { TriggerView } from './mig/trigger-view.js?v=power-11';
+import { FrameBudget } from './core/frame-budget.js';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
         this.dialog = dialog; this.description = description; this.opener = opener;
         this.abort = new AbortController();
         this.navigation = new MotionNavigation();
-        this.$ = selector => dialog.querySelector(selector);
+        this.elements = new Map();
+        this.$ = selector => {
+            if (!this.elements.has(selector)) this.elements.set(selector, dialog.querySelector(selector));
+            return this.elements.get(selector);
+        };
+        this.frameBudget = new FrameBudget(); this.needsPaint = true;
         this.canvas = this.$('#arcade-canvas');
         this.palette = readPalette();
         this.dialog.dataset.engine = description.engine;
@@ -54,6 +60,7 @@ export class GameRoom {
         this.fillControls();
         this.runner.publish();
         dialog.showModal();
+        document.documentElement.dataset.arcadeOpen = 'true';
         this.resizeCanvas();
         this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
         this.resizeObserver.observe(this.canvas.parentElement);
@@ -61,7 +68,7 @@ export class GameRoom {
         this.toggleCamera();
         this.request = requestAnimationFrame(time => this.frame(time));
         loadArtwork(this.palette.theme).then(images => {
-            if (!this.closed) this.painter.images = images;
+            if (!this.closed) { this.painter.images = images; this.needsPaint = true; }
         });
     }
 
@@ -146,6 +153,12 @@ export class GameRoom {
         }
         this.painter.h = height;
         this.painter.compact = box.width < 480;
+        this.needsPaint = true;
+    }
+
+    text(selector, value) {
+        const element = this.$(selector), content = String(value);
+        if (element.textContent !== content) element.textContent = content;
     }
 
     play() {
@@ -213,18 +226,21 @@ export class GameRoom {
 
     updateUI(state) {
         if (this.closed) return;
+        if (this.dialog.dataset.phase !== state.phase) this.needsPaint = true;
+        const active = state.phase === 'playing' && !(this.description.engine === 'maze' && this.runner.game.state.stage === 'preview');
+        this.camera?.setInferenceFps(active ? 20 : 10);
         this.dialog.dataset.phase = state.phase;
-        this.$('#arcade-score').textContent = state.score;
-        this.$('#arcade-time').textContent = `${state.remaining}s`;
-        this.$('#arcade-lives').textContent = state.lives;
+        this.text('#arcade-score', state.score);
+        this.text('#arcade-time', `${state.remaining}s`);
+        this.text('#arcade-lives', state.lives);
         this.$('#arcade-tutorial').hidden = state.phase !== 'tutorial';
         this.$('#arcade-paused').hidden = state.phase !== 'paused';
         this.$('#arcade-result').hidden = state.phase !== 'finished';
-        this.$('#arcade-final-score').textContent = state.score;
-        this.$('#arcade-pause').textContent = state.phase === 'paused' ? 'Resume' : 'Pause';
+        this.text('#arcade-final-score', state.score);
+        this.text('#arcade-pause', state.phase === 'paused' ? 'Resume' : 'Pause');
         this.$('#arcade-pause').disabled = ['tutorial', 'finished'].includes(state.phase);
-        this.$('#arcade-restart').textContent = 'Restart';
-        this.$('#arcade-begin').textContent = this.navigation.deadline ? 'Cancel countdown' : this.runner?.started ? 'Resume' : 'Start';
+        this.text('#arcade-restart', 'Restart');
+        this.text('#arcade-begin', this.navigation.deadline ? 'Cancel countdown' : this.runner?.started ? 'Resume' : 'Start');
         if (!this.navigation.deadline) {
             const instruction = this.runner.started ? 'Lift to resume' : 'Lift to start';
             if (this.$('#arcade-controls-status').textContent !== instruction) this.$('#arcade-controls-status').textContent = instruction;
@@ -328,8 +344,11 @@ export class GameRoom {
         this.triggerView.update(frame);
         for (const [part, visible] of [['shoulders', frame.shoulders], ['left', visiblePoint(frame.left)], ['right', visiblePoint(frame.right)]]) {
             const indicator = this.$(`[data-tracking=${part}]`);
-            indicator.dataset.visible = String(Boolean(visible));
-            indicator.querySelector('span').textContent = visible ? '✓' : '—';
+            const flag = String(Boolean(visible));
+            if (indicator.dataset.visible !== flag) {
+                indicator.dataset.visible = flag;
+                indicator.querySelector('span').textContent = visible ? '✓' : '—';
+            }
         }
         for (const side of ['left', 'right']) {
             const marker = this.$(`.camera-wrist[data-wrist=${side}]`), point = frame[side];
@@ -340,6 +359,10 @@ export class GameRoom {
 
     frame(timestamp) {
         if (this.closed) return;
+        if (!this.frameBudget.due(timestamp)) {
+            this.request = requestAnimationFrame(time => this.frame(time));
+            return;
+        }
         let trackingHold = false;
         if (this.camera.running) {
             const stale = this.trackingAt != null && timestamp - this.trackingAt > 1500;
@@ -352,7 +375,7 @@ export class GameRoom {
         }
         if (this.cameraStarting && this.inputMode === 'motion') trackingHold = true;
         this.dialog.dataset.tracking = trackingHold ? 'held' : 'ready';
-        this.$('#arcade-tracking-hint').textContent = this.cameraStarting ? 'Camera…' : 'Show a wrist';
+        this.text('#arcade-tracking-hint', this.cameraStarting ? 'Camera…' : 'Show a wrist');
         this.$('#arcade-tracking-hint').hidden = !trackingHold || this.runner.phase !== 'playing';
         const navigation = this.navigation.step({ visible: this.visible, lastSeen: this.trackingAt, lostSince: this.lostAt }, timestamp);
         if (navigation?.cancelled) { this.cancelCountdown(); }
@@ -362,21 +385,29 @@ export class GameRoom {
             this.$('#arcade-countdown').textContent = text;
             this.$('#arcade-controls-status').textContent = text;
         }
-        if (timestamp > (this.recognisedUntil || 0)) this.$('#arcade-recognition').textContent = '';
+        if (timestamp > (this.recognisedUntil || 0)) this.text('#arcade-recognition', '');
         for (const wrist of WRISTS) if (timestamp > (this.wristPulseUntil[wrist] || 0)) {
-            this.$(`.camera-wrist[data-wrist=${wrist}]`).textContent = wrist === 'left' ? 'L' : 'R';
+            this.text(`.camera-wrist[data-wrist=${wrist}]`, wrist === 'left' ? 'L' : 'R');
         }
         for (const wrist of WRISTS) {
             const marker = this.$(`.camera-wrist[data-wrist=${wrist}]`), point = this.markerMotion[wrist].step(timestamp);
-            if (point) { marker.style.left = `${(1 - point.x) * 100}%`; marker.style.top = `${point.y * 100}%`; }
+            if (point) {
+                const left = `${(1 - point.x) * 100}%`, top = `${point.y * 100}%`;
+                if (marker.style.left !== left) marker.style.left = left;
+                if (marker.style.top !== top) marker.style.top = top;
+            }
             const pulse = timestamp < (this.wristPulseUntil[wrist] || 0);
-            marker.dataset.pulse = String(pulse);
+            if (marker.dataset.pulse !== String(pulse)) marker.dataset.pulse = String(pulse);
             const group = this.$(`[data-wrist-controls=${wrist}]`);
-            if (group) group.dataset.pulse = String(pulse);
+            if (group && group.dataset.pulse !== String(pulse)) group.dataset.pulse = String(pulse);
         }
         this.runner.step(timestamp, { hold: trackingHold });
-        this.painter.background();
-        this.runner.game.render(this.painter);
+        // A paused/tutorial canvas is static. Camera feedback and navigation stay live.
+        if (this.runner.phase === 'playing' || this.needsPaint) {
+            this.painter.background();
+            this.runner.game.render(this.painter);
+            this.needsPaint = false;
+        }
         if (this.description.engine === 'maze') {
             this.dialog.dataset.mazeStage = this.runner.game.state.stage;
             this.dialog.dataset.mazeLevel = this.runner.game.state.level;
@@ -393,9 +424,11 @@ export class GameRoom {
     dispose() {
         if (this.closed) return;
         this.closed = true;
+        delete document.documentElement.dataset.arcadeOpen;
         cancelAnimationFrame(this.request); this.abort.abort();
         this.resizeObserver?.disconnect();
         this.camera.stop(); this.runner.dispose(); this.sound.dispose();
+        this.painter = null; this.elements.clear();
         if (this.dialog.open) this.dialog.close();
         if (this.opener?.isConnected) this.opener.focus({ preventScroll: true });
     }

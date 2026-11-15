@@ -196,6 +196,25 @@ plus `schema_version: 1`. Files are limited to 32 KB, durations to 30–90 secon
 and text to short single lines. URLs, HTML execution, scripts and unknown fields
 are not accepted. Imported games inherit the current theme and engine controls.
 
+## Runtime efficiency
+
+The camera uses up to 20 inference frames/second during active play and 10 in
+menus, pauses and Link Maze memorisation. Capture requests 640 by 480, while wrist
+markers and the game have their own display budget of about 60 Hz. The hidden SDK
+debug canvas is disabled and pose-only sessions do not initialise a hand model.
+Paused/tutorial boards retain their paint; the maze tree is cached independently
+from its animated icons. Covered theme animations and GIF backgrounds suspend
+while the room is open and restore on close.
+
+The npm dependency still supplies 1.1.0's WASM/models. Pending the next registry
+release, asset preparation uses the exact upstream JavaScript source revision in
+mig/runtime-source.json, verifies SHA-256 hashes and records that provenance in
+vendor/motion-input-grid/package.json. Re-running prepare:assets can reuse those
+verified files offline. No private recognizer is introduced.
+
+Tests count render/inference work and exercise gesture/navigation behaviour.
+These budgets do not establish a temperature or battery saving on every device.
+
 ## Verification
 
 `npm test` runs deterministic engine, input, import and real-WASM tests.

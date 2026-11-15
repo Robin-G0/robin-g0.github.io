@@ -266,3 +266,14 @@
 .demo-forearm { transform-origin: 18px 49px; animation: wrist-lift 2.6s ease-in-out infinite; }
 @keyframes wrist-lift { 0%, 15%, 100% { transform: rotate(160deg); } 40%, 65% { transform: rotate(0); } }
 @media (prefers-reduced-motion: reduce) { .demo-forearm { animation: none; transform: rotate(0); } }
+
+/* Freeze covered theme effects while the game owns attention; restore on close. */
+:root[data-arcade-open] .page-shell *,
+:root[data-arcade-open] .page-shell *::before,
+:root[data-arcade-open] .page-shell *::after,
+:root[data-arcade-open] .ambient * { animation-play-state: paused !important; backdrop-filter: none !important; }
+:root[data-arcade-open] #arcade-player,
+:root[data-arcade-open] #arcade-player::backdrop,
+:root[data-arcade-open] .site-header { backdrop-filter: none !important; }
+:root[data-arcade-open][data-theme=aero] .about,
+:root[data-arcade-open][data-theme=glass] .about { background-image: none !important; }

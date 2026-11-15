@@ -4,6 +4,7 @@ export class MIGSession {
         this.options = options; this.state = { running: false }; this.points = []; this.activeActions = new Set(); this.inputs = [];
         this.tracker = { active: index => this.activeActions.has(this.inputs[index]?.action) };
         window.motionTest = {
+            fps: options.maxInferenceFps,
             observe: (visible = true, missing = null) => {
                 this.points = visible ? [11, 12, 15, 16].map(index => index === missing ? null
                     : ({ x: index === 11 ? .65 : index === 12 ? .35 : index === 15 ? .7 : .3, y: index < 15 ? .35 : .65, confidence: .95 })) : [];
@@ -25,6 +26,7 @@ export class MIGSession {
         };
     }
     subscribe(listener) { this.listener = listener; listener(this.state); return () => {}; }
+    setInferenceFps(fps) { window.motionTest.fps = fps; }
     async importJSON(text) { this.inputs = JSON.parse(text).inputs; }
     async start(video) {
         const canvas = document.createElement('canvas'); canvas.width = 640; canvas.height = 480;

@@ -1,5 +1,5 @@
-import { arcadeProfile } from './profile.js?v=upward-10';
-import { GestureGate } from './gesture-gate.js?v=upward-10';
+import { arcadeProfile } from './profile.js?v=power-11';
+import { GestureGate } from './gesture-gate.js?v=power-11';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -15,6 +15,7 @@ export class MotionCamera {
         this.generation = 0;
         this.pending = [];
         this.gate = new GestureGate();
+        this.inferenceFps = 20;
     }
 
     async start(video, overlay) {
@@ -27,6 +28,9 @@ export class MotionCamera {
             const session = new MIGSession({
                 assetBase: new URL('../../vendor/motion-input-grid/runtime/', import.meta.url).href,
                 profileMode: true,
+                maxInferenceFps: this.inferenceFps,
+                drawOverlay: false,
+                videoConstraints: { width: 640, height: 480, frameRate: { ideal: 20, max: 30 } },
                 onAction: event => {
                     if (generation === this.generation) this.pending.push({ ...event, timestamp: this.clock() });
                 },
@@ -85,6 +89,12 @@ export class MotionCamera {
         this.gate.reset();
         this.session?.recalibrate();
         this.onStatus('Lower your hands and keep both shoulders visible.');
+    }
+
+    setInferenceFps(fps) {
+        if (this.inferenceFps === fps) return;
+        this.inferenceFps = fps;
+        this.session?.setInferenceFps?.(fps);
     }
 
     stop() {

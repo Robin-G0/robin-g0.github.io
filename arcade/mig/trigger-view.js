@@ -1,5 +1,10 @@
-import { arcadeProfile } from './profile.js?v=upward-10';
+import { arcadeProfile } from './profile.js?v=power-11';
 import { commandLabel } from '../core/commands.js';
+
+function attribute(element, name, value) {
+    const text = String(value);
+    if (element.getAttribute(name) !== text) element.setAttribute(name, text);
+}
 
 /** Project profile cells for display only; this module never emits game commands.
  * npm 1.1.0 does not expose the calibrated grid. Match its shoulder-relative metric,
@@ -45,8 +50,8 @@ export class TriggerView {
                 (g.y + g.ay * dx + g.ax * dy) * 1000];
         };
         for (const { group, polygon, label, cell: [x, y, w, h] } of this.boxes) {
-            polygon.setAttribute('points', [[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(p => project(...p).join(',')).join(' '));
             const corners = [[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(p => project(...p));
+            attribute(polygon, 'points', corners.map(p => p.map(n => n.toFixed(1)).join(',')).join(' '));
             // Keep labels inside the visible portion of even a partly clipped region.
             const cx = (Math.max(0, Math.min(...corners.map(p => p[0]))) + Math.min(1000, Math.max(...corners.map(p => p[0])))) / 2;
             const cy = (Math.max(0, Math.min(...corners.map(p => p[1]))) + Math.min(1000, Math.max(...corners.map(p => p[1])))) / 2;
@@ -54,9 +59,9 @@ export class TriggerView {
             const offset = upper ? 0 : group.dataset.triggerWrist === 'left' ? -55 : 55;
             // The broad upward region is shared by both wrists; separate its labels.
             const labelX = upper ? cx + (group.dataset.triggerWrist === 'left' ? -120 : 120) : cx;
-            label.setAttribute('x', Math.max(70, Math.min(930, labelX)));
-            label.setAttribute('y', Math.max(45, Math.min(955, cy + offset)));
-            group.dataset.active = String(Boolean(frame.active?.includes(group.dataset.trigger)));
+            attribute(label, 'x', Math.max(70, Math.min(930, labelX)).toFixed(1));
+            attribute(label, 'y', Math.max(45, Math.min(955, cy + offset)).toFixed(1));
+            attribute(group, 'data-active', Boolean(frame.active?.includes(group.dataset.trigger)));
         }
     }
 }

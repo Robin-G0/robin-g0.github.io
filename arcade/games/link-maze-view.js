@@ -1,10 +1,18 @@
 import { LINK_EFFECTS } from './link-maze-map.js';
 import { drawLinkEffect } from './link-maze-art.js';
+import { Painter } from '../core/painter.js?v=power-11';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
 const arrow = side => side === 0 ? '←' : '→';
 
-function overview(s, p, reducedMotion) {
+const mapLayers = new WeakMap();
+
+function mapPoint(map, node, height) {
+    return { x: 38 + node.x * 644,
+        y: height - 126 - node.depth * ((height - 274) / map.maxDepth) };
+}
+
+function mapDrawing(s, p) {
     const { map } = s, safe = new Set(map.route);
     const top = 148, bottom = p.h - 126, step = (bottom - top) / map.maxDepth;
     const x = node => 38 + node.x * 644;
@@ -26,8 +34,6 @@ function overview(s, p, reducedMotion) {
             p.rect(x(node) - w / 2, y(node) - height / 2, w, height, navy);
             p.outline(x(node) - w / 2, y(node) - height / 2, w, height, effect.color);
             p.text(effect.label, x(node), y(node), p.compact ? 30 : 18, effect.color, 'center');
-            if (node.effect !== 'none') drawLinkEffect(p, node.effect,
-                x(node) + w / 2 + 17, y(node), p.compact ? 38 : 28, s.time, reducedMotion);
         }
         if (!node.children.length) p.line([[x(node), y(node) - 5], [x(node), top - 28]], '#4e386d', 1);
     }
@@ -40,6 +46,31 @@ function overview(s, p, reducedMotion) {
     p.text('QUICK ROUTE', 360, p.h - 82, p.compact ? 31 : 23, cyan, 'center');
     const spacing = 82, origin = 360 - (map.shortRoute.length - 1) * spacing / 2;
     map.shortRoute.forEach((side, i) => p.text(arrow(side), origin + i * spacing, p.h - 44, 54, ink, 'center'));
+}
+
+function overview(s, p, reducedMotion) {
+    if (typeof document === 'undefined') mapDrawing(s, p);
+    else {
+        let layer = mapLayers.get(p);
+        if (!layer || layer.map !== s.map || layer.height !== p.h || layer.compact !== p.compact) {
+            const scale = p.c.getTransform().a || 1, canvas = document.createElement('canvas');
+            canvas.width = Math.ceil(p.w * scale); canvas.height = Math.ceil(p.h * scale);
+            const context = canvas.getContext('2d'); context.setTransform(scale, 0, 0, scale, 0, 0);
+            const cached = new Painter(context, p.colors); cached.h = p.h; cached.compact = p.compact;
+            mapDrawing(s, cached);
+            layer = { canvas, map: s.map, height: p.h, compact: p.compact };
+            mapLayers.set(p, layer);
+        }
+        p.c.drawImage(layer.canvas, 0, 0, p.w, p.h);
+    }
+    // Animate only the small sprites above the cached tree. Neither path consumes RNG.
+    for (const id of s.map.route) {
+        const node = s.map.nodes[id];
+        if (!node.children.length || node.effect === 'none') continue;
+        const point = mapPoint(s.map, node, p.h), width = p.compact ? 116 : 68;
+        drawLinkEffect(p, node.effect, point.x + width / 2 + 17, point.y,
+            p.compact ? 38 : 28, s.time, reducedMotion);
+    }
 }
 
 function links(s, p, reducedMotion) {
