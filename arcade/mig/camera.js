@@ -1,5 +1,5 @@
 import { arcadeProfile } from './profile.js?v=targets-12';
-import { GestureGate } from './gesture-gate.js?v=power-11';
+import { GestureGate } from './gesture-gate.js?v=tempo-15';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -9,12 +9,12 @@ export function visiblePoint(point) {
 /** Public npm API only; the application never reconstructs MIG gesture rules. */
 export class MotionCamera {
     constructor({ onInput, onTracking, onStatus, loadPackage = () => import('motion-input-grid'),
-        clock = () => performance.now(), profile = arcadeProfile }) {
+        clock = () => performance.now(), profile = arcadeProfile, cooldownMs = 0 }) {
         Object.assign(this, { onInput, onTracking, onStatus, loadPackage, clock, profile });
         this.session = null;
         this.generation = 0;
         this.pending = [];
-        this.gate = new GestureGate();
+        this.gate = new GestureGate({ cooldownMs });
         this.inferenceFps = 20;
     }
 

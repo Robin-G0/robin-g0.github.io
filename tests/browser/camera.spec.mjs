@@ -111,6 +111,7 @@ test('popup controls accept six directions without a home gate and lights acknow
     await expect(page.locator('#arcade-score')).toHaveText('10');
     await expect(page.locator('[data-wrist-controls=left]')).toHaveAttribute('data-pulse', 'true');
     await expect(page.locator('#arcade-recognition')).toHaveText('L ↑');
+    await page.waitForTimeout(220); // A new move by the same wrist clears its short cooldown.
     await page.evaluate(() => window.motionTest.raw('left_right'));
     await expect(page.locator('#arcade-score')).toHaveText('23');
     // The identical arrow in the other stack still exists.

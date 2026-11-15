@@ -72,8 +72,11 @@ has Required and Trigger constraints in the same rectangle. In npm 1.1.0,
 a trigger-only step does not reset its hold timer on brief exits; the Required
 constraint is what makes dwell continuous. No finger inference is required.
 Shoulders and the acting wrist suffice; the other wrist and legs may be absent.
-GestureGate only deduplicates native deliveries and drops ambiguous same-wrist
-batches. There is no neutral readiness latch or mandatory home return.
+GestureGate deduplicates native deliveries and drops ambiguous same-wrist
+batches. Pop-up Panic also selects a 200 ms cooldown per wrist across all three
+directions; one wrist never blocks the other. Rejected events are discarded rather
+than replayed, and tracking flicker does not reset the cooldown. Other games keep
+the default zero extra cooldown. There is no neutral readiness latch or mandatory home return.
 After observation loss, a reacquired wrist can produce one new settled pulse;
 continuous visible occupancy never streams repeated presses.
 Packaged-WASM tests cover close reaches for both wrists, 0.75/1.33/1.78 camera
@@ -125,7 +128,11 @@ and an empty board earns another `100 × level`. Waiting builds valuable groups 
 risks the visible stack ceiling. Overflow allows 1.2 seconds to recover.
 
 A shuffled three-of-each-direction bag and visible upcoming arrows make planning
-possible. Clears speed up paired arrivals gradually. Clearing gaps makes remaining
+possible. Paired arrivals accelerate with simulation time from 1.5 seconds to a
+0.65-second floor over the first minute, before the difficulty pace multiplier.
+Pause and tracking holds freeze that ramp; slow frames do not queue spawn bursts.
+Different directions from both wrists can clear in the same camera observation,
+with independent result plates and tap effects. Clearing gaps makes remaining
 windows settle; large sweeps get a burst and a short rising chiptune. Reduced-motion
 rendering keeps the rules and random sequence unchanged. A deterministic test
 sustains a round with one input every 1.7 seconds; this is not a comfort or webcam

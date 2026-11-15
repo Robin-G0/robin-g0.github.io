@@ -15,6 +15,11 @@ export class MIGSession {
                 this.activeActions = new Set([action]);
                 this.options.onAction({ action }); this.options.onFrame(this);
             },
+            batch: actions => {
+                this.activeActions = new Set(actions);
+                for (const action of actions) this.options.onAction({ action });
+                this.options.onFrame(this);
+            },
             gesture: action => {
                 const command = action.includes('_') ? action : action + '_up';
                 this.options.onAction({ action: command.split('_')[0] + '_neutral' }); this.options.onFrame(this);

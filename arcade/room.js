@@ -1,9 +1,9 @@
-import { engines } from './registry.js?v=mobile-14';
+import { engines } from './registry.js?v=tempo-15';
 import { GameRunner } from './core/runner.js?v=power-11';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=targets-12';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=tempo-15';
 import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
@@ -11,6 +11,7 @@ import { lessonFor } from './lessons.js?v=maze-13';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-12';
 import { FrameBudget } from './core/frame-budget.js';
+import { WRIST_COOLDOWN_MS } from './games/popup-panic.js?v=tempo-15';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -52,6 +53,7 @@ export class GameRoom {
         this.instructions = lessonFor(description.engine);
         this.camera = new MotionCamera({
             profile,
+            cooldownMs: description.engine === 'popups' ? WRIST_COOLDOWN_MS : 0,
             onInput: (action, timestamp) => this.motionInput(action, timestamp),
             onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
         });

@@ -1,9 +1,15 @@
 import { game } from '../core/game.js?v=motion-6';
-import { decodeGesture, DIRECTIONS, ARROWS } from '../core/commands.js';
+import { decodeGesture, DIRECTIONS, ARROWS, WRISTS } from '../core/commands.js';
 import { clamp } from '../core/random.js';
 
 export const STACK_LIMIT = 9;
 export const CHAIN_SECONDS = 4.5;
+export const WRIST_COOLDOWN_MS = 200;
+
+/** Paired arrivals accelerate with simulation time, independently of score. */
+export function spawnInterval(elapsed, pace = 1) {
+    return (1.5 - .85 * clamp(elapsed / 60, 0, 1)) / pace;
+}
 
 export function batchPoints(count, chain = 1, level = 1) {
     return count > 0 ? Math.round(10 * count * count * (1 + Math.min(6, chain - 1) * .25) * level) : 0;
@@ -11,9 +17,9 @@ export function batchPoints(count, chain = 1, level = 1) {
 
 /** One stack per anatomical wrist; three screen directions. Empty gestures are harmless. */
 export function popups(env) {
-    const state = { windows: [], bag: [], queue: [], next: 1.5 / env.pace, serial: 0,
+    const state = { windows: [], bag: [], queue: [], next: spawnInterval(0, env.pace), serial: 0,
         cleared: 0, level: 1, chain: 0, lastClearAt: -Infinity, bursts: [], lastClear: null,
-        fullAt: null, tap: null };
+        fullAt: null, taps: {}, lastClears: {} };
 
     function draw(s) {
         if (!s.bag.length) {
@@ -40,7 +46,7 @@ export function popups(env) {
             const gesture = decodeGesture(event.action);
             if (!gesture || !DIRECTIONS.includes(gesture.direction)) return;
             const { wrist, direction } = gesture, stack = wrist === 'left' ? 0 : 1;
-            s.tap = { wrist, direction, at: s.time };
+            s.taps[wrist] = { wrist, direction, at: s.time };
             const matches = window => window.stack === stack && window.direction === direction;
             const matching = s.windows.filter(matches);
             if (!matching.length) return; // No lost points, broken chain, error dialog or artificial lockout.
@@ -55,6 +61,7 @@ export function popups(env) {
             s.score += gained;
             s.lastClearAt = s.time;
             s.lastClear = { count, points: gained, at: s.time, chain: s.chain, perfect, wrist, direction };
+            s.lastClears[wrist] = s.lastClear;
             s.level = 1 + Math.min(7, Math.floor(s.cleared / 20));
             if ([0, 1].every(stack => s.windows.filter(window => window.stack === stack).length <= STACK_LIMIT)) s.fullAt = null;
             if (perfect) s.next = Math.max(s.next, s.time + .9);
@@ -65,7 +72,7 @@ export function popups(env) {
             if (s.time >= s.next) {
                 for (let stack = 0; stack < 2; stack++) add(s, stack, s.queue.shift());
                 s.queue.push(draw(s), draw(s));
-                s.next = s.time + Math.max(1, 1.5 - (s.level - 1) * .07) / env.pace;
+                s.next = s.time + spawnInterval(s.time, env.pace);
             }
             const rows = [0, 0];
             for (const window of s.windows) {
@@ -139,15 +146,16 @@ export function popups(env) {
                     }
                 }
             }
-            const clear = s.lastClear;
-            if (clear && s.time - clear.at < 1.15) {
+            for (const wrist of WRISTS) {
+                const clear = s.lastClears[wrist];
+                if (!clear || s.time - clear.at >= 1.15) continue;
                 const age = s.time - clear.at;
                 const scale = env.reducedMotion ? 1 : 1 + .12 * Math.exp(-age * 9) * Math.sin(age * 20);
                 c.save(); c.translate(clear.wrist === 'left' ? 186 : 533, 42); c.scale(scale, scale);
                 p.rect(-96, -34, 192, 100, '#100927', 4); p.outline(-96, -34, 192, 100, colours[clear.direction], 2);
                 p.text(`${ARROWS[clear.direction]} ${clear.count}×`, 0, -2, 53, colours[clear.direction], 'center');
                 p.text(`+${clear.points}`, 0, 40, 35, '#fff', 'center'); c.restore();
-                if (clear.perfect) {
+                if (clear.perfect && clear === s.lastClear) {
                     p.line([[75, p.h - 23], [645, p.h - 23]], '#fff15a', 5);
                     p.text('ALL CLEAR', 360, p.h * .58, 47, '#fff15a', 'center');
                 }
@@ -155,9 +163,11 @@ export function popups(env) {
             if (s.chain > 1 && s.time - s.lastClearAt < CHAIN_SECONDS) {
                 p.rect(266, p.h - 17, 188 * (1 - (s.time - s.lastClearAt) / CHAIN_SECONDS), 5, '#63ffff');
             }
-            if (s.tap && s.time - s.tap.at < .22) {
-                c.save(); c.globalAlpha = .65 * (1 - (s.time - s.tap.at) / .22);
-                arrow(s.tap.wrist === 'left' ? 165 : 555, p.h - 13, s.tap.direction, 100); c.restore();
+            for (const wrist of WRISTS) {
+                const tap = s.taps[wrist];
+                if (!tap || s.time - tap.at >= .22) continue;
+                c.save(); c.globalAlpha = .65 * (1 - (s.time - tap.at) / .22);
+                arrow(tap.wrist === 'left' ? 165 : 555, p.h - 13, tap.direction, 100); c.restore();
             }
         }
     });

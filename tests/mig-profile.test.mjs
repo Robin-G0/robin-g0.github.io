@@ -8,8 +8,8 @@ const wasm = await createMIG();
 const home = {left:[6.5,5.5], right:[2.5,5.5]};
 const targets = {left_up:[6.5,2], left_left:[10,5.5], left_right:[2.5,5.5],
     right_up:[2.5,2], right_left:[6.5,5.5], right_right:[-1,5.5]};
-function harness({aspect=1,width=.3,shoulderY=.3,profile=arcadeProfile}={}) {
-    const tracker = new wasm.Tracker(), gate = new GestureGate(), events = [];
+function harness({aspect=1,width=.3,shoulderY=.3,profile=arcadeProfile,cooldownMs=0}={}) {
+    const tracker = new wasm.Tracker(), gate = new GestureGate({cooldownMs}), events = [];
     assert.equal(tracker.load(JSON.stringify(profile)), '');
     assert.equal(tracker.trackHands(), false);
     let time = 0, seq = 0;
@@ -146,4 +146,18 @@ test('popup direction boundaries have a neutral band and retain continuous nativ
         h.dwell([10,2.1],null);assert.deepEqual(h.events,['left_left']);
         h.dwell([10,.5],null);assert.deepEqual(h.events,['left_left','left_up']);
     }finally{h.close();}
+});
+
+test('packaged MIG detects different directions from both wrists in the same observation with cooldowns',()=>{
+    for(const gap of [50,100]){
+        const h=harness({profile:popupProfile,cooldownMs:200});
+        try{
+            h.dwell([10,2.5],[-1,2.5],gap);
+            assert.deepEqual(h.events,['left_left','right_right']);
+            h.dwell([10,2.5],[-1,2.5],gap,25);
+            assert.equal(h.events.length,2,'Held destinations never repeat');
+            h.dwell([6.5,.5],[6.5,2.5],gap);
+            assert.deepEqual(h.events,['left_left','right_right','left_up','right_left']);
+        }finally{h.close();}
+    }
 });
