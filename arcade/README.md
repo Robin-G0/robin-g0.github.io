@@ -127,10 +127,15 @@ and do not break a chain. Bigger batches earn `10 × count² × chain multiplier
 Consecutive successful clears within 4.5 simulation seconds increase the multiplier,
 and an empty board earns another `100 × level`. Waiting builds valuable groups but
 risks the visible stack ceiling. Overflow allows 1.2 seconds to recover.
+This engine declares `endless: true`: the host shows elapsed survival time and
+does not apply the catalog's round duration. Only unresolved stack overflow ends
+play. Ordinary timed games and Link Maze's replenishing clock keep their own rules.
 
 A shuffled three-of-each-direction bag and visible upcoming arrows make planning
-possible. Paired arrivals accelerate with simulation time from 1.5 seconds to a
-0.65-second floor over the first minute, before the difficulty pace multiplier.
+possible. Paired arrivals accelerate with simulation time from 1.5 seconds to
+0.65 seconds over the first minute, then keep shrinking through a smooth survival
+ramp, before the difficulty pace multiplier. The all-clear recovery delay scales
+down with the current interval instead of imposing a fixed spawn-rate ceiling.
 Pause and tracking holds freeze that ramp; slow frames do not queue spawn bursts.
 Different directions from both wrists can clear in the same camera observation,
 with independent result plates and tap effects. Clearing gaps makes remaining

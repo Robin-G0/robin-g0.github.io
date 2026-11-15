@@ -8,7 +8,8 @@ export const WRIST_DIRECTION_COOLDOWN_MS = 200;
 
 /** Paired arrivals accelerate with simulation time, independently of score. */
 export function spawnInterval(elapsed, pace = 1) {
-    return (1.5 - .85 * clamp(elapsed / 60, 0, 1)) / pace;
+    const opening = 1.5 - .85 * clamp(elapsed / 60, 0, 1);
+    return opening / (1 + Math.max(0, elapsed - 60) / 45) / pace;
 }
 
 export function batchPoints(count, chain = 1, level = 1) {
@@ -40,7 +41,7 @@ export function popups(env) {
     }
     state.queue = Array.from({ length: 4 }, () => draw(state));
 
-    return game(state, {
+    const instance = game(state, {
         feedback(s, event) { return { x: decodeGesture(event.action)?.wrist === 'left' ? 185 : 535, y: 210, hideAll: true }; },
         input(s, event) {
             const gesture = decodeGesture(event.action);
@@ -64,7 +65,7 @@ export function popups(env) {
             s.lastClears[wrist] = s.lastClear;
             s.level = 1 + Math.min(7, Math.floor(s.cleared / 20));
             if ([0, 1].every(stack => s.windows.filter(window => window.stack === stack).length <= STACK_LIMIT)) s.fullAt = null;
-            if (perfect) s.next = Math.max(s.next, s.time + .9);
+            if (perfect) s.next = Math.max(s.next, s.time + Math.min(.9, spawnInterval(s.time, env.pace) * .6));
             env.message(`${count}×  +${gained}`);
             env.sound?.({ kind: 'clear', count, chain: s.chain, perfect });
         },
@@ -171,4 +172,5 @@ export function popups(env) {
             }
         }
     });
+    return { ...instance, endless: true };
 }

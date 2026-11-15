@@ -72,10 +72,12 @@ test('comfortable discrete inputs can sustain a round, and reduced-motion render
     assert.deepEqual(runs[0].game.state.queue, runs[1].game.state.queue);
 });
 
-test('paired spawns accelerate with play time, cap their speed and freeze while paused',()=>{
+test('paired spawns keep accelerating past a minute and freeze while paused',()=>{
     assert.ok(spawnInterval(30)<spawnInterval(0));
     assert.ok(spawnInterval(60)<spawnInterval(30));
-    assert.equal(spawnInterval(600),spawnInterval(60));
+    assert.ok(spawnInterval(120)<spawnInterval(60));
+    assert.ok(spawnInterval(600)<spawnInterval(120));
+    assert.ok(spawnInterval(3600)>0);
     assert.equal(spawnInterval(30,.8),spawnInterval(30)/.8);
     const run=create(),g=run.game,born=[];
     let serial=g.state.serial;

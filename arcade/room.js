@@ -1,5 +1,5 @@
-import { engines } from './registry.js?v=directions-16';
-import { GameRunner } from './core/runner.js?v=power-11';
+import { engines } from './registry.js?v=survival-17';
+import { GameRunner } from './core/runner.js?v=survival-17';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
@@ -11,7 +11,7 @@ import { lessonFor } from './lessons.js?v=maze-13';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-12';
 import { FrameBudget } from './core/frame-budget.js';
-import { WRIST_DIRECTION_COOLDOWN_MS } from './games/popup-panic.js?v=directions-16';
+import { WRIST_DIRECTION_COOLDOWN_MS } from './games/popup-panic.js?v=survival-17';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
@@ -238,7 +238,8 @@ export class GameRoom {
         this.camera?.setInferenceFps(active ? 20 : 10);
         this.dialog.dataset.phase = state.phase;
         this.text('#arcade-score', state.score);
-        this.text('#arcade-time', `${state.remaining}s`);
+        this.text('#arcade-time', `${state.remaining == null ? state.elapsed : state.remaining}s`);
+        this.text('.arcade-hud > div:nth-child(2) dt', state.remaining == null ? 'Survived' : 'Time');
         this.text('#arcade-lives', state.lives);
         this.$('#arcade-tutorial').hidden = state.phase !== 'tutorial';
         this.$('#arcade-paused').hidden = state.phase !== 'paused';

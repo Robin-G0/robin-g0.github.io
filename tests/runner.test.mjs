@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { GameRunner } from '../arcade/core/runner.js';
 import { game } from '../arcade/core/game.js';
 import { MotionCamera } from '../arcade/mig/camera.js';
+import { popups, STACK_LIMIT } from '../arcade/games/popup-panic.js';
+import { WRIST_COMMANDS } from '../arcade/core/commands.js';
 
 test('runner discards paused/tutorial inputs and bounds a slow simulation frame', () => {
     let now = 1000;
@@ -78,4 +80,36 @@ test('closing during package load cannot reopen the camera', async () => {
     resolvePackage({ MIGSession: class { constructor() { constructed++; } } });
     await start;
     assert.equal(constructed, 0);
+});
+
+test('Pop-up Panic survives beyond the round limit and ends only on stack overflow',()=>{
+    let now=1000,last;
+    const runner=new GameRunner({duration:60,seed:8,difficulty:'gentle',controls:Object.fromEntries(WRIST_COMMANDS.map(a=>[a,a]))},
+        popups,{clock:()=>now,changed:state=>last=state});
+    runner.play();
+    for(let tick=0;tick<900;tick++){
+        now+=100;runner.step(now);
+        if(tick%6===0)for(const wrist of ['left','right'])runner.router.dispatch(`${wrist}_${['left','up','right'][Math.floor(tick/6)%3]}`);
+    }
+    runner.publish();
+    assert.equal(runner.phase,'playing');assert.ok(runner.elapsed>89);
+    assert.equal(last.remaining,null);assert.ok(last.elapsed>=89);
+    const elapsed=runner.elapsed;
+    now+=2000;runner.step(now,{hold:true});assert.equal(runner.elapsed,elapsed);
+    runner.pause();now+=2000;runner.step(now);assert.equal(runner.elapsed,elapsed);runner.play();
+    for(let tick=0;tick<300&&runner.phase==='playing';tick++){now+=100;runner.step(now);}
+    assert.equal(runner.phase,'finished');
+    assert.ok([0,1].some(stack=>runner.game.state.windows.filter(w=>w.stack===stack).length>STACK_LIMIT));
+    runner.restart();assert.equal(runner.elapsed,0);assert.equal(runner.phase,'playing');
+    assert.equal(runner.game.state.fullAt,null);runner.dispose();
+});
+
+test('ordinary timed engines still finish at their configured duration',()=>{
+    let now=0,last;
+    const runner=new GameRunner({duration:1,seed:1},()=>game({}, {render(){}}),
+        {clock:()=>now,changed:state=>last=state});
+    runner.play();
+    for(let tick=0;tick<12;tick++){now+=100;runner.step(now);}
+    assert.equal(runner.phase,'finished');assert.equal(last.remaining,0);
+    assert.ok(Math.abs(runner.elapsed-1)<.000001);runner.dispose();
 });
