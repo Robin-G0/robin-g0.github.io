@@ -1,4 +1,4 @@
-import { engines } from './registry.js?v=power-11';
+import { engines } from './registry.js?v=maze-13';
 import { GameRunner } from './core/runner.js?v=power-11';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
@@ -7,7 +7,7 @@ import { MotionCamera, visiblePoint } from './mig/camera.js?v=targets-12';
 import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
 import { MotionNavigation } from './core/motion-navigation.js?v=controls-5';
-import { lessonFor } from './lessons.js?v=power-11';
+import { lessonFor } from './lessons.js?v=maze-13';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-12';
 import { FrameBudget } from './core/frame-budget.js';
@@ -137,7 +137,8 @@ export class GameRoom {
             } else {
                 const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
                 button.dataset.arcadeInput = wrist;
-                const arrow = document.createElement('span'); arrow.className = 'action-key'; arrow.textContent = ARROWS[wrist];
+                const arrow = document.createElement('span'); arrow.className = 'action-key';
+                arrow.textContent = this.description.engine === 'maze' ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
                 const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.description.controls[wrist];
                 button.append(arrow, label); area.append(button);
             }

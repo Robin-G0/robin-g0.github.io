@@ -228,6 +228,7 @@
 [data-engine=popups] #arcade-playfield-input, [data-engine=popups] #arcade-playfield-message { display: none !important; }
 [data-engine=maze] #arcade-playfield-input, [data-engine=maze] #arcade-playfield-message { display: none !important; }
 [data-engine=maze] .arcade-hud > div:last-child { display: none; }
+[data-engine=maze] .arcade-stage { width: min(100%, 620px); height: clamp(600px, 78vh, 820px); min-height: 600px; max-height: none; aspect-ratio: auto; margin-inline: auto; }
 #arcade-paused { background: color-mix(in srgb, var(--bg) 70%, transparent); }
 #arcade-paused h3 { font-size: 36px; }
 #arcade-final-score { font-size: 52px; }

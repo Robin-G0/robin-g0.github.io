@@ -14,7 +14,7 @@ export const games = Object.freeze([
     entry('desktop95', 'stack', 'Window Stack', 'Place each moving window on the stack.', 'Place window', 'Reverse slide'),
     entry('desktop95', 'ski', 'Ski Run', 'Pass the gates and avoid the trees.', 'Left lane', 'Right lane'),
     entry('construction', 'popups', 'Pop-up Panic', 'Each wrist clears its stack.', 'Clear ←', 'Clear →'),
-    entry('construction', 'maze', 'Link Maze', 'Memorise the map. Find home. Keep the clock alive.', 'Left link', 'Right link'),
+    entry('construction', 'maze', 'Link Maze', 'Memorise the map. Find home. Keep the clock alive.', 'Raise left wrist', 'Raise right wrist'),
     entry('construction', 'juggle', 'GIF Juggler', 'Keep both bouncing GIFs in the air.', 'Left bounce', 'Right bounce'),
     entry('matrix', 'parry', 'Construct Parry', 'Block the incoming attacks on the marked side.', 'Left guard', 'Right guard'),
     entry('matrix', 'binary', 'Binary Lock', 'Transform the register into the target code.', 'Rotate bits', 'Flip first bit'),

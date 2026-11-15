@@ -3,49 +3,44 @@ import { drawLinkEffect } from './link-maze-art.js';
 import { Painter } from '../core/painter.js?v=power-11';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
-const arrow = side => side === 0 ? '←' : '→';
+const wrist = side => side === 0 ? 'L' : 'R';
 
 const mapLayers = new WeakMap();
 
 function mapPoint(map, node, height) {
-    return { x: 38 + node.x * 644,
-        y: height - 126 - node.depth * ((height - 274) / map.maxDepth) };
+    return { x: 82 + node.x * 556,
+        y: height - 78 - node.depth * ((height - 226) / map.maxDepth) };
 }
 
 function mapDrawing(s, p) {
-    const { map } = s, safe = new Set(map.route);
-    const top = 148, bottom = p.h - 126, step = (bottom - top) / map.maxDepth;
-    const x = node => 38 + node.x * 644;
-    const y = node => bottom - node.depth * step;
-    // Muted branches first; the suggested short route remains legible above them.
-    for (const highlight of [false, true]) for (const node of map.nodes) {
+    const { map } = s;
+    const top = 148, bottom = p.h - 78;
+    const x = node => mapPoint(map, node, p.h).x;
+    const y = node => mapPoint(map, node, p.h).y;
+    // Every branch uses the same treatment: players choose what to memorise.
+    for (const node of map.nodes) {
         for (const childId of node.children) {
-            const child = map.nodes[childId], chosen = safe.has(node.id) && safe.has(childId);
-            if (chosen !== highlight) continue;
-            p.line([[x(node), y(node)], [x(child), y(child)]], chosen ? cyan : '#4e386d', chosen ? 4 : 1);
+            const child = map.nodes[childId];
+            p.line([[x(node), y(node)], [x(child), y(child)]], '#68558e', 2);
         }
     }
     for (const node of map.nodes) {
-        const effect = LINK_EFFECTS[node.effect], chosen = safe.has(node.id);
-        const width = chosen ? 16 : 6;
-        p.rect(x(node) - width / 2, y(node) - width / 2, width, width, chosen ? cyan : effect.color);
-        if (chosen && node.id && node.children.length) {
-            const w = p.compact ? 116 : 68, height = p.compact ? 38 : 22;
+        const effect = LINK_EFFECTS[node.effect], width = 8;
+        p.rect(x(node) - width / 2, y(node) - width / 2, width, width, effect.color);
+        if (node.id && node.children.length && node.depth <= 2) {
+            const w = 78, height = 28;
             p.rect(x(node) - w / 2, y(node) - height / 2, w, height, navy);
             p.outline(x(node) - w / 2, y(node) - height / 2, w, height, effect.color);
-            p.text(effect.label, x(node), y(node), p.compact ? 30 : 18, effect.color, 'center');
+            p.text(effect.label, x(node), y(node), 22, effect.color, 'center');
         }
         if (!node.children.length) p.line([[x(node), y(node) - 5], [x(node), top - 28]], '#4e386d', 1);
     }
     const labelWidth = p.compact ? 128 : 84;
     p.rect(x(map.nodes[0]) - labelWidth / 2, bottom - 3, labelWidth, p.compact ? 38 : 29, yellow);
     p.text('START', x(map.nodes[0]), bottom + 12, p.compact ? 34 : 23, navy, 'center');
-    p.line([[38, top - 28], [682, top - 28]], yellow, 2);
+    p.line([[82, top - 28], [638, top - 28]], yellow, 2);
     p.rect(360 - labelWidth / 2, top - 43, labelWidth, p.compact ? 40 : 30, yellow);
     p.text('END', 360, top - 28, p.compact ? 36 : 25, navy, 'center');
-    p.text('QUICK ROUTE', 360, p.h - 82, p.compact ? 31 : 23, cyan, 'center');
-    const spacing = 82, origin = 360 - (map.shortRoute.length - 1) * spacing / 2;
-    map.shortRoute.forEach((side, i) => p.text(arrow(side), origin + i * spacing, p.h - 44, 54, ink, 'center'));
 }
 
 function overview(s, p, reducedMotion) {
@@ -64,12 +59,11 @@ function overview(s, p, reducedMotion) {
         p.c.drawImage(layer.canvas, 0, 0, p.w, p.h);
     }
     // Animate only the small sprites above the cached tree. Neither path consumes RNG.
-    for (const id of s.map.route) {
-        const node = s.map.nodes[id];
-        if (!node.children.length || node.effect === 'none') continue;
-        const point = mapPoint(s.map, node, p.h), width = p.compact ? 116 : 68;
+    for (const node of s.map.nodes) {
+        if (!node.id || !node.children.length || node.depth > 2 || node.effect === 'none') continue;
+        const point = mapPoint(s.map, node, p.h), width = 78;
         drawLinkEffect(p, node.effect, point.x + width / 2 + 17, point.y,
-            p.compact ? 38 : 28, s.time, reducedMotion);
+            28, s.time, reducedMotion);
     }
 }
 
@@ -93,7 +87,7 @@ function links(s, p, reducedMotion) {
         const flashColor = selected ? LINK_EFFECTS[s.flash.effect].color : cyan;
         p.rect(left, top, 300, 110, selected ? flashColor : '#241747');
         p.outline(left, top, 300, 110, selected ? ink : active ? '#ffbe70' : cyan, selected ? 5 : 2);
-        p.text(arrow(side), center, top + 33, 60, selected ? navy : cyan, 'center');
+        p.text(wrist(side), center, top + 33, 60, selected ? navy : cyan, 'center');
         const illustrated = content && drawLinkEffect(p, next.effect, left + 50, top + 79, 45, s.time, reducedMotion);
         p.text(content?.label || 'LINK ?', center + (illustrated ? 15 : 0), top + 82, p.compact ? 44 : 33, selected ? navy : content?.color || ink, 'center');
     }
@@ -107,7 +101,7 @@ function links(s, p, reducedMotion) {
         p.text(effect.label, 360, playerY - 76, p.compact ? 54 : 43, effect.color, 'center');
     }
     // Only the route already taken remains visible; no hidden map or future effects leak.
-    p.text(s.history.map(side => side === 'left' ? '←' : '→').join('  ') || 'START', 360, h - 17, p.compact ? 38 : 26, '#b7a5dc', 'center');
+    p.text(s.history.map(side => wrist(side === 'left' ? 0 : 1)).join('  ') || 'START', 360, h - 17, p.compact ? 38 : 26, '#b7a5dc', 'center');
 }
 
 export function renderMaze(s, p, reducedMotion = false) {

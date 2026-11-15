@@ -1,6 +1,6 @@
 import { game } from '../core/game.js?v=motion-6';
 import { generateMaze } from './link-maze-map.js';
-import { renderMaze } from './link-maze-view.js?v=power-11';
+import { renderMaze } from './link-maze-view.js?v=maze-13';
 
 export const EXIT_SECONDS = 8;
 export const MAX_SECONDS = 90;

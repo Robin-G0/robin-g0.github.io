@@ -2,7 +2,7 @@ import { game, hurt, reward, hearts } from '../core/game.js?v=tutorial-3';
 
 export { popups } from './popup-panic.js?v=gestures-7';
 
-export { maze } from './link-maze.js?v=power-11';
+export { maze } from './link-maze.js?v=maze-13';
 
 export function juggle(env) {
     const state = { balls: [{ x: 205, y: 205, velocity: -90 }, { x: 515, y: 110, velocity: 15 }] };

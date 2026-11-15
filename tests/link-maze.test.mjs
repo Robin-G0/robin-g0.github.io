@@ -117,8 +117,22 @@ test('preview and navigation both advance upward with screen-left and screen-rig
         assert.ok(texts.find(t=>t.text==='START').y>texts.find(t=>t.text==='END').y);
         texts.length=0;g.state.stage='navigate';renderMaze(g.state,painter,true);
         const player=texts.find(t=>t.text==='@');
-        const left=texts.find(t=>t.text==='\u2190'),right=texts.find(t=>t.text==='\u2192');
+        const left=texts.find(t=>t.text==='L'),right=texts.find(t=>t.text==='R');
         assert.ok(player.y>left.y&&player.y>right.y);
         assert.ok(left.x<player.x&&right.x>player.x);
     }
+});
+
+test('preview does not disclose a chosen solution through text, line styles or animated route selection',async()=>{
+    const {renderMaze}=await import('../arcade/games/link-maze-view.js');
+    const {g}=create(),draw=()=>{
+        const calls=[];
+        const painter=new Proxy({h:1000,images:new Map()},{get:(o,k)=>k in o?o[k]:(...args)=>calls.push([k,...args])});
+        renderMaze(g.state,painter,true);return calls;
+    };
+    const original=draw();
+    g.state.map.route=[];g.state.map.shortRoute=[];
+    assert.deepEqual(draw(),original,'The preview is independent of the generator solution metadata');
+    const text=original.filter(c=>c[0]==='text').map(c=>c[1]);
+    assert.equal(text.some(t=>t.includes('QUICK ROUTE')||/[\u2190\u2192]/u.test(t)),false);
 });

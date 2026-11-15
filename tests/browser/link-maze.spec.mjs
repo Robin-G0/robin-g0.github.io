@@ -58,12 +58,27 @@ test('mobile maze fits, remains legible and does not move when a link changes co
     await page.clock.runFor(9600);
     await page.locator('#arcade-player').evaluate(d=>d.scrollTop=0);
     const before=await page.locator('.arcade-stage').boundingBox();
+    expect(before.height).toBeGreaterThanOrEqual(600);
+    expect(before.height).toBeGreaterThan(before.width*1.5);
+    await expect(page.locator('[data-arcade-input=left] .action-key')).toHaveText('L');
+    await expect(page.locator('[data-arcade-input=right] .action-key')).toHaveText('R');
+    await expect(page.locator('[data-arcade-input=left] .action-name')).toHaveText('Raise left wrist');
     await page.keyboard.press('ArrowLeft');await page.clock.runFor(100);
     const after=await page.locator('.arcade-stage').boundingBox();expect(after).toEqual(before);
     const size=await page.locator('#arcade-player').evaluate(d=>({width:d.clientWidth,content:d.scrollWidth}));
     expect(size.content).toBeLessThanOrEqual(size.width+1);
     const button=await page.locator('[data-arcade-input=left]').boundingBox();expect(button.height).toBeGreaterThanOrEqual(44);
     const camera=await page.locator('#arcade-camera-dock').boundingBox();expect(camera.y).toBeGreaterThanOrEqual(after.y+after.height);
+});
+
+test('desktop maze has a portrait board and explains wrist raises in Controls',async({page})=>{
+    await open(page);
+    const board=await page.locator('.arcade-stage').boundingBox();
+    expect(board.width).toBeLessThanOrEqual(620);
+    expect(board.height).toBeGreaterThan(board.width);
+    await page.locator('#arcade-help').click();
+    await expect(page.locator('[data-tutorial-action=left]')).toHaveText('Raise left wrist');
+    await expect(page.locator('[data-tutorial-action=right]')).toHaveText('Raise right wrist');
 });
 
 test('native MIG wrist events navigate the remembered route without another camera recognizer',async({page})=>{
