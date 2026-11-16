@@ -44,10 +44,11 @@ export class InputRouter {
 }
 
 export function bindAlternativeControls(element, router, signal, scheme = 'wrist-up') {
-    const keyActions = scheme === 'wrist-directions'
+    const keyActions = ['wrist-directions','flight-directions'].includes(scheme)
         ? { a: 'left_left', w: 'left_up', d: 'left_right', j: 'right_left', i: 'right_up', l: 'right_right',
             ArrowLeft: 'right_left', ArrowUp: 'right_up', ArrowRight: 'right_right' }
         : { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right' };
+    if (scheme === 'flight-directions') keyActions.ArrowDown = 'left_up';
     element.addEventListener('keydown', event => {
         if (event.target.matches('input, select, textarea') || event.ctrlKey || event.metaKey) return;
         const action = keyActions[event.key.length === 1 ? event.key.toLowerCase() : event.key];

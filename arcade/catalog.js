@@ -7,8 +7,10 @@ function entry(theme, engine, title, goal, left, right, options = {}) {
 }
 
 export const games = Object.freeze([
-    entry('phosphor', 'invaders', 'Terminal Invaders', 'Line up. Dodge warned shots. Clear the next fleet.', 'Move left', 'Move right', {scoreVersion:2}),
-    entry('phosphor', 'lander', 'Lunar Lander', 'Save fuel. Brake early. Touch down gently.', 'Thrust', 'Retro brake', {scoreVersion:2}),
+    entry('phosphor', 'invaders', 'Terminal Invaders', 'Use cover. Dodge warned shots. Clear the next fleet.', 'Move left', 'Move right', {scoreVersion:3}),
+    entry('phosphor', 'lander', 'Lunar Lander', 'Line up with the pad. Brake left. Thrust right.', 'Brake', 'Thrust', {
+        scoreVersion:3,inputScheme:'flight-directions',controls:{left_left:'Step left',left_up:'Brake',left_right:'Step right',
+            right_left:'Step left',right_up:'Thrust',right_right:'Step right'}}),
     entry('phosphor', 'snake', 'ASCII Snake', 'Route the signal. Queue a corner. Collect the next cache.', 'Turn left', 'Turn right', {scoreVersion:2}),
     entry('desktop95', 'sort', 'Folder Sort', 'Send each file to the matching folder.', 'Left folder', 'Right folder'),
     entry('desktop95', 'stack', 'Window Stack', 'Place each moving window on the stack.', 'Place window', 'Reverse slide'),

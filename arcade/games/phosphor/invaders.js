@@ -1,6 +1,7 @@
 import {game} from '../../core/game.js';
 import {clamp,integer} from '../../core/random.js';
 import {CRT,terminal,stars,addBurst,bursts,pruneBursts,loseLife} from './display.js';
+import {createBunkers,strikeBunker,crushBunker,drawBunkers} from './bunkers.js?v=phosphor-32';
 
 export const INVADERS={lanes:7,ground:322,shotSeconds:.48,warningSeconds:.95,hitGrace:1.15};
 export const laneX=lane=>72+lane*96;
@@ -9,7 +10,7 @@ export const laneX=lane=>72+lane*96;
 export function invaders(env) {
     const s={time:0,lane:3,previousLane:3,movedAt:-10,bullets:[],aliens:[],bombs:[],bursts:[],
         wave:0,nextShot:0,nextAttack:3,chain:0,lastKill:-10,shield:false,invulnerableUntil:0,
-        breached:0,intermissionUntil:0,ended:false};
+        breached:0,intermissionUntil:0,ended:false,bunkers:createBunkers()};
     function fleet() {
         s.wave++;s.breached=0;
         s.aliens=Array.from({length:14},(_,id)=>({id,lane:id%7,y:82+Math.floor(id/7)*44}));
@@ -38,7 +39,9 @@ export function invaders(env) {
                 s.bullets.push({lane:s.lane,y:314});s.nextShot=s.time+INVADERS.shotSeconds;
             }
             for(const bullet of s.bullets){
+                const previous=bullet.y;
                 bullet.y-=290*dt;
+                if(strikeBunker(s.bunkers,bullet.lane,previous,bullet.y,s.time)){bullet.y=-100;continue;}
                 const target=s.aliens.filter(a=>a.lane===bullet.lane && Math.abs(a.y-bullet.y)<22)
                     .sort((a,b)=>b.y-a.y)[0];
                 if(!target)continue;
@@ -51,6 +54,7 @@ export function invaders(env) {
             const descent=(4+s.wave*1.3)*env.pace;
             for(const alien of s.aliens){
                 alien.y+=descent*dt;
+                crushBunker(s.bunkers,alien);
                 if(alien.y>INVADERS.ground){s.breached++;hit();alien.y=1000;}
             }
             s.aliens=s.aliens.filter(a=>a.y<1000);
@@ -62,7 +66,9 @@ export function invaders(env) {
             }
             for(const bomb of s.bombs){
                 if(s.time<bomb.launchAt)continue;
+                const previous=bomb.y;
                 bomb.y+=(78+Math.min(60,s.wave*5))*env.pace*dt;
+                if(strikeBunker(s.bunkers,bomb.lane,previous,bomb.y,s.time)){bomb.y=1000;continue;}
                 if(bomb.y>=318 && bomb.lane===s.lane){hit();bomb.y=1000;}
             }
             s.bombs=s.bombs.filter(b=>b.y<340);
@@ -91,6 +97,7 @@ export function invaders(env) {
                 p.rect(x-12,cy-5,7,6,CRT.dark);p.rect(x+5,cy-5,7,6,CRT.dark);
             }
             for(const bullet of s.bullets)p.rect(laneX(bullet.lane)-2,y(bullet.y),4,13,CRT.white);
+            drawBunkers(s.bunkers,p,y,s.time);
             const x=laneX(s.lane),shipY=p.h-68;
             if(s.time-s.movedAt<.2)p.outline(laneX(s.previousLane)-24,shipY,48,14,CRT.dim,2);
             const color=s.time<s.invulnerableUntil?CRT.amber:s.time-s.movedAt<.24?CRT.white:CRT.green;

@@ -1,11 +1,11 @@
-import { games, gamesForTheme } from './catalog.js?v=phosphor-31';
-import { engines } from './registry.js?v=phosphor-31';
+import { games, gamesForTheme } from './catalog.js?v=phosphor-32';
+import { engines } from './registry.js?v=phosphor-32';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
-import { localBindings } from './mig/bindings.js?v=bindings-29';
-import { GameRoom } from './room.js?v=phosphor-31';
+import { localBindings } from './mig/bindings.js?v=phosphor-32';
+import { GameRoom } from './room.js?v=phosphor-32';
 
-import {ChallengeStore, readChallenge} from './core/challenges.js?v=phosphor-31';
+import {ChallengeStore, readChallenge} from './core/challenges.js?v=phosphor-32';
 
 const challenges = new ChallengeStore(games);
 const root = document.documentElement;

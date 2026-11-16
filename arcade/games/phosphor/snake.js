@@ -5,6 +5,12 @@ import {CRT,terminal,meter,addBurst,bursts,pruneBursts,loseLife} from './display
 export const SNAKE={columns:12,rows:9,quickSeconds:6,minStep:.7};
 const directions=[[1,0],[0,1],[-1,0],[0,-1]];
 const arrows=['>','v','<','^'];
+export const snakeGlyph=(direction,head=true)=>head?arrows[direction]:'o';
+function drawGlyph(p,glyph,x,y,size,color) {
+    // Literal ASCII must remain an unmistakable angle/letter, even with a decorative display font.
+    const c=p.c;c.save();c.font=`bold ${size}px Consolas, "Lucida Console", monospace`;
+    c.textAlign='center';c.textBaseline='middle';c.fillStyle=color;c.fillText(glyph,x,y);c.restore();
+}
 const openingBody=()=>[{x:5,y:4},{x:4,y:4},{x:3,y:4}];
 export function snakeStep(pace,eaten) {return Math.max(SNAKE.minStep,1.35/pace-eaten*.008);}
 export function nextSnakeCell(s) {
@@ -67,8 +73,8 @@ export function snake(env) {
             if(quick)meter(p,target.x-cell*.34,target.y+cell*.28,cell*.68,1-(s.time-s.foodAt)/SNAKE.quickSeconds,CRT.amber);
             s.body.forEach((part,index)=>{
                 const {x,y}=position(part),pulse=index===0&&s.time-s.queuedAt<.25;
-                p.rect(x-cell*.39,y-cell*.39,cell*.78,cell*.78,index===0?CRT.white:index%2?CRT.green:'#39bc7a');
-                if(index===0)p.text(arrows[s.direction],x,y,cell*.77,pulse?CRT.green:CRT.dark,'center');
+                if(index===0)p.outline(x-cell*.43,y-cell*.43,cell*.86,cell*.86,pulse?CRT.white:CRT.green,2);
+                drawGlyph(p,snakeGlyph(s.direction,index===0),x,y,cell*.88,index===0?CRT.white:CRT.green);
             });
             const next=nextSnakeCell(s),head=position(s.body[0]);
             if(next.x>=0&&next.x<12&&next.y>=0&&next.y<9){

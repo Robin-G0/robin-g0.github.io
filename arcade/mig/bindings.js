@@ -1,3 +1,4 @@
+import {commandLabel} from '../core/commands.js';
 const STORAGE_KEY = 'mig-arcade-bindings-v1';
 const MAX_BYTES = 1024 * 1024;
 
@@ -28,6 +29,8 @@ export async function validateBindings(source, load = () => import('../../vendor
 function browserStorage() { try { return globalThis.localStorage; } catch { return null; } }
 export const bindingName = input => String(input.name || input.action || input.id).slice(0,80);
 export function controlLabels(description) {
+    if(description.inputScheme==='flight-directions')return Object.fromEntries(Object.entries(description.controls)
+        .map(([action,label])=>[action,`${commandLabel(action)}: ${label}`]));
     if (description.engine === 'maze') return {left:'L route',right:'R route'};
     if (description.engine === 'juggle') return {left:'L bounce',right:'R bounce'};
     return description.controls;

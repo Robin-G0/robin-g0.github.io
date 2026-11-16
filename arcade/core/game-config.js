@@ -3,7 +3,7 @@ import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=survival-17
 
 /** Host integration policy, separate from engine rules and visual theme materials. */
 export function gameConfig(description) {
-    const directional = description.inputScheme === 'wrist-directions';
+    const directional = ['wrist-directions','flight-directions'].includes(description.inputScheme);
     const lifts = ['maze','juggle'].includes(description.engine);
     const phosphor = ['invaders','lander','snake'].includes(description.engine);
     return {

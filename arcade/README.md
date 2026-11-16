@@ -314,9 +314,9 @@ describe the automated tests as physical-camera validation.
 ## Phosphor engines
 
 `games/phosphor/` separates Invaders, Lander and Snake rules from their CRT display
-helpers and three-card SVG tutorials. Phosphor uses the two-input wrist-Up profile
-with the established raise geometry, rather than evaluating unused side actions.
+helpers and three-card SVG tutorials. Invaders and Snake use the two-input wrist-Up profile. Lander reuses the proven
+six-direction profile: L Up brakes, R Up thrusts, side gestures step horizontally.
 Portrait rendering and game-owned outcome feedback are explicit host settings.
-The revised games use scoreVersion 2: prior records stay stored separately, and
+Invaders/Lander now use scoreVersion 3; Snake keeps v2. Prior records stay stored separately, and
 old challenge links are rejected with a compatibility message. Keep versioned
 boards and links aligned when changing scoring in another engine.
