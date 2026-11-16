@@ -22,9 +22,9 @@
               "id": "left_left_hold",
               "landmark": "left_wrist",
               "cell": [
-                7,
+                9,
                 1,
-                11,
+                9,
                 17
               ],
               "type": "required",
@@ -34,9 +34,9 @@
               "id": "left_left_zone",
               "landmark": "left_wrist",
               "cell": [
-                7,
+                9,
                 1,
-                11,
+                9,
                 17
               ],
               "type": "trigger",
@@ -108,7 +108,7 @@
               "cell": [
                 -9,
                 1,
-                15,
+                13,
                 17
               ],
               "type": "required",
@@ -120,7 +120,7 @@
               "cell": [
                 -9,
                 1,
-                15,
+                13,
                 17
               ],
               "type": "trigger",
@@ -148,9 +148,9 @@
               "id": "right_left_hold",
               "landmark": "right_wrist",
               "cell": [
-                3,
+                5,
                 1,
-                15,
+                13,
                 17
               ],
               "type": "required",
@@ -160,9 +160,9 @@
               "id": "right_left_zone",
               "landmark": "right_wrist",
               "cell": [
-                3,
+                5,
                 1,
-                15,
+                13,
                 17
               ],
               "type": "trigger",
@@ -234,7 +234,7 @@
               "cell": [
                 -9,
                 1,
-                11,
+                9,
                 17
               ],
               "type": "required",
@@ -246,7 +246,7 @@
               "cell": [
                 -9,
                 1,
-                11,
+                9,
                 17
               ],
               "type": "trigger",

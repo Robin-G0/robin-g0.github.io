@@ -137,6 +137,27 @@ test('popup side sweeps above shoulder height do not fire Up, for either wrist',
     }
 });
 
+test('popup rest corridors tolerate two more cells on each side without firing on an inward return',()=>{
+    for(const wrist of ['left','right']) {
+        const h=harness({profile:popupProfile,aspect:4/3,width:.2});
+        const move=x=>h.dwell(wrist==='left'?[x,5]:null,wrist==='right'?[x,5]:null);
+        const rest=wrist==='left'?[4.01,5,6.5,7.5,8.99]:[.01,1,2.5,3.5,4.99];
+        const inward=wrist==='left'?3.9:5.1;
+        const outward=wrist==='left'?9.1:-.1;
+        try {
+            for(const x of rest)move(x);
+            assert.deepEqual(h.events,[],'Resting and modest horizontal drift stay neutral');
+            move(inward);
+            const action=`${wrist}_${wrist==='left'?'right':'left'}`;
+            assert.deepEqual(h.events,[action]);
+            for(const x of rest)move(x);
+            assert.deepEqual(h.events,[action],'Returning from inside must not count as an outward move');
+            move(outward);
+            assert.deepEqual(h.events,[action,`${wrist}_${wrist==='left'?'left':'right'}`]);
+        }finally{h.close();}
+    }
+});
+
 test('popup side regions meet Up without a dead band and retain continuous native dwell',()=>{
     const h=harness({profile:popupProfile});
     try{

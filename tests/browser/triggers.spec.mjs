@@ -20,8 +20,8 @@ test('trigger guides mirror the selected game profile, show native activation an
     await expect(zones).toBeVisible();
     await expect(zones.locator('[data-trigger]')).toHaveCount(6);
     const corner = await zones.locator('[data-trigger=left_left] polygon').evaluate(p => p.getAttribute('points').split(' ')[0].split(',').map(Number));
-    // Pop-up Panic's side targets now start two cells above the original band.
-    expect(corner[0]).toBeCloseTo(350, 2); expect(corner[1]).toBeCloseTo(150, 2);
+    // Side thresholds move two cells outward while continuing to touch Up.
+    expect(corner[0]).toBeCloseTo(230, 2); expect(corner[1]).toBeCloseTo(150, 2);
     const size = await page.locator('[data-wrist=right].camera-wrist').boundingBox();
     await page.evaluate(() => window.motionTest.raw('right_up'));
     await page.clock.runFor(32);

@@ -10,9 +10,11 @@ export const wristZones = {
 // Pop-up Panic reserves the high band for deliberate raises. Side sweeps can
 // travel above the shoulders without entering Up. The half-open side rectangles
 // meet Up at Y=1: no vertical dead zone and no competing commands overlap.
+// Each wrist keeps a five-cell horizontal rest corridor: move both side thresholds
+// two cells away from rest, so returning from a cross-body reach stays neutral.
 export const popupZones = {
-    left: { up: [-9, -9, 27, 10], left: [7, 1, 11, 17], right: [-9, 1, 15, 17] },
-    right: { up: [-9, -9, 27, 10], left: [3, 1, 15, 17], right: [-9, 1, 11, 17] }
+    left: { up: [-9, -9, 27, 10], left: [9, 1, 9, 17], right: [-9, 1, 13, 17] },
+    right: { up: [-9, -9, 27, 10], left: [5, 1, 13, 17], right: [-9, 1, 9, 17] }
 };
 
 function region(wrist, direction, zones) {

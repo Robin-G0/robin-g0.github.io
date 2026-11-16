@@ -135,6 +135,12 @@ test('popup camera guides and downloaded profile use the higher Up and side band
     const response = await page.request.get(profile);
     const inputs = (await response.json()).inputs;
     expect(await page.evaluate(() => window.motionTest.profile.inputs)).toEqual(inputs);
+    const sideCells={left_left:[9,1,9,17],left_right:[-9,1,13,17],
+        right_left:[5,1,13,17],right_right:[-9,1,9,17]};
+    for(const [action,cell] of Object.entries(sideCells)) {
+        const constraints=inputs.find(input=>input.action===action).steps[0].constraints;
+        expect(constraints.every(constraint=>JSON.stringify(constraint.cell)===JSON.stringify(cell))).toBe(true);
+    }
     // The mock's active state is indexed by the profile actually imported into MIG.
     await page.evaluate(() => window.motionTest.raw('right_left'));
     await expect(page.locator('[data-trigger=right_left]')).toHaveAttribute('data-active','true');
