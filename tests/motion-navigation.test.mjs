@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MotionNavigation } from '../arcade/core/motion-navigation.js';
 import { visiblePoint } from '../arcade/mig/camera.js';
+test('a latched countdown finishes after tracking disappears',()=>{
+ const n=new MotionNavigation();n.request('tutorial',true,1000,true);
+ assert.deepEqual(n.step({visible:false,lastSeen:1000},4000),{play:true});
+});
 
 test('a recognised wrist confirms tutorial or pause after a visible countdown', () => {
     for (const phase of ['tutorial', 'paused']) {

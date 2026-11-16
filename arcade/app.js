@@ -1,9 +1,9 @@
 import { games, gamesForTheme } from './catalog.js?v=survival-17';
-import { engines } from './registry.js?v=traps-20';
+import { engines } from './registry.js?v=ready-21';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=pressure-19';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js?v=traps-20';
+import { GameRoom } from './room.js?v=ready-21';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

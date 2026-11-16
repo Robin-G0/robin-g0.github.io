@@ -1,13 +1,13 @@
-import { engines } from './registry.js?v=traps-20';
-import { GameRunner } from './core/runner.js?v=traps-20';
+import { engines } from './registry.js?v=ready-21';
+import { GameRunner } from './core/runner.js?v=ready-21';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=pressure-19';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=directions-16';
 import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
-import { MotionNavigation } from './core/motion-navigation.js?v=greeting-18';
-import { lessonFor } from './lessons.js?v=traps-20';
+import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
+import { lessonFor } from './lessons.js?v=ready-21';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-12';
 import { FrameBudget } from './core/frame-budget.js';
@@ -229,7 +229,7 @@ export class GameRoom {
     }
 
     requestCountdown(visible, now) {
-        if (this.navigation.request(this.runner.phase, visible, now)) {
+        if (this.navigation.request(this.runner.phase, visible, now, this.runner.phase === 'tutorial')) {
             this.inputMode = 'motion';
             this.$('#arcade-cancel-countdown').hidden = false;
         }
@@ -262,7 +262,7 @@ export class GameRoom {
         this.text('#arcade-restart', 'Restart');
         this.text('#arcade-begin', this.runner?.started ? 'Resume' : 'Start');
         if (!this.navigation.deadline) {
-            const instruction = this.dialog.dataset.brief === 'start' ? 'Say hi (with hand) to start' : this.runner.started ? 'Lift to resume' : 'Lift to start';
+            const instruction = this.dialog.dataset.brief === 'start' ? (this.cameraReady ? 'Say hi (with hand) to start' : this.dialog.dataset.camera === 'unavailable' ? 'Press Start to play' : 'Loading') : this.runner.started ? 'Lift to resume' : 'Lift to start';
             if (this.$('#arcade-controls-status').textContent !== instruction) this.$('#arcade-controls-status').textContent = instruction;
         }
         this.updateCameraLayout();
@@ -307,6 +307,7 @@ export class GameRoom {
         if (this.camera.session) this.camera.stop();
         const attempt = this.cameraAttempt = (this.cameraAttempt || 0) + 1;
         this.cameraStarting = true;
+        this.cameraReady = false;
         this.inputMode = 'motion';
         this.dialog.dataset.camera = 'loading';
         this.trackingAt = performance.now(); this.lostAt = null; this.visible = false;
@@ -324,6 +325,7 @@ export class GameRoom {
         this.cameraStarting = false; this.camera.stop(); this.cancelCountdown();
         this.inputMode = 'keyboard';
         this.visible = false; this.dialog.dataset.camera = 'off';
+        this.cameraReady = false;
         this.startWristVisible = false; this.startLostAt = null;
         this.$('#arcade-camera').textContent = 'Use camera';
         this.cameraStatus();
@@ -346,6 +348,7 @@ export class GameRoom {
     }
 
     tracking(frame) {
+        this.cameraReady = true;
         const video = this.$('#arcade-video');
         if (video.videoWidth && video.videoHeight) {
             this.$('.camera-view').style.aspectRatio = `${video.videoWidth}/${video.videoHeight}`;

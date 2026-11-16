@@ -1,5 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
+test('loading lasts until the tracker delivers its first frame',async({page})=>{
+ let release;const gate=new Promise(r=>release=r);
+ await page.route('**/vendor/motion-input-grid/src/index.mjs',async r=>{await gate;r.fulfill({path:fileURLToPath(new URL('./fixtures/camera-session.mjs',import.meta.url)),contentType:'text/javascript'});});
+ await page.locator('[data-game=construction-popups]').click();
+ await page.clock.runFor(200);
+ await expect(page.locator('#arcade-controls-status')).toHaveText('Loading');
+ release();await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
+ await page.clock.runFor(300);
+ await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi (with hand) to start');
+});
 
 test.beforeEach(async({page})=>{
     await page.clock.install();
@@ -26,13 +36,12 @@ test('either visible wrist starts the shared greeting countdown without a game g
     }
 });
 
-test('countdowns cancel on hand loss and Controls never auto-dismisses while being read',async({page})=>{
+test('countdowns finish without hands and Controls never auto-dismisses while being read',async({page})=>{
     await page.locator('[data-game=construction-popups]').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
     await page.evaluate(()=>window.motionTest.observe());await page.clock.runFor(1000);
-    await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(900);
-    await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi (with hand) to start');
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','tutorial');
+    await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(2300);
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
     await page.locator('#arcade-help').click();
     await page.evaluate(()=>window.motionTest.observe());await page.clock.runFor(3300);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','tutorial');
