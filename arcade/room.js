@@ -1,13 +1,13 @@
-import { engines } from './registry.js?v=juggler-26';
+import { engines } from './registry.js?v=juggler-27';
 import { GameRunner } from './core/runner.js?v=ready-21';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=juggler-26';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=juggler-27';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=targets-25';
 import { arcadeProfile, popupProfile, constructionLiftProfile } from './mig/profile.js?v=targets-25';
-import { ArcadeAudio } from './core/audio.js?v=juggler-26';
+import { ArcadeAudio } from './core/audio.js?v=juggler-27';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=juggler-26';
+import { lessonFor } from './lessons.js?v=juggler-27';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-25';
 import { FrameBudget } from './core/frame-budget.js';

@@ -1,6 +1,6 @@
 import * as phosphor from './games/phosphor.js?v=tutorial-3';
 import * as desktop from './games/desktop95.js?v=tutorial-3';
-import * as web from './games/construction.js?v=juggler-26';
+import * as web from './games/construction.js?v=juggler-27';
 import * as matrix from './games/matrix.js?v=tutorial-3';
 import * as chrome from './games/y2k.js?v=tutorial-3';
 import * as aqua from './games/aqua.js?v=tutorial-3';

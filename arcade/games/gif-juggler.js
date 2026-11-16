@@ -1,7 +1,7 @@
 import { game } from '../core/game.js?v=motion-6';
-import { renderJuggler } from './gif-juggler-view.js?v=juggler-26';
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-26';
-export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-26';
+import { renderJuggler } from './gif-juggler-view.js?v=juggler-27';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
+export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
 
 export function catchPoints(y, touching = false) {
     const risk = Math.max(0, Math.min(1, (y - JUGGLER.catchStart) / (CONTACT_Y - JUGGLER.catchStart)));
@@ -93,7 +93,7 @@ export function juggle(env) {
                         ball.y = 60; ball.velocity = 0; ball.contactAt = null;
                         ball.power = null; ball.wakeAt = s.time + JUGGLER.recovery;
                         env.sound?.({ kind: 'miss' });
-                        if (s.lives <= 0) { s.ended = true; env.finish('Connection lost'); break; }
+                        if (s.lives <= 0) { s.ended = true; env.finish('Game over'); break; }
                     }
                     continue;
                 }

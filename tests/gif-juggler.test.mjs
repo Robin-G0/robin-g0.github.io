@@ -12,7 +12,7 @@ function setup(options={}) {
     const advance=seconds=>{for(let left=seconds;left>1e-8;left-=1/120)g.update(Math.min(left,1/120));};
     return {g,s:g.state,sounds,messages,results,advance};
 }
-function falling(ball,y=240) { Object.assign(ball,{y,velocity:100,contactAt:null,wakeAt:0}); }
+function falling(ball,y=280) { Object.assign(ball,{y,velocity:100,contactAt:null,wakeAt:0}); }
 
 test('late catches increase points, actual contact doubles them and ascending/empty raises are harmless',()=>{
     const {g,s,messages,sounds}=setup();
@@ -20,7 +20,7 @@ test('late catches increase points, actual contact doubles them and ascending/em
     assert.equal(catchPoints(CONTACT_Y,true),2*catchPoints(CONTACT_Y));
     g.input({action:'left'});assert.equal(s.score,0);assert.equal(s.catches,0);
     assert.deepEqual(messages,[]);assert.deepEqual(sounds,[]);
-    falling(s.balls[0],220);g.input({action:'left'});
+    falling(s.balls[0],265);g.input({action:'left'});
     const early=s.score;
     g.input({action:'left'});assert.equal(s.score,early,'Holding/spamming cannot score on an ascending GIF');
     falling(s.balls[0],290);g.input({action:'left'});assert.ok(s.score-early>early);
@@ -38,8 +38,24 @@ test('both wrists remain independent and one lift catches every eligible GIF in 
     assert.equal(s.catches,2);
     assert.ok(s.balls[0].velocity<0&&s.balls[2].velocity<0);
     assert.ok(s.balls[1].velocity>0,'The other wrist still has its own catch');
-    assert.equal(s.score,catchPoints(240)*2+25);
+    assert.equal(s.score,catchPoints(280)*2+25);
     g.input({action:'right'});assert.equal(s.catches,3);
+});
+
+test('a lift cannot bounce distant GIFs, including distant companions in the same lane',()=>{
+    for(const lane of [0,1]){
+        const {g,s,sounds}=setup();
+        const action=lane?'right':'left',ball=s.balls[lane];
+        for(const y of [180,220,JUGGLER.catchStart-.01]){
+            falling(ball,y);g.input({action});
+            assert.equal(ball.velocity,100);assert.equal(s.score,0);assert.equal(s.catches,0);
+        }
+        assert.deepEqual(sounds,[],'An early lift must not pretend a catch happened');
+        const companion={...ball,id:2,y:230};s.balls.push(companion);
+        falling(ball,JUGGLER.catchStart);g.input({action});
+        assert.ok(ball.velocity<0);assert.equal(s.score,10);
+        assert.equal(companion.velocity,100,'Catching one GIF never scoops up a distant companion');
+    }
 });
 
 test('contact has real-time grace independent of world speed and a miss costs only one life before recovery',()=>{
@@ -103,7 +119,7 @@ test('a comfortable timed player can continue past 60 seconds, while idle play n
     assert.ok(runner.elapsed>60,'A catalog duration must not end survival play');
     assert.ok(runner.game.state.score>500);assert.equal(runner.game.state.balls.length,4);
     const idle=setup();idle.advance(25);
-    assert.equal(idle.s.lives,0);assert.deepEqual(idle.results,['Connection lost']);
+    assert.equal(idle.s.lives,0);assert.deepEqual(idle.results,['Game over']);
     runner.dispose();
 });
 

@@ -1,6 +1,6 @@
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-26';
-import { drawJugglerSprite } from './gif-juggler-art.js?v=juggler-26';
-import { Painter } from '../core/painter.js?v=juggler-26';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
+import { drawJugglerSprite } from './gif-juggler-art.js?v=juggler-27';
+import { Painter } from '../core/painter.js?v=juggler-27';
 
 const NAVY = '#100d35', INK = '#fff9e8', GOLD = '#fff16b', CYAN = '#65ffff';
 const laneX = lane => lane ? 525 : 195;
@@ -26,6 +26,11 @@ function backdrop(p, g) {
     p.line([[360, 79], [360, p.h - 30]], '#4d4268', 1, [3, 8]);
     for (const lane of [0, 1]) {
         const x = laneX(lane);
+        // A GIF becomes catchable when its visible bottom enters this short band.
+        const catchTop = g.y(JUGGLER.catchStart) + g.size / 2;
+        p.line([[x - 118, catchTop], [x + 118, catchTop]], '#3d5869', 1, [3, 7]);
+        p.line([[x - 118, catchTop], [x - 118, g.line], [x - 106, g.line]], '#3d5869');
+        p.line([[x + 118, catchTop], [x + 118, g.line], [x + 106, g.line]], '#3d5869');
         p.rect(x - 118, g.line - 1, 236, 10, GOLD);
         for (let j = 0; j < 12; j++) p.rect(x - 118 + j * 20, g.line + 1, 10, 6, NAVY);
         p.text(lane ? 'R' : 'L', x, p.h - (p.compact ? 42 : 29), p.compact ? 54 : 35, INK, 'center');

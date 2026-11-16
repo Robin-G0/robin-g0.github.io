@@ -9,8 +9,8 @@ test.beforeEach(async ({page})=>{
 
 test('original GIF companions and simulation-clock sprites animate and respect reduced motion',async ({page})=>{
     const result=await page.evaluate(async()=>{
-        const {Painter,loadArtwork}=await import('/arcade/core/painter.js?v=juggler-26');
-        const {drawJugglerSprite}=await import('/arcade/games/gif-juggler-art.js?v=juggler-26');
+        const {Painter,loadArtwork}=await import('/arcade/core/painter.js?v=juggler-27');
+        const {drawJugglerSprite}=await import('/arcade/games/gif-juggler-art.js?v=juggler-27');
         const images=await loadArtwork('construction');
         const canvas=document.createElement('canvas');canvas.width=canvas.height=112;
         const p=new Painter(canvas.getContext('2d'),{font:'Arial'},images);
@@ -40,6 +40,9 @@ test('Juggler runs with L/R lifts, local feedback and freezes its painted board 
     await expect(page.locator('[data-arcade-input=right] .action-key')).toHaveText('R');
     await page.clock.runFor(1100);
     await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#arcade-score')).toHaveText('0');
+    await page.clock.runFor(500);
+    await page.keyboard.press('ArrowRight');
     await expect(page.locator('#arcade-score')).not.toHaveText('0');
     await expect(page.locator('#arcade-playfield-input')).toBeEmpty();
     await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
@@ -53,4 +56,12 @@ test('Juggler runs with L/R lifts, local feedback and freezes its painted board 
     expect(await page.locator('#arcade-canvas').evaluate(canvas=>canvas.toDataURL())).not.toBe(frozen);
     await page.locator('#arcade-help').click();
     await expect(page.locator('#arcade-lesson-tip')).toHaveText(/x2/);
+});
+
+test('running out of lives reports Game over rather than a connection failure',async ({page})=>{
+    await page.locator('[data-game=construction-juggle]').click();
+    await page.locator('#arcade-no-camera').click();
+    await page.clock.runFor(16000);
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
+    await expect(page.locator('#arcade-result h3')).toHaveText('Game over');
 });
