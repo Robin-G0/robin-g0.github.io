@@ -1,7 +1,7 @@
 import { game } from '../core/game.js?v=motion-6';
-import { renderJuggler } from './gif-juggler-view.js?v=juggler-27';
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
-export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
+import { renderJuggler } from './gif-juggler-view.js?v=arcade-28';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=arcade-28';
+export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=arcade-28';
 
 export function catchPoints(y, touching = false) {
     const risk = Math.max(0, Math.min(1, (y - JUGGLER.catchStart) / (CONTACT_Y - JUGGLER.catchStart)));

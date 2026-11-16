@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 test.beforeEach(async({page})=>{
     await page.clock.install();
+    // Cooldown assertions use only explicit virtual time, not worker wall time.
+    await page.clock.pauseAt(new Date(Date.now()+1000));
     await page.route('https://raw.githubusercontent.com/**',r=>r.abort());
     await page.route('**/vendor/motion-input-grid/src/index.mjs',r=>r.fulfill({
         path:fileURLToPath(new URL('./fixtures/camera-session.mjs',import.meta.url)),contentType:'text/javascript'

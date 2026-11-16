@@ -1,6 +1,6 @@
 import { LINK_EFFECTS } from './link-maze-map.js?v=traps-20';
 import { drawLinkEffect } from './link-maze-art.js?v=traps-20';
-import { Painter } from '../core/painter.js?v=juggler-27';
+import { Painter } from '../core/painter.js?v=arcade-28';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
 const wrist = side => side === 0 ? 'L' : 'R';

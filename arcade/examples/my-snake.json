@@ -4,7 +4,6 @@
   "engine": "snake",
   "title": "My First Snake",
   "goal": "Collect the signals and leave room for the next corner.",
-  "duration": 60,
   "difficulty": "gentle",
   "seed": 7
 }

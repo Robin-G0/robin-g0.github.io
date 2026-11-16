@@ -8,7 +8,7 @@ test('loading lasts until the tracker delivers its first frame',async({page})=>{
  await expect(page.locator('#arcade-controls-status')).toHaveText('Loading');
  release();await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
  await page.clock.runFor(300);
- await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi (with hand) to start');
+ await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi to start');
 });
 
 test.beforeEach(async({page})=>{
@@ -24,7 +24,7 @@ test('either visible wrist starts the shared greeting countdown without a game g
     for(const [engine,missing] of [['popups',16],['maze',15]]){
         await page.locator(`[data-game=construction-${engine}]`).click();
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
-        await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi (with hand) to start');
+        await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi to start');
         await expect(page.locator('#arcade-tutorial .gesture-lesson')).not.toBeVisible();
         await expect(page.locator('#arcade-lesson-goal')).not.toBeVisible();
         expect(await page.locator('#arcade-controls-status').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(30);

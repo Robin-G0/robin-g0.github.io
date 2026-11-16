@@ -1,6 +1,8 @@
 // Deterministic public SDK events for UI tests, not a pose detector or production code.
 export class MIGSession {
     constructor(options) {
+        window.cameraResources ??= {created:0,disposed:0,frames:0,streams:[]};
+        window.cameraResources.created++;
         this.options = options; this.state = { running: false }; this.points = []; this.activeActions = new Set(); this.inputs = [];
         this.tracker = { active: index => this.activeActions.has(this.inputs[index]?.action) };
         window.motionTest = {
@@ -36,13 +38,14 @@ export class MIGSession {
     async start(video) {
         const canvas = document.createElement('canvas'); canvas.width = 640; canvas.height = 480;
         canvas.getContext('2d').fillRect(0, 0, 640, 480);
-        this.stream = canvas.captureStream(30); video.srcObject = this.stream; await video.play();
+        this.stream = canvas.captureStream(30);window.cameraResources.streams.push(this.stream); video.srcObject = this.stream; await video.play();
         this.video = video; this.state.running = true; this.listener(this.state);
-        this.interval = setInterval(() => this.options.onFrame(this), 50);
+        this.interval = setInterval(() => {window.cameraResources.frames++;this.options.onFrame(this);}, 50);
     }
     coordinate(index) { return this.points[[11, 12, 15, 16].indexOf(index)] || null; }
     recalibrate() {}
     dispose() {
+        if(this.disposed)return;this.disposed=true;window.cameraResources.disposed++;
         clearInterval(this.interval); this.stream?.getTracks().forEach(track => track.stop());
         if (this.video) this.video.srcObject = null;
     }

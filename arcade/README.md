@@ -243,11 +243,15 @@ flips a bit. Register the copied factory explicitly, then add its goal and the t
 action labels to the catalog. `mig/camera.js` already handles the package session;
 the new game only needs `event.action` and should never inspect camera landmarks.
 
-Visitors import JSON descriptions targeting an installed engine. Only the listed
+Visitors import JSON presets targeting an installed engine. A preset changes the
+title, instructions, difficulty and random seed; it does not install a new game
+or change its rules. Presets stay in memory until the page is reloaded. Only the listed
 schema fields are accepted: id, engine, title, goal, duration, seed and difficulty,
 plus `schema_version: 1`. Files are limited to 32 KB, durations to 30–90 seconds,
 and text to short single lines. URLs, HTML execution, scripts and unknown fields
-are not accepted. Imported games inherit the current theme and engine controls.
+are not accepted. Imported games inherit the current theme and engine controls. The optional
+`duration` field is legacy metadata: the current survival and repeating-round
+engines use their own loss rules and clocks. It is omitted from the example.
 
 ## Runtime efficiency
 

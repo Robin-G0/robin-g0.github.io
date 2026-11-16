@@ -1,6 +1,6 @@
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=juggler-27';
-import { drawJugglerSprite } from './gif-juggler-art.js?v=juggler-27';
-import { Painter } from '../core/painter.js?v=juggler-27';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=arcade-28';
+import { drawJugglerSprite } from './gif-juggler-art.js?v=arcade-28';
+import { Painter } from '../core/painter.js?v=arcade-28';
 
 const NAVY = '#100d35', INK = '#fff9e8', GOLD = '#fff16b', CYAN = '#65ffff';
 const laneX = lane => lane ? 525 : 195;

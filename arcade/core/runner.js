@@ -69,7 +69,8 @@ export class GameRunner {
     pause(reason = 'Paused') {
         if (this.phase !== 'playing') return;
         this.phase = 'paused'; this.game.pause(); this.router.setPhase(this.phase);
-        this.message(reason); this.publish();
+        if (reason) this.message(reason);
+        this.publish();
     }
 
     tutorial() {

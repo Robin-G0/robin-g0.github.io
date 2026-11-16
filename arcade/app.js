@@ -1,9 +1,9 @@
-import { games, gamesForTheme } from './catalog.js?v=juggler-27';
-import { engines } from './registry.js?v=juggler-27';
+import { games, gamesForTheme } from './catalog.js?v=arcade-28';
+import { engines } from './registry.js?v=arcade-28';
 import { seededRandom } from './core/random.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=juggler-27';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js?v=juggler-27';
+import { GameRoom } from './room.js?v=arcade-28';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

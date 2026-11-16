@@ -8,7 +8,7 @@ const voices = {
 export class ArcadeAudio {
     constructor(theme, createContext = () => new (globalThis.AudioContext || globalThis.webkitAudioContext)()) {
         this.profile = voices[theme] || voices.material;
-        this.createContext = createContext; this.enabled = true; this.nodes = new Set();
+        this.createContext = createContext; this.enabled = true; this.nodes = new Map();
     }
     unlock() {
         if (!this.enabled || this.disposed) return;
@@ -45,14 +45,19 @@ export class ArcadeAudio {
             envelope.gain.linearRampToValueAtTime(.45, start + .006);
             envelope.gain.exponentialRampToValueAtTime(.001, start + .14);
             oscillator.connect(envelope); envelope.connect(this.output);
-            this.nodes.add(oscillator);
+            this.nodes.set(oscillator, envelope);
             oscillator.onended = () => { this.nodes.delete(oscillator); oscillator.disconnect(); envelope.disconnect(); };
             oscillator.start(start); oscillator.stop(start + .16);
         });
     }
     dispose() {
         this.disposed = true;
-        for (const node of this.nodes) { try { node.stop(); } catch { /* Already ended. */ } }
-        this.nodes.clear(); this.context?.close()?.catch(() => {});
+        for (const [node, envelope] of this.nodes) {
+            node.onended = null;
+            try { node.stop(); } catch { /* Already ended. */ }
+            node.disconnect(); envelope.disconnect();
+        }
+        this.nodes.clear(); this.output?.disconnect(); this.context?.close()?.catch(() => {});
+        this.output = null; this.context = null;
     }
 }
