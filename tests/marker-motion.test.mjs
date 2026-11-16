@@ -22,3 +22,14 @@ test('subpixel noise stays still and missing wrists reset instead of dragging a 
     marker.observe(null);assert.equal(marker.step(1000),null);
     marker.observe({x:.9,y:.3});assert.deepEqual(marker.step(1016),{x:.9,y:.3});
 });
+
+test('inward horizontal sweeps never introduce vertical drift in display smoothing',()=>{
+    for(const start of [.15,.85]) {
+        const marker=new MarkerMotion();marker.observe({x:start,y:.4});marker.step(0);
+        for(let frame=1;frame<=60;frame++) {
+            const x=start+(1-2*start)*frame/60;
+            marker.observe({x,y:.4});
+            assert.equal(marker.step(frame*50).y,.4);
+        }
+    }
+});

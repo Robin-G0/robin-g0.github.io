@@ -137,13 +137,12 @@ test('popup side sweeps above shoulder height do not fire Up, for either wrist',
     }
 });
 
-test('popup direction boundaries have a neutral band and retain continuous native dwell',()=>{
+test('popup side regions meet Up without a dead band and retain continuous native dwell',()=>{
     const h=harness({profile:popupProfile});
     try{
         for(let i=0;i<24;i++)h.frame([10,i%2?.9:1.5],null);
-        assert.deepEqual(h.events,[],'Brief visits to Up cannot accumulate dwell across the gap');
-        h.dwell([10,1.5],null);assert.deepEqual(h.events,[],'The vertical gap is neutral');
-        h.dwell([10,2.1],null);assert.deepEqual(h.events,['left_left']);
+        assert.deepEqual(h.events,[],'Brief alternating visits cannot accumulate dwell in either direction');
+        h.dwell([10,1.01],null);assert.deepEqual(h.events,['left_left']);
         h.dwell([10,.5],null);assert.deepEqual(h.events,['left_left','left_up']);
     }finally{h.close();}
 });
@@ -158,6 +157,26 @@ test('packaged MIG detects different directions from both wrists in the same obs
             assert.equal(h.events.length,2,'Held destinations never repeat');
             h.dwell([6.5,.5],[6.5,2.5],gap);
             assert.deepEqual(h.events,['left_left','right_right','left_up','right_left']);
+        }finally{h.close();}
+    }
+});
+
+test('both popup wrists accept sides immediately below Up and retain horizontal coordinates across the torso',()=>{
+    for(const wrist of ['left','right']) {
+        const h=harness({profile:popupProfile,aspect:4/3,width:.2});
+        const move=(point,n=8)=>h.dwell(wrist==='left'?point:null,wrist==='right'?point:null,50,n);
+        try {
+            move([10,1.01]);move([-1,1.01]);move([4,.99]);
+            assert.deepEqual(h.events,[`${wrist}_left`,`${wrist}_right`,`${wrist}_up`]);
+            const index=wrist==='left'?15:16;
+            for(const x of [10,8,6,4,2,0,-1,0,2,4,6,8,10]) {
+                move([x,2.5],1);
+                const point=h.tracker.coordinate(index,0);
+                assert.ok(point,'A visible inward sweep retains its anatomical wrist');
+                assert.ok(Math.abs(point.x-(.5+(x-4.5)*.2*.2))<1e-6);
+                assert.ok(Math.abs(point.y-(.3+(2.5-3.5)*.2*(4/3)*.2))<1e-6,
+                    'Horizontal input cannot acquire a downward wave in the coordinate API');
+            }
         }finally{h.close();}
     }
 });

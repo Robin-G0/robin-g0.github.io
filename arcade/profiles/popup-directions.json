@@ -23,9 +23,9 @@
               "landmark": "left_wrist",
               "cell": [
                 7,
-                2,
+                1,
                 11,
-                16
+                17
               ],
               "type": "required",
               "priority": "high"
@@ -35,9 +35,9 @@
               "landmark": "left_wrist",
               "cell": [
                 7,
-                2,
+                1,
                 11,
-                16
+                17
               ],
               "type": "trigger",
               "priority": "high"
@@ -107,9 +107,9 @@
               "landmark": "left_wrist",
               "cell": [
                 -9,
-                2,
+                1,
                 15,
-                16
+                17
               ],
               "type": "required",
               "priority": "high"
@@ -119,9 +119,9 @@
               "landmark": "left_wrist",
               "cell": [
                 -9,
-                2,
+                1,
                 15,
-                16
+                17
               ],
               "type": "trigger",
               "priority": "high"
@@ -149,9 +149,9 @@
               "landmark": "right_wrist",
               "cell": [
                 3,
-                2,
+                1,
                 15,
-                16
+                17
               ],
               "type": "required",
               "priority": "high"
@@ -161,9 +161,9 @@
               "landmark": "right_wrist",
               "cell": [
                 3,
-                2,
+                1,
                 15,
-                16
+                17
               ],
               "type": "trigger",
               "priority": "high"
@@ -233,9 +233,9 @@
               "landmark": "right_wrist",
               "cell": [
                 -9,
-                2,
+                1,
                 11,
-                16
+                17
               ],
               "type": "required",
               "priority": "high"
@@ -245,9 +245,9 @@
               "landmark": "right_wrist",
               "cell": [
                 -9,
-                2,
+                1,
                 11,
-                16
+                17
               ],
               "type": "trigger",
               "priority": "high"

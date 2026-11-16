@@ -143,9 +143,9 @@ test('popup camera guides and downloaded profile use the higher Up and side band
     for(const wrist of ['left','right']){
         const up=polygons[`${wrist}_up`],side=polygons[`${wrist}_left`];
         const upBottom=Math.max(...up.map(p=>p.y)),sideTop=Math.min(...side.map(p=>p.y));
-        expect(upBottom).toBeLessThan(sideTop);
+        expect(upBottom).toBeCloseTo(sideTop, 6);
         expect(upBottom).toBeCloseTo(150,0); // shoulders y=.35, scale=.06, Up ends at cell 1
-        expect(sideTop).toBeCloseTo(230,0); // side band starts at cell 2
+        expect(sideTop).toBeCloseTo(150,0); // side band touches Up at cell 1
         expect(inputs.find(i=>i.action===`${wrist}_up`).steps[0].constraints[0].cell).toEqual([-9,-9,27,10]);
     }
     await page.locator('#arcade-close').click();
