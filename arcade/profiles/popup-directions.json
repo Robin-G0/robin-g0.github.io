@@ -108,7 +108,7 @@
               "cell": [
                 -9,
                 1,
-                13,
+                14,
                 17
               ],
               "type": "required",
@@ -120,7 +120,7 @@
               "cell": [
                 -9,
                 1,
-                13,
+                14,
                 17
               ],
               "type": "trigger",
@@ -148,9 +148,9 @@
               "id": "right_left_hold",
               "landmark": "right_wrist",
               "cell": [
-                5,
+                4,
                 1,
-                13,
+                14,
                 17
               ],
               "type": "required",
@@ -160,9 +160,9 @@
               "id": "right_left_zone",
               "landmark": "right_wrist",
               "cell": [
-                5,
+                4,
                 1,
-                13,
+                14,
                 17
               ],
               "type": "trigger",

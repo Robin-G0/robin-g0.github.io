@@ -137,12 +137,13 @@ test('popup side sweeps above shoulder height do not fire Up, for either wrist',
     }
 });
 
-test('popup rest corridors tolerate two more cells on each side without firing on an inward return',()=>{
+test('popup inward reaches are one cell easier while returning to rest never fires outward',()=>{
     for(const wrist of ['left','right']) {
         const h=harness({profile:popupProfile,aspect:4/3,width:.2});
         const move=x=>h.dwell(wrist==='left'?[x,5]:null,wrist==='right'?[x,5]:null);
-        const rest=wrist==='left'?[4.01,5,6.5,7.5,8.99]:[.01,1,2.5,3.5,4.99];
-        const inward=wrist==='left'?3.9:5.1;
+        const rest=wrist==='left'?[5.01,5.5,6.5,7.5,8.99]:[.01,1,2.5,3.5,3.99];
+        // These points were neutral before moving only the inward thresholds.
+        const inward=wrist==='left'?4.9:4.1;
         const outward=wrist==='left'?9.1:-.1;
         try {
             for(const x of rest)move(x);

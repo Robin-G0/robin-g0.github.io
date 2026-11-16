@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js?v=targets-23';
+import { arcadeProfile } from './profile.js?v=targets-24';
 import { commandLabel } from '../core/commands.js';
 
 function attribute(element, name, value) {

@@ -1,4 +1,4 @@
-import { arcadeProfile } from './profile.js?v=targets-23';
+import { arcadeProfile } from './profile.js?v=targets-24';
 import { GestureGate } from './gesture-gate.js?v=directions-16';
 
 export function visiblePoint(point) {
