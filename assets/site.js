@@ -1,6 +1,7 @@
 const $ = (selector) => document.querySelector(selector);
 const root = document.documentElement;
 const profileBase = 'https://raw.githubusercontent.com/Robin-G0/Robin-G0/main/assets/';
+const defaultTheme = 'construction';
 const colorList = ['#5bb7c8', '#b59bdb', '#dcb368', '#9dbd82', '#dd8e8e', '#7d9ed0'];
 const icons = {'C++':'cplusplus', C:'c', Python:'python', JavaScript:'javascript', TypeScript:'typescript', CMake:'cmake', CSS:'css3', HTML:'html5', PowerShell:'powershell', Luau:'lua', Shell:'bash', 'C#':'csharp', Java:'java', Dockerfile:'docker', GLSL:'opengl', GDScript:'godot'};
 const objects = {y2k:'y2k-chrome-orbit-v1.png', aqua:'aqua-glass-compass-v1.png', aero:'aero-globe.png', glass:'glass-space-earth-v1.png'};
@@ -27,7 +28,7 @@ function applyTheme(id, manual = false, updateURL = true) {
   $('meta[name="theme-color"]').content = theme[appearance].bg;
   $('#theme-name').textContent = theme.name;
   $('#theme-era').textContent = theme.era;
-  $('#theme-mode').textContent = manual ? 'Visual identity' : 'Theme of the day';
+  $('#theme-mode').textContent = manual ? 'Visual identity' : 'Default theme';
   $('#daily-shortcut').hidden = !manual;
   const date = daily?.selected;
   if (date) {
@@ -105,9 +106,9 @@ $('#open-themes').addEventListener('click',() => { picker.showModal(); $('#open-
 $('#close-themes').addEventListener('click',() => picker.close());
 picker.addEventListener('close',() => { $('#open-themes').setAttribute('aria-expanded','false'); $('#open-themes').focus({preventScroll:true}); });
 picker.addEventListener('click',event => { if (event.target === picker) { const r=picker.getBoundingClientRect(); if (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) picker.close(); } });
-function selectDaily() { if (daily) applyTheme(daily.id,false); picker.close(); }
-$('#choose-daily').addEventListener('click',selectDaily);
-$('#daily-shortcut').addEventListener('click',selectDaily);
+function selectDefault() { applyTheme(defaultTheme,false); picker.close(); }
+$('#choose-daily').addEventListener('click',selectDefault);
+$('#daily-shortcut').addEventListener('click',selectDefault);
 $('#choose-random').addEventListener('click',() => {
   const options=catalog.filter(theme => theme.id!==active?.id); if (!options.length) return;
   const random = new Uint32Array(1); crypto.getRandomValues(random);
@@ -120,7 +121,7 @@ $('#toggle-mode').addEventListener('click',() => {
 });
 window.addEventListener('popstate',() => {
   const id=new URL(location.href).searchParams.get('theme');
-  applyTheme(catalog.some(t=>t.id===id) ? id : daily?.id, Boolean(id && catalog.some(t=>t.id===id)),false);
+  applyTheme(catalog.some(t=>t.id===id) ? id : defaultTheme, Boolean(id && catalog.some(t=>t.id===id)),false);
 });
 
 const pattern=[0,3,4,5], cells=[...document.querySelectorAll('[data-cell]')];
@@ -168,10 +169,10 @@ async function refreshPublicProfile() {
   lastRefresh=Date.now();
   try {
     const day=new Date().toISOString().slice(0,10);
-    const [theme,stats]=await Promise.all([getJSON(`${profileBase}theme.json?day=${day}`),getJSON(`${profileBase}stats.json?day=${day}`)]);
-    if (!validStats(stats) || theme.selected !== stats.updated || !catalog.some(item=>item.id===theme.id)) return;
-    daily=theme; renderStats(stats);
-    applyTheme(explicit ? active.id : daily.id,explicit,false);
+    const stats=await getJSON(`${profileBase}stats.json?day=${day}`);
+    if (!validStats(stats)) return;
+    daily={selected:stats.updated}; renderStats(stats);
+    applyTheme(explicit ? active.id : defaultTheme,explicit,false);
   } catch { /* The bundled public snapshot remains usable offline. */ }
 }
 try {
@@ -180,7 +181,7 @@ try {
   daily=snapshot.theme;
   buildPicker(); renderStats(snapshot.stats);
   const requested=new URL(location.href).searchParams.get('theme');
-  applyTheme(catalog.some(t=>t.id===requested) ? requested : daily.id,catalog.some(t=>t.id===requested));
+  applyTheme(catalog.some(t=>t.id===requested) ? requested : defaultTheme,catalog.some(t=>t.id===requested));
   root.dataset.ready='true';
   refreshPublicProfile();
 } catch {
