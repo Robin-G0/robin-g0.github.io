@@ -15,7 +15,7 @@ export class MIGSession {
             move: (side, x, y) => { this.points[side === 'left' ? 2 : 3] = {x,y,confidence:.95}; this.options.onFrame(this); },
             raw: action => {
                 this.activeActions = new Set([action]);
-                this.options.onAction({ action }); this.options.onFrame(this);
+                this.options.onAction({ action, id:this.inputs.find(input=>input.action===action)?.id }); this.options.onFrame(this);
             },
             batch: actions => {
                 this.activeActions = new Set(actions);

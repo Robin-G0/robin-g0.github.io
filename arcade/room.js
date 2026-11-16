@@ -3,22 +3,25 @@ import { GameRunner } from './core/runner.js?v=arcade-28';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=arcade-28';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=bindings-29';
 import { arcadeProfile, popupProfile, constructionLiftProfile } from './mig/profile.js?v=targets-25';
 import { ArcadeAudio } from './core/audio.js?v=arcade-28';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
 import { lessonFor } from './lessons.js?v=arcade-28';
 import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js?v=targets-25';
+import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
 import { FrameBudget } from './core/frame-budget.js';
 import { WRIST_DIRECTION_COOLDOWN_MS } from './games/popup-panic.js?v=survival-17';
-import { localScores } from './core/scores.js?v=arcade-28';
-import { GameGuide, wavingHand } from './core/guide.js?v=arcade-28';
+import { localScores } from './core/scores.js?v=bindings-29';
+import { GameGuide, wavingHand } from './core/guide.js?v=bindings-29';
 import { seededRandom } from './core/random.js';
+import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=bindings-29';
 
 export class GameRoom {
     constructor(dialog, description, opener) {
         this.dialog = dialog; this.description = description; this.opener = opener;
+        dialog.querySelector('#arcade-binding-panel').hidden = true;
+        for (const button of dialog.querySelectorAll('#arcade-binding-panel button')) button.disabled = false;
         this.scores = localScores;
         this.guideOpen = false;
         this.abort = new AbortController();
@@ -37,12 +40,16 @@ export class GameRoom {
         this.$('#arcade-tutorial').setAttribute('aria-label', 'Start game');
         this.sixDirections = description.inputScheme === 'wrist-directions';
         const constructionLifts = ['maze', 'juggle'].includes(description.engine);
-        const profile = description.engine === 'popups' ? popupProfile : constructionLifts ? constructionLiftProfile : arcadeProfile;
+        this.defaultProfile = description.engine === 'popups' ? popupProfile : constructionLifts ? constructionLiftProfile : arcadeProfile;
+        this.bindingPlan = compileBindings(description,this.defaultProfile,localBindings.profile,localBindings.assignments(description));
+        const profile = this.bindingPlan.profile;
         const profileFile = description.engine === 'popups' ? 'popup-directions' : constructionLifts ? 'construction-lifts' : 'wrist-raises';
         this.$('a[download]').href = `./arcade/profiles/${profileFile}.json?v=targets-25`;
+        this.defaultProfileURL = this.$('a[download]').href;
         this.wristPulseUntil = {};
         this.markerMotion = Object.fromEntries(WRISTS.map(wrist => [wrist, new MarkerMotion()]));
-        this.triggerView = new TriggerView(this.$('#arcade-trigger-zones'), this.sixDirections ? DIRECTIONS : ['up'], profile);
+        this.triggerView = new TriggerView(this.$('#arcade-trigger-zones'), this.sixDirections ? DIRECTIONS : ['up'], profile,
+            {mapped:this.bindingPlan.mapped,labels:this.guideLabels()});
         this.$('.camera-positioning').textContent = this.sixDirections ? 'Arrow boxes · no home return' : 'Lift into ↑ · lower to repeat';
         this.inputMode = 'motion';
         this.sound = new ArcadeAudio(this.palette.theme);
@@ -62,6 +69,8 @@ export class GameRoom {
         });
         this.instructions = lessonFor(description.engine);
         this.guide = new GameGuide(this.$('#arcade-walkthrough'), description, {
+            getBindings: () => this.bindingPlan.mapped ? Object.fromEntries(Object.entries(this.bindingPlan.labels)
+                .map(([control,name])=>[controlLabels(description)[control],name])) : null,
             signal: this.abort.signal, onDone: () => this.closeGuide(),
             drawPreview: element => {
                 const canvas = document.createElement('canvas'); canvas.width = 720; canvas.height = 420;
@@ -73,9 +82,9 @@ export class GameRoom {
         });
         this.$('#arcade-start-icon').innerHTML = wavingHand;
         this.camera = new MotionCamera({
-            profile,
+            profile, mapped:this.bindingPlan.mapped,
             cooldownMs: description.engine === 'popups' ? WRIST_DIRECTION_COOLDOWN_MS : 0,
-            onInput: (action, timestamp) => this.motionInput(action, timestamp),
+            onInput: (action, timestamp, details) => details?.mapped ? this.mappedInput(action,timestamp) : this.motionInput(action, timestamp),
             onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
         });
         this.bindControls();
@@ -85,6 +94,7 @@ export class GameRoom {
         this.$('#arcade-feedback').textContent = this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
         this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
+        this.updateBindingDisplay();
         this.runner.publish();
         dialog.showModal();
         document.documentElement.dataset.arcadeOpen = 'true';
@@ -115,6 +125,7 @@ export class GameRoom {
         on('#arcade-again', () => this.restart());
         on('#arcade-restart', () => this.restart());
         on('#arcade-help', () => {
+            if(this.bindingPanelOpen)return;
             this.dialog.dataset.brief = 'controls';
             this.$('#arcade-tutorial').removeAttribute('aria-label');
             this.$('#arcade-tutorial').setAttribute('aria-labelledby', 'arcade-lesson-title');
@@ -123,6 +134,23 @@ export class GameRoom {
             this.$('#arcade-begin').focus({ preventScroll: true });
         });
         on('#arcade-guide', () => this.openGuide());
+        on('#arcade-bindings', () => this.openBindings());
+        on('#arcade-binding-import', () => this.$('#arcade-binding-file').click());
+        on('#arcade-binding-cancel', () => this.closeBindings());
+        on('#arcade-binding-defaults', () => {
+            for(const select of this.dialog.querySelectorAll('[data-bind-control]'))select.value='';
+        });
+        on('#arcade-binding-apply', () => this.applyBindings());
+        this.$('#arcade-binding-file').addEventListener('change', async event => {
+            const file=event.target.files[0];if(!file)return;
+            const button=this.$('#arcade-binding-import');button.disabled=true;
+            this.$('#arcade-binding-apply').disabled=true;
+            try {
+                await localBindings.importFile(file);
+                if(!this.closed){this.renderBindings();this.text('#arcade-binding-status','Choose a binding for each control, then Apply.');}
+            } catch(error) {if(!this.closed)this.text('#arcade-binding-status',error.message);}
+            finally {if(!this.closed){button.disabled=false;this.$('#arcade-binding-apply').disabled=false;event.target.value='';}}
+        },{signal});
         this.$('#arcade-score-form').addEventListener('submit', event => {
             event.preventDefault();
             const name = this.$('#arcade-name').value;
@@ -137,6 +165,7 @@ export class GameRoom {
             this.$('#arcade-save-score').disabled = input.value.length !== 5;
         }, { signal });
         on('#arcade-pause', () => {
+            if(this.bindingPanelOpen || this.guideOpen)return;
             this.cancelCountdown();
             if (this.runner.phase === 'playing') this.runner.pause(); else if (this.runner.phase === 'paused') this.runner.play();
         });
@@ -187,7 +216,7 @@ export class GameRoom {
                 button.dataset.arcadeInput = wrist;
                 const arrow = document.createElement('span'); arrow.className = 'action-key';
                 arrow.textContent = ['maze', 'juggle'].includes(this.description.engine) ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
-                const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.description.controls[wrist];
+                const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.bindingPlan.mapped ? controlLabels(this.description)[wrist] : this.description.controls[wrist];
                 button.append(arrow, label); area.append(button);
             }
         }
@@ -215,7 +244,7 @@ export class GameRoom {
     }
 
     play() {
-        if (this.guideOpen) return;
+        if (this.guideOpen || this.bindingPanelOpen) return;
         this.cancelCountdown(); this.clearFeedback(); this.runner.play(); this.canvas.focus({ preventScroll: true });
     }
 
@@ -226,6 +255,7 @@ export class GameRoom {
     }
 
     restart() {
+        if(this.bindingPanelOpen)return;
         this.cancelCountdown();
         this.clearFeedback();
         if (this.runner.phase === 'finished' && this.cameraForReplay) {
@@ -249,7 +279,7 @@ export class GameRoom {
     }
 
     input(action, details = {}) {
-        if (this.guideOpen) return false;
+        if (this.guideOpen || this.bindingPanelOpen) return false;
         if (this.runner.phase !== 'tutorial') {
             this.inputMode = details.source || 'keyboard';
             return this.runner.router.dispatch(action, details);
@@ -258,7 +288,7 @@ export class GameRoom {
     }
 
     motionInput(action, timestamp) {
-        if (this.closed || this.guideOpen || document.hidden || performance.now() - timestamp > 250) return;
+        if (this.closed || this.guideOpen || this.bindingPanelOpen || document.hidden || performance.now() - timestamp > 250) return;
         const gesture = decodeGesture(action);
         if (!gesture || gesture.direction === 'neutral') return;
         this.$('#arcade-recognition').textContent = commandLabel(action);
@@ -275,12 +305,105 @@ export class GameRoom {
     }
 
     requestCountdown(visible, now) {
-        if (this.guideOpen) return;
+        if (this.guideOpen || this.bindingPanelOpen) return;
         const initialStart = this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start';
         if (this.navigation.request(this.runner.phase, visible, now, initialStart)) {
             this.inputMode = 'motion';
             this.$('#arcade-cancel-countdown').hidden = false;
         }
+    }
+
+    mappedInput(action,timestamp) {
+        if(this.closed || this.bindingPanelOpen || this.guideOpen || document.hidden || performance.now()-timestamp>250)return;
+        if(this.runner.phase==='playing')this.input(action,{source:'motion',timestamp});
+        else this.requestCountdown(true,performance.now());
+    }
+
+    guideLabels() {
+        return Object.fromEntries(Object.keys(this.description.controls).map(control=>
+            [control,this.sixDirections ? commandLabel(control) : control==='left'?'L':'R']));
+    }
+
+    openBindings() {
+        if(this.bindingPanelOpen)return;
+        this.bindingsResume = this.runner.phase==='playing';
+        this.bindingsReturnGuide = this.guideOpen;
+        if(this.guideOpen){this.guide.hide();this.guideOpen=false;}
+        this.bindingPanelOpen=true;this.cancelCountdown();
+        if(this.bindingsResume)this.runner.pause('');
+        this.renderBindings();this.$('#arcade-binding-panel').hidden=false;
+        this.runner.publish();this.$('#arcade-binding-import').focus({preventScroll:true});
+    }
+
+    renderBindings() {
+        this.text('#arcade-binding-source',localBindings.profile?localBindings.name:'Game defaults');
+        this.text('#arcade-binding-status','');
+        const assignments=localBindings.assignments(this.description),labels=controlLabels(this.description);
+        this.$('#arcade-binding-rows').replaceChildren(...Object.keys(this.description.controls).map(control=>{
+            const row=document.createElement('label'),title=document.createElement('span'),select=document.createElement('select');
+            title.textContent=labels[control];select.dataset.bindControl=control;
+            select.setAttribute('aria-label',`${labels[control]} binding`);
+            select.add(new Option('Game default',''));
+            for(const input of localBindings.profile?.inputs||[])select.add(new Option(bindingName(input),input.id));
+            select.value=assignments[control];select.disabled=!localBindings.profile;
+            row.append(title,select);return row;
+        }));
+    }
+
+    async applyBindings() {
+        const button=this.$('#arcade-binding-apply');button.disabled=true;
+        this.$('#arcade-binding-cancel').disabled=true;this.$('#arcade-binding-import').disabled=true;
+        this.text('#arcade-binding-status','Applying bindings…');
+        const assignments=Object.fromEntries([...this.dialog.querySelectorAll('[data-bind-control]')].map(select=>
+            [select.dataset.bindControl,select.value]));
+        try {
+            const plan=compileBindings(this.description,this.defaultProfile,localBindings.profile,assignments);
+            if(!await this.camera.configure(plan.profile,plan.mapped) || this.closed)return;
+            localBindings.setAssignments(this.description,assignments);
+            this.bindingPlan=plan;
+            this.triggerView=new TriggerView(this.$('#arcade-trigger-zones'),this.sixDirections?DIRECTIONS:['up'],plan.profile,
+                {mapped:plan.mapped,labels:this.guideLabels()});
+            this.fillControls();this.updateBindingDisplay();this.closeBindings();
+        } catch(error) {if(!this.closed)this.text('#arcade-binding-status',`Bindings were not applied: ${error.message}`);}
+        finally {if(!this.closed){button.disabled=false;this.$('#arcade-binding-cancel').disabled=false;this.$('#arcade-binding-import').disabled=false;}}
+    }
+
+    closeBindings() {
+        this.bindingPanelOpen=false;this.$('#arcade-binding-panel').hidden=true;
+        this.startWristVisible=false;
+        if(this.bindingsReturnGuide){this.guideOpen=true;this.guide.element.hidden=false;this.guide.render();}
+        if(this.bindingsResume && this.runner.phase==='paused' && !document.hidden)this.play();
+        else this.runner.publish();
+        this.bindingsReturnGuide=false;this.bindingsResume=false;
+        (this.guideOpen?this.guide.element.querySelector('[data-guide-next]'):this.$('#arcade-canvas')).focus({preventScroll:true});
+    }
+
+    updateBindingDisplay() {
+        this.dialog.dataset.bindings=this.bindingPlan.mapped?'custom':'default';
+        if(this.bindingDownloadURL){URL.revokeObjectURL(this.bindingDownloadURL);this.bindingDownloadURL=null;}
+        if(this.bindingPlan.mapped){
+            this.bindingDownloadURL=URL.createObjectURL(new Blob([JSON.stringify(this.bindingPlan.profile,null,2)],{type:'application/json'}));
+            this.$('a[download]').href=this.bindingDownloadURL;
+            this.$('a[download]').download=`${this.description.engine}-bindings.json`;
+        } else {this.$('a[download]').href=this.defaultProfileURL;this.$('a[download]').download='';}
+        this.painter.controls=this.bindingPlan.mapped?controlLabels(this.description):this.description.controls;
+        this.$('.gesture-lesson').hidden=this.bindingPlan.mapped;
+        const list=this.$('#arcade-controls-bindings');list.hidden=!this.bindingPlan.mapped;list.replaceChildren();
+        for(const [control,name]of Object.entries(this.bindingPlan.labels)){
+            const term=document.createElement('dt'),value=document.createElement('dd');
+            term.textContent=controlLabels(this.description)[control];value.textContent=name;list.append(term,value);
+            const actionLabel=this.dialog.querySelector(`[data-arcade-input="${control}"] .action-name`);
+            if(actionLabel)actionLabel.textContent=controlLabels(this.description)[control];
+        }
+        if(!this.bindingPlan.mapped)for(const control of ['left','right']){
+            const label=this.dialog.querySelector(`[data-arcade-input="${control}"] .action-name`);
+            if(label)label.textContent=this.description.controls[control];
+        }
+        this.$('.camera-positioning').textContent=this.bindingPlan.mapped?
+            (this.triggerView.unsupported?'Imported bindings · some regions have no body preview':'Imported bindings'):
+            this.sixDirections?'Arrow boxes · no home return':'Lift into ↑ · lower to repeat';
+        for(const side of ['left','right'])if(this.bindingPlan.mapped && this.bindingPlan.labels[side])
+            this.$(`[data-tutorial-explanation=${side}]`).textContent=`${controlLabels(this.description)[side]}: ${this.bindingPlan.labels[side]}`;
     }
 
     cancelCountdown() {
@@ -301,9 +424,10 @@ export class GameRoom {
         this.text('#arcade-time', `${state.remaining == null ? state.elapsed : state.remaining}s`);
         this.text('.arcade-hud > div:nth-child(2) dt', state.clockLabel || (state.remaining == null ? 'Survived' : 'Time'));
         this.text('#arcade-lives', state.lives);
-        this.$('#arcade-tutorial').hidden = this.guideOpen || state.phase !== 'tutorial';
-        this.$('#arcade-paused').hidden = this.guideOpen || state.phase !== 'paused';
-        this.$('#arcade-result').hidden = this.guideOpen || state.phase !== 'finished';
+        const editor = this.guideOpen || this.bindingPanelOpen;
+        this.$('#arcade-tutorial').hidden = editor || state.phase !== 'tutorial';
+        this.$('#arcade-paused').hidden = editor || state.phase !== 'paused';
+        this.$('#arcade-result').hidden = editor || state.phase !== 'finished';
         this.text('#arcade-final-score', state.score);
         this.text('#arcade-result h3', state.result || 'Done');
         this.text('#arcade-pause', state.phase === 'paused' ? 'Resume' : 'Pause');
@@ -311,9 +435,10 @@ export class GameRoom {
         this.text('#arcade-restart', 'Restart');
         this.text('#arcade-begin', this.runner?.started ? 'Resume' : 'Start');
         if (!this.navigation.deadline) {
-            const greeting = this.dialog.dataset.brief === 'start' && this.cameraReady;
+            const greeting = this.dialog.dataset.brief === 'start' && this.cameraReady && !this.bindingPlan.mapped;
             const instruction = this.dialog.dataset.brief === 'start' ? (greeting ? 'Say hi' : this.dialog.dataset.camera === 'unavailable' ? 'Press Start to play' : 'Loading') : this.runner.started ? 'Lift to resume' : 'Lift to start';
             this.startPrompt(instruction, greeting);
+            if(this.bindingPlan.mapped && this.cameraReady)this.startPrompt(this.dialog.dataset.brief==='start'?'Use a binding to start':'Use a binding to resume');
         }
         this.updateCameraLayout();
         if (justFinished) {
@@ -331,7 +456,7 @@ export class GameRoom {
     }
 
     openGuide() {
-        if (this.guideOpen) return;
+        if (this.guideOpen || this.bindingPanelOpen) return;
         this.resumeAfterGuide = this.runner.phase === 'playing';
         this.guideOpen = true;
         this.cancelCountdown();
@@ -390,7 +515,8 @@ export class GameRoom {
             this.$(`[data-arcade-input=${action}]`).dataset.pulse = 'true';
             this.pulseUntil = performance.now() + 180;
             this.recognisedUntil = performance.now() + 1800;
-            this.$('#arcade-recognition').textContent = decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
+            this.$('#arcade-recognition').textContent = this.bindingPlan.mapped ?
+                `${this.bindingPlan.labels[action]} → ${controlLabels(this.description)[action]}` : decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
             if (!['popups', 'maze', 'juggle'].includes(this.description.engine)) this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
@@ -462,7 +588,7 @@ export class GameRoom {
         this.startWristVisible = wristVisible;
         if (wristVisible) this.startLostAt = null;
         else this.startLostAt ??= frame.timestamp;
-        if (wristEntered && this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start' && !document.hidden) {
+        if (!this.bindingPlan.mapped && wristEntered && this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start' && !document.hidden) {
             this.requestCountdown(true, frame.timestamp);
         }
         if (frame.visible) {
@@ -565,6 +691,7 @@ export class GameRoom {
         this.resizeObserver?.disconnect();
         this.camera.stop(); this.runner.dispose(); this.sound.dispose();
         this.guide.dispose();
+        if(this.bindingDownloadURL)URL.revokeObjectURL(this.bindingDownloadURL);
         this.canvas.width = this.canvas.height = 1;
         this.painter = null; this.elements.clear();
         if (this.dialog.open) this.dialog.close();

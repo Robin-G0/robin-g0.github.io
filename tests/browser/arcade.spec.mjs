@@ -69,16 +69,13 @@ test('mobile touch controls fit at 320 px and survive orientation changes', asyn
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
 });
 
-test('imports open declarative games and reject executable fields', async ({ page }) => {
+test('old game files are rejected without opening a game', async ({ page }) => {
     await page.goto('/?theme=glass#arcade');
     const input = page.locator('#arcade-import-file');
     const description = { schema_version: 1, id: 'test-snake', engine: 'snake',
         title: 'Imported Snake', goal: 'Collect signals.', seed: 7 };
     await input.setInputFiles({ name: 'snake.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(description)) });
-    await expect(page.locator('#arcade-game-title')).toHaveText('Imported Snake');
-    await page.locator('#arcade-close').click();
-    await input.setInputFiles({ name: 'unsafe.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ ...description, script: 'alert(1)' })) });
-    await expect(page.locator('#arcade-import-status')).toContainText('unsupported fields');
+    await expect(page.locator('#arcade-import-status')).toContainText('MIG configuration');
     await expect(page.locator('#arcade-player')).not.toBeVisible();
 });
 

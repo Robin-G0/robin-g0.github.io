@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "id": "my-first-snake",
-  "engine": "snake",
-  "title": "My First Snake",
-  "goal": "Collect the signals and leave room for the next corner.",
-  "difficulty": "gentle",
-  "seed": 7
-}

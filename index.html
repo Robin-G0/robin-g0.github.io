@@ -12,11 +12,11 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=construction-default-1">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=arcade-28">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=bindings-29">
   <link rel="stylesheet" href="./arcade/themes.css?v=pressure-19">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=construction-default-1"></script>
-  <script type="module" src="./arcade/app.js?v=arcade-28"></script>
+  <script type="module" src="./arcade/app.js?v=bindings-29"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -75,8 +75,8 @@
       <div class="section-heading"><div><p class="eyebrow">05 / Motion Input Grid</p><h2 id="arcade-title">Arcade</h2></div><span class="text-link">Three games for this era</span></div>
       <p class="arcade-intro">Short rounds. Play with wrist movements, the keyboard, or the touch buttons.</p>
       <div class="arcade-list" id="arcade-games"></div>
-      <div class="arcade-imports"><button type="button" id="arcade-import-button">Import a preset</button><input type="file" id="arcade-import-file" accept=".json,application/json" hidden><a href="./arcade/examples/my-snake.json" download>Example JSON ↗</a><a href="./arcade/README.md">Build your own ↗</a><button id="arcade-imported" type="button" hidden></button></div>
-      <details class="preset-help"><summary>What is a preset?</summary><p>Customize an installed game: its name, instructions, difficulty and random seed. Download the example JSON, edit it, then import it here. It stays until you reload this page.</p></details>
+      <div class="arcade-imports"><button type="button" id="arcade-import-button">Import bindings</button><input type="file" id="arcade-import-file" accept=".json,application/json" hidden><a href="./arcade/profiles/popup-directions.json" download>Example bindings JSON</a><button id="arcade-clear-bindings" type="button" hidden>Reset all bindings</button></div>
+      <details class="preset-help"><summary>How do bindings work?</summary><p>Export a JSON configuration from Motion Input Grid, import it here, then open a game and choose Bindings. Assign one input to each game control. Unassigned controls use the game defaults. Your configuration and choices stay in this browser.</p></details>
       <p id="arcade-import-status" role="status"></p>
     </section>
     <footer class="site-footer"><span>Robin-G0</span><a href="https://github.com/Robin-G0">GitHub ↗</a><a href="https://github.com/Robin-G0/Robin-G0/tree/main/themes">Explore the README themes ↗</a><a href="#main">Back to top ↑</a></footer>
@@ -98,10 +98,17 @@
           <div><svg viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="14" r="8"/><path d="M50 23V74M30 35H70M30 35L18 49M70 35L81 56L75 70"/><g class="demo-forearm"><path d="M18 49L10 25"/><circle cx="10" cy="25" r="5"/></g></svg><strong><span data-tutorial-action="left"></span><small>Left wrist</small></strong></div>
           <div><svg class="right-lift" viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="14" r="8"/><path d="M50 23V74M30 35H70M30 35L18 49M70 35L81 56L75 70"/><g class="demo-forearm"><path d="M18 49L10 25"/><circle cx="10" cy="25" r="5"/></g></svg><strong><span data-tutorial-action="right"></span><small>Right wrist</small></strong></div>
         </div>
+        <dl id="arcade-controls-bindings" class="guide-binding-summary" hidden></dl>
         <p id="arcade-neutral-cue" hidden>Move between arrow boxes</p>
         <div class="lesson-actions"><button id="arcade-no-camera" class="camera-alternative" type="button">Keyboard / touch</button></div>
         <details id="arcade-controls-tips"><summary>Tips</summary><p data-tutorial-explanation="left"></p><p data-tutorial-explanation="right"></p><p id="arcade-lesson-tip"></p></details>
       </div>
+      <section id="arcade-binding-panel" class="arcade-overlay arcade-binding-panel" role="region" aria-labelledby="arcade-binding-title" hidden>
+        <h3 id="arcade-binding-title">Motion bindings</h3><p id="arcade-binding-source">Game defaults</p>
+        <div class="binding-import"><button id="arcade-binding-import" type="button">Import configuration</button><input id="arcade-binding-file" type="file" accept=".json,application/json" hidden></div>
+        <div id="arcade-binding-rows"></div><p id="arcade-binding-status" role="status"></p>
+        <div class="binding-actions"><button id="arcade-binding-defaults" type="button">Game defaults</button><button id="arcade-binding-cancel" type="button">Cancel</button><button id="arcade-binding-apply" class="button primary" type="button">Apply</button></div>
+      </section>
       <span id="arcade-playfield-input" class="arcade-playfield-input" role="status" hidden></span>
       <p id="arcade-playfield-message" class="arcade-playfield-message" role="status" hidden></p>
       <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
@@ -109,7 +116,7 @@
     </div>
     <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
     <p id="arcade-feedback" role="status" aria-live="polite"></p>
-    <div class="arcade-toolbar"><button id="arcade-sound" type="button" aria-label="Mute sound" aria-pressed="true">&#9835;</button><button id="arcade-guide" type="button">Tutorial</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><a href="./arcade/profiles/wrist-raises.json?v=power-11" download>Gesture profile ↗</a></div>
+    <div class="arcade-toolbar"><button id="arcade-sound" type="button" aria-label="Mute sound" aria-pressed="true">&#9835;</button><button id="arcade-bindings" type="button">Bindings</button><button id="arcade-guide" type="button">Tutorial</button><button id="arcade-pause" type="button">Pause</button><button id="arcade-restart" type="button">Restart</button><a href="./arcade/profiles/wrist-raises.json?v=power-11" download>Gesture profile ↗</a></div>
     <section class="arcade-camera-dock" id="arcade-camera-dock" aria-label="Camera and positioning">
       <div class="camera-view">
         <video id="arcade-video" autoplay muted playsinline></video>

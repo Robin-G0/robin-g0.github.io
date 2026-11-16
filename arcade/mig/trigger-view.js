@@ -11,24 +11,43 @@ function attribute(element, name, value) {
  * axis and 35 ms smoothing; an initial live projection is an alignment guide.
  */
 export class TriggerView {
-    constructor(svg, directions = ['left', 'up', 'right'], profile = arcadeProfile) {
+    constructor(svg, directions = ['left', 'up', 'right'], profile = arcadeProfile, {mapped=false,labels={}} = {}) {
         this.svg = svg; this.reset();
         svg.replaceChildren();
-        this.boxes = profile.inputs.filter(input => directions.includes(input.action.split('_')[1])).map(input => {
+        this.unsupported = 0;
+        const regions = [];
+        for(const input of profile.inputs) {
+            if(!mapped) {
+                if(directions.includes(input.action.split('_')[1]))regions.push({input,cell:input.steps[0].constraints[0].cell});
+                continue;
+            }
+            // The deployed API exposes body coordinates but no calibrated/hand grid.
+            if(input.space!=='body' || input.mirror){this.unsupported++;continue;}
+            const seen=new Set();
+            for(const step of [{constraints:input.constraints},...(input.steps || [])])for(const constraint of step.constraints || []) {
+                if(!['required','trigger'].includes(constraint.type) || !Array.isArray(constraint.cell))continue;
+                const cell=constraint.cell.length===2?[...constraint.cell,1,1]:constraint.cell;
+                const key=JSON.stringify([constraint.landmark,cell]);
+                if(seen.has(key))continue;seen.add(key);
+                regions.push({input,cell,wrist:constraint.landmark?.startsWith('left_')?'left':'right'});
+            }
+            if(!seen.size)this.unsupported++;
+        }
+        this.boxes = regions.map(({input,cell,wrist}) => {
             const group = document.createElementNS(svg.namespaceURI, 'g');
             group.dataset.trigger = input.action;
-            group.dataset.triggerWrist = input.action.split('_')[0];
+            group.dataset.triggerWrist = wrist || input.action.split('_')[0];
             const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
             const label = document.createElementNS(svg.namespaceURI, 'text');
-            label.textContent = commandLabel(input.action);
+            label.textContent = mapped ? (labels[input.action] || input.action) : commandLabel(input.action);
             group.append(polygon, label); svg.append(group);
-            return { group, polygon, label, cell: input.steps[0].constraints[0].cell };
+            return { group, polygon, label, cell };
         });
     }
     reset() { this.grid = null; this.time = null; this.svg.setAttribute('hidden', ''); }
     update(frame) {
         const shoulders = frame.shoulderPoints;
-        if (!frame.shoulders || !shoulders) { this.reset(); return; }
+        if (!this.boxes.length || !frame.shoulders || !shoulders) { this.reset(); return; }
         const aspect = frame.aspect || 1;
         const a = { x: shoulders[1].x * aspect, y: shoulders[1].y };
         const b = { x: shoulders[0].x * aspect, y: shoulders[0].y };

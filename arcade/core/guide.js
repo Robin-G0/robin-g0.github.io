@@ -29,8 +29,9 @@ const captions = {
 
 /** Three in-game cards. No window, recognizer, timers or permanent GIF elements. */
 export class GameGuide {
-    constructor(element,description,{signal,onDone,drawPreview}) {
+    constructor(element,description,{signal,onDone,drawPreview,getBindings=()=>null}) {
         this.element=element;this.description=description;this.onDone=onDone;this.drawPreview=drawPreview;
+        this.getBindings=getBindings;
         element.innerHTML='<div class="guide-heading"><h3>How to play</h3><button type="button" data-guide-skip hidden>Skip</button></div><p class="guide-progress" aria-label="Tutorial progress"><span>1</span><span>2</span><span>3</span></p><figure class="guide-figure"></figure><h4 class="guide-title"></h4><p class="guide-caption"></p><div class="guide-nav"><button type="button" data-guide-back>Back</button><button type="button" class="button primary" data-guide-next>Next</button></div>';
         this.$=selector=>element.querySelector(selector);
         this.$('[data-guide-back]').addEventListener('click',()=>{this.step--;this.render();},{signal});
@@ -50,7 +51,16 @@ export class GameGuide {
             [inputScheme==='wrist-directions'?'Match an arrow with that wrist.':'Lift L or R. Lower to repeat.',goal,
                 PRESSURE_RULES[engine]?.kind==='rounds'?'Score to refill time. Keep your lives.':'Build your score. Pressure rises over time.'][this.step];
         const figure=this.$('.guide-figure');figure.replaceChildren();
-        if(diagrams[engine])figure.innerHTML=diagrams[engine][this.step];
+        const bindings=this.getBindings();
+        if(this.step===0 && bindings){
+            const list=document.createElement('dl');list.className='guide-binding-summary';
+            for(const [control,name]of Object.entries(bindings)){
+                const term=document.createElement('dt'),value=document.createElement('dd');
+                term.textContent=control.replaceAll('_',' ');value.textContent=name;list.append(term,value);
+            }
+            figure.append(list);this.$('.guide-caption').textContent='Use your assigned bindings for these controls.';
+        }
+        else if(diagrams[engine])figure.innerHTML=diagrams[engine][this.step];
         else if(this.step===1)this.drawPreview(figure);
         else figure.innerHTML=this.step===0?controls(inputScheme==='wrist-directions'):
             frame(label('+ SCORE',200,75,37)+label('\u2665 \u2665 \u2665',200,129,34));

@@ -16,11 +16,11 @@ test('local arcade scores keep the five best runs, persist five-character names 
     assert.equal(loaded.data.name,'ROBIN');assert.equal(loaded.hasScore(game),true);
 });
 
-test('difficulty and imported preset seeds have separate boards',()=>{
+test('each engine and difficulty has a separate score board',()=>{
     const store=new ScoreStore(storage());store.record(game,100);
     assert.equal(store.hasScore({...game,difficulty:'standard'}),false);
-    store.record({...game,imported:true,id:'import-demo',seed:1},500);
-    assert.equal(store.hasScore({...game,imported:true,id:'import-demo',seed:2}),false);
+    store.record({...game,engine:'maze'},500);
+    assert.equal(store.list({...game,engine:'maze'})[0].score,500);
     assert.equal(store.list(game)[0].score,100);
 });
 

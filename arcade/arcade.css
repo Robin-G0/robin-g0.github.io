@@ -374,3 +374,15 @@
     .guide-title { font-size: 24px; }
 }
 @media(prefers-reduced-motion:reduce) { .guide-art *, .start-hand { animation: none !important; } }
+.arcade-binding-panel { z-index: 6; overflow-y: auto; justify-content: flex-start; align-items: stretch; gap: 12px; text-align: left; }
+.arcade-binding-panel h3 { margin: 0; }
+.arcade-binding-panel > p { max-width: 100%; overflow-wrap: anywhere; }
+#arcade-binding-rows { width: 100%; display: grid; gap: 10px; }
+#arcade-binding-rows label { display: grid; grid-template-columns: minmax(90px,1fr) minmax(0,2fr); gap: 12px; align-items: center; font-size: 18px; }
+#arcade-binding-rows select { width: 100%; min-width: 0; min-height: 44px; padding: 7px; color: var(--ink); background: var(--soft); border: 1px solid var(--border); font: 16px var(--arcade-font); }
+.binding-import button, .binding-actions button { min-height: 44px; padding: 7px 12px; }
+.binding-import button, .binding-actions button:not(.primary) { color: var(--ink); background: var(--soft); border: 1px solid var(--border); }
+.binding-actions { position: sticky; bottom: -22px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; background: var(--bg); padding-block: 10px; margin-top: auto; }
+.guide-binding-summary { display: grid; grid-template-columns: minmax(60px,1fr) minmax(0,2fr); text-align: left; gap: 8px 15px; margin: 0; width: 100%; font-size: 18px; }
+.guide-binding-summary dt { color: var(--accent); }
+.guide-binding-summary dd { margin: 0; overflow-wrap: anywhere; }

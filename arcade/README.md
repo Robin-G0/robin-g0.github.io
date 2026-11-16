@@ -40,7 +40,7 @@ The static site needs no server build.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
 - `mig/profile.js`: native schema-v2 occupancy and trigger regions with continuous dwell.
 - `mig/camera.js`: `MIGSession`, frame health, status, recalibration and disposal.
-- `core/import-game.js`: strict validation of declarative game files.
+- `mig/bindings.js`: native configuration validation, local assignments and logical command routing.
 
 ## Game contract
 
@@ -113,14 +113,14 @@ Missing hands never pause any arcade game. Simulation, clocks and difficulty
 continue; missing-input feedback remains beside the camera without covering play.
 Keyboard/touch input takes over without a camera gate. Slow frames are bounded,
 not turned into pause dialogs. Manual Pause and Controls remain explicit choices.
-The initial screen shows one large "Say hi (with hand) to start" prompt.
+The initial screen shows Loading until a tracker frame, then a themed animated hand prompt.
 Showing either wrist starts a three-second countdown, without an Up gesture.
-Start and keyboard/touch remain direct fallbacks; disappearing hands cancel the
-countdown. Presence starts only the initial screen, never auto-closes Controls
+Start and keyboard/touch remain direct fallbacks; the initial countdown stays latched
+when hands disappear. Presence starts only the initial screen, never auto-closes Controls
 or resumes manual Pause. There are no practice or readiness gates. Controls pauses an existing
 round without resetting its score or position; Start becomes Resume. A wrist raise
 can also resume a paused round. The confirmation pulse never enters the game. Loss of
-tracking cancels the countdown. `core/motion-navigation.js` keeps that small flow
+tracking cancels a resume countdown, but never the initial starting countdown. `core/motion-navigation.js` keeps that small flow
 separate from the game input router and never recognises a gesture itself.
 
 ## Pop-up Panic loop
@@ -220,9 +220,8 @@ catalog's old 60-second duration, ends an arcade run. Link Maze keeps capped map
 dimensions while later rounds offer less memorisation time.
 
 These policies never change camera inference rates, native gesture dwell or
-command cooldowns. Manual pause freezes both simulation and progression. Imported
-duration metadata remains supported for compatibility, but trusted arcade engines
-select their own survival/round policy.
+command cooldowns. Manual pause freezes both simulation and progression. Trusted
+arcade engines select their own survival/round policy.
 
 The eleven era screens use distinct materials, buttons and font families. Four
 small local WOFF2 fonts include licenses and source records in `assets/fonts`;
@@ -230,7 +229,7 @@ no font-service requests occur at runtime. Canvas previews and games wait for
 their own typography before a final repaint, retaining a readable fallback.
 Intro motion respects reduced motion and stops being rendered during play.
 
-## Add or import a game
+## Add a game
 
 To add trusted executable code, write a factory in `games/`, register it in
 `registry.js`, and add its description to `catalog.js`, its pressure policy to
@@ -243,15 +242,26 @@ flips a bit. Register the copied factory explicitly, then add its goal and the t
 action labels to the catalog. `mig/camera.js` already handles the package session;
 the new game only needs `event.action` and should never inspect camera landmarks.
 
-Visitors import JSON presets targeting an installed engine. A preset changes the
-title, instructions, difficulty and random seed; it does not install a new game
-or change its rules. Presets stay in memory until the page is reloaded. Only the listed
-schema fields are accepted: id, engine, title, goal, duration, seed and difficulty,
-plus `schema_version: 1`. Files are limited to 32 KB, durations to 30–90 seconds,
-and text to short single lines. URLs, HTML execution, scripts and unknown fields
-are not accepted. Imported games inherit the current theme and engine controls. The optional
-`duration` field is legacy metadata: the current survival and repeating-round
-engines use their own loss rules and clocks. It is omitted from the example.
+## Import and assign motion bindings
+
+Use Import bindings to open a schema-v2 JSON export from Motion Input Grid.
+The deployed native engine validates it without starting a camera or models.
+Open any game, choose Bindings, and assign an imported input to each logical
+control. Blank selections retain the game's default. Apply updates the session
+and guides; Game defaults restores the original controls on Apply. The profile
+and per-engine selections are saved in this browser, with a memory-only fallback.
+Replacing a configuration clears old assignments. Reset all bindings clears both.
+
+`mig/bindings.js` copies only the selected rules into a runtime profile with stable
+logical IDs. Original input names/actions need not match game controls. A source
+binding can drive multiple controls. Recognition remains native; the host only
+routes/deduplicates pulses and preserves independent cooldowns. Keyboard/touch,
+game rules, scoring and difficulty stay game-owned. Importing games is no longer
+supported. Body-space regions have a camera guide; calibrated and mirrored
+inputs still work natively but are labelled as having no body preview.
+
+The tutorial's controls card and downloadable profile reflect custom assignments.
+The other two cards still explain the actual game loop and rewards/hazards.
 
 ## Runtime efficiency
 
