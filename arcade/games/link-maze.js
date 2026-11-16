@@ -12,6 +12,8 @@ export function maze(env) {
 
     function newMap(s) {
         s.map = generateMaze(env.random, s.level);
+        // Keep the capped, readable map size while later rounds demand more memory.
+        s.map.preview = Math.max(4, s.map.preview / (1 + Math.max(0, s.completed - 2) * .12));
         s.current = 0; s.steps = 0; s.peek = 0; s.flipped = 0; s.history = [];
         s.stage = 'preview'; s.until = (s.time || 0) + s.map.preview;
         s.flash = null; s.outcome = null;
@@ -63,6 +65,6 @@ export function maze(env) {
         },
         render(s, painter) { renderMaze(s, painter, env.reducedMotion); }
     });
-    // An endless time-bank game owns its clock. Other engines keep the host's fixed round.
-    return { ...instance, remainingSeconds: () => state.remaining, holdOnTrackingLoss: false };
+    // Repeating maps own their time bank; the host supplies other engines' pressure policies.
+    return { ...instance, remainingSeconds: () => state.remaining };
 }

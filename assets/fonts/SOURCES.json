@@ -1,0 +1,34 @@
+[
+  {
+    "family": "VT323",
+    "file": "vt323.woff2",
+    "weight": "400",
+    "source": "https://fonts.gstatic.com/s/vt323/v18/pxiKyp0ihIEF2isfFJU.woff2",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/vt323/OFL.txt",
+    "bytes": 17936
+  },
+  {
+    "family": "Share Tech Mono",
+    "file": "share-tech-mono.woff2",
+    "weight": "400",
+    "source": "https://fonts.gstatic.com/s/sharetechmono/v16/J7aHnp1uDWRBEqV98dVQztYldFcLowEF.woff2",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/sharetechmono/OFL.txt",
+    "bytes": 13500
+  },
+  {
+    "family": "Orbitron",
+    "file": "orbitron.woff2",
+    "weight": "400 900",
+    "source": "https://fonts.gstatic.com/s/orbitron/v35/yMJRMIlzdpvBhQQL_Qq7dy0.woff2",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/orbitron/OFL.txt",
+    "bytes": 11800
+  },
+  {
+    "family": "Caveat",
+    "file": "caveat.woff2",
+    "weight": "400 700",
+    "source": "https://fonts.gstatic.com/s/caveat/v23/Wnz6HAc5bAfYB2Q7ZjYY.woff2",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/OFL.txt",
+    "bytes": 74932
+  }
+]

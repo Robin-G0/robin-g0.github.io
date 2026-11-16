@@ -23,7 +23,7 @@ test('camera refusal leaves keyboard play available', async ({ page }) => {
     await expect(page.locator('#arcade-playfield-message')).toHaveText('Gate open');
 });
 
-test('blank camera quietly freezes play without a pause menu and releases the stream on exit', async ({ page }) => {
+test('blank camera keeps play running without a pause menu and releases the stream on exit', async ({ page }) => {
     test.setTimeout(90000);
     await page.evaluate(() => {
         navigator.mediaDevices.getUserMedia = async () => {
@@ -41,12 +41,12 @@ test('blank camera quietly freezes play without a pause menu and releases the st
     await expect.poll(() => page.evaluate(() => Boolean(document.querySelector('#arcade-video').srcObject)),
         { timeout: 60000 }).toBe(true);
     await page.locator('#arcade-begin').click();
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held', { timeout: 10000 });
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'missing', { timeout: 10000 });
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
     await expect(page.locator('#arcade-paused')).not.toBeVisible();
     const time = await page.locator('#arcade-time').textContent();
-    await page.waitForTimeout(250);
-    await expect(page.locator('#arcade-time')).toHaveText(time);
+    await page.waitForTimeout(1200);
+    expect(parseInt(await page.locator('#arcade-time').textContent())).toBeGreaterThan(parseInt(time));
     await page.locator('#arcade-close').click();
     expect(await page.evaluate(() => window.testCameraTrack.readyState)).toBe('ended');
     expect(await page.locator('#arcade-video').evaluate(video => video.srcObject)).toBe(null);
@@ -182,7 +182,7 @@ test('torso-only tracking starts with either wrist and recovers without a menu',
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
     await expect(page.locator('#arcade-score')).toHaveText('0');
     await page.evaluate(() => window.motionTest.observe(false));
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'missing');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
     await expect(page.locator('#arcade-paused')).not.toBeVisible();
     await page.evaluate(() => window.motionTest.observe(true, 15));
@@ -208,10 +208,10 @@ test('keyboard-only mode starts immediately and stops the camera', async ({ page
     expect(await page.locator('#arcade-video').evaluate(video => video.srcObject)).toBe(null);
 });
 
-test('keyboard input takes over during a tracking hold and sound can be muted', async ({ page }) => {
+test('keyboard input takes over during missing tracking and sound can be muted', async ({ page }) => {
     await openObservedCamera(page);
     await page.locator('#arcade-begin').click();
-    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'held');
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'missing');
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-tracking', 'ready');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');

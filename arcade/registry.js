@@ -1,10 +1,10 @@
 import * as phosphor from './games/phosphor.js?v=tutorial-3';
 import * as desktop from './games/desktop95.js?v=tutorial-3';
-import * as web from './games/construction.js?v=greeting-18';
+import * as web from './games/construction.js?v=pressure-19';
 import * as matrix from './games/matrix.js?v=tutorial-3';
 import * as chrome from './games/y2k.js?v=tutorial-3';
 import * as aqua from './games/aqua.js?v=tutorial-3';
-import * as aero from './games/aero.js?v=tutorial-3';
+import * as aero from './games/aero.js?v=pressure-19';
 import * as metro from './games/metro.js?v=tutorial-3';
 import * as paper from './games/material.js?v=tutorial-3';
 import * as glass from './games/glass.js?v=tutorial-3';

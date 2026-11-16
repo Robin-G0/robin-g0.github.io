@@ -7,6 +7,12 @@ const photoFiles = {
 };
 const imageCache = new Map();
 
+export async function loadTypography(palette) {
+    if (typeof document === 'undefined' || !document.fonts) return;
+    await Promise.allSettled([document.fonts.load(`22px ${palette.font}`),
+        document.fonts.load(`40px ${palette.displayFont || palette.font}`)]);
+}
+
 export async function loadArtwork(theme) {
     if (typeof Image === 'undefined') return new Map();
     const needed = theme === 'aero' ? ['aero', 'fish'] : theme === 'glass' ? ['glass', 'jelly', 'earth']
@@ -23,7 +29,9 @@ export async function loadArtwork(theme) {
 
 export function readPalette() {
     const style = getComputedStyle(document.body);
-    const result = { font: style.fontFamily, theme: document.documentElement.dataset.theme };
+    const result = { font: style.getPropertyValue('--arcade-font').trim() || style.fontFamily,
+        displayFont: style.getPropertyValue('--arcade-display').trim() || style.fontFamily,
+        theme: document.documentElement.dataset.theme };
     for (const key of ['bg', 'ink', 'muted', 'accent', 'soft', 'border', 'gold']) {
         result[key] = style.getPropertyValue(`--${key}`).trim();
     }
@@ -78,7 +86,7 @@ export class Painter {
     }
     text(text, x, y, size = 22, color = 'ink', align = 'left') {
         const c = this.c; c.fillStyle = this.color(color);
-        c.font = `${size}px ${this.colors.font || 'Arial'}`;
+        c.font = `${size}px ${(size >= 30 ? this.colors.displayFont : null) || this.colors.font || 'Arial'}`;
         c.textAlign = align; c.textBaseline = 'middle'; c.fillText(String(text), x, y);
     }
     sprite(name, x, y, width, height) {

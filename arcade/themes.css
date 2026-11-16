@@ -1,0 +1,118 @@
+/* Era-specific arcade materials. Only the visible intro animates; no extra frame loop. */
+@font-face { font-family: 'VT323'; src: url('../assets/fonts/vt323.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Share Tech Mono'; src: url('../assets/fonts/share-tech-mono.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Orbitron'; src: url('../assets/fonts/orbitron.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'Caveat'; src: url('../assets/fonts/caveat.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+#arcade-player { font-family: var(--arcade-font, var(--font)); }
+#arcade-player .arcade-action, #arcade-player .arcade-controls-trigger { font-family: inherit; }
+[data-brief=start] #arcade-tutorial { isolation: isolate; overflow: hidden; padding: clamp(20px, 5%, 48px); }
+[data-brief=start] #arcade-tutorial::before,
+[data-brief=start] #arcade-tutorial::after { content: ''; position: absolute; pointer-events: none; z-index: -1; }
+[data-brief=start] #arcade-controls-status { font-family: var(--arcade-display, var(--display)); text-wrap: balance; }
+
+/* Phosphor: a luminous command prompt on a scanned CRT. */
+:root[data-theme=phosphor] { --arcade-font: 'Lucida Console', Consolas, monospace; --arcade-display: 'VT323', Consolas, monospace; }
+[data-theme=phosphor] #arcade-player { border: 1px solid #4be897; box-shadow: 0 0 35px #13e87525; }
+[data-theme=phosphor] [data-brief=start] #arcade-tutorial { background: radial-gradient(ellipse, #09251a, #020b07); color: #80ffc1; align-items: flex-start; text-align: left; }
+[data-theme=phosphor] [data-brief=start] #arcade-tutorial::before { inset: 0; background: repeating-linear-gradient(transparent 0 3px, #0005 3px 4px); }
+[data-theme=phosphor] [data-brief=start] #arcade-controls-status { color: #80ffc1; font-size: clamp(28px, 4vw, 43px); text-shadow: 0 0 12px #4cff9980; }
+[data-theme=phosphor] [data-brief=start] #arcade-controls-status::before { content: '> '; }
+[data-theme=phosphor] [data-brief=start] #arcade-controls-status::after { content: ' ▋'; animation: arcade-cursor 1.2s steps(1) infinite; }
+[data-theme=phosphor] #arcade-begin { background: #061b10; color: #80ffc1; border: 1px solid #80ffc1; border-radius: 0; box-shadow: none; }
+
+/* Windows 95: gray controls, bevels and an uninterrupted navy title strip. */
+:root[data-theme=desktop95] { --arcade-font: Tahoma, Verdana, sans-serif; --arcade-display: var(--arcade-font); }
+[data-theme=desktop95] #arcade-player { background: #c0c0c0; color: #111; border: 3px outset #eee; border-radius: 0; }
+[data-theme=desktop95] .arcade-room-header { background: linear-gradient(90deg, #000080, #237cad); color: #fff; margin: 3px; }
+[data-theme=desktop95] [data-brief=start] #arcade-tutorial { background: #c0c0c0; color: #111; }
+[data-theme=desktop95] [data-brief=start] #arcade-tutorial::before { width: 72px; height: 72px; top: 18px; left: 20px; background: conic-gradient(#169734 0 25%,#168adc 0 50%,#ffce00 0 75%,#ef4428 0); transform: skewY(-8deg); opacity: .2; }
+[data-theme=desktop95] [data-brief=start] #arcade-controls-status { color: #111; font-size: clamp(27px, 4vw, 42px); }
+[data-theme=desktop95] #arcade-begin { border: 3px outset #fff; background: #c0c0c0; color: #111; border-radius: 0; box-shadow: 1px 1px #111; min-width: 160px; }
+
+/* Personal-web era: bold links, stippled purple and construction tape. */
+:root[data-theme=construction] { --arcade-font: 'Trebuchet MS', Arial, sans-serif; --arcade-display: Georgia, 'Times New Roman', serif; }
+[data-theme=construction] [data-brief=start] #arcade-tutorial { background: radial-gradient(#a98cff24 1px, transparent 1px) 0 0 / 12px 12px, #110b32; }
+[data-theme=construction] [data-brief=start] #arcade-tutorial::before { inset: 0 0 auto; height: 13px; background: repeating-linear-gradient(135deg,#fff15a 0 14px,#17102c 14px 28px); }
+[data-theme=construction] [data-brief=start] #arcade-tutorial::after { inset: auto 0 0; height: 13px; background: repeating-linear-gradient(135deg,#fff15a 0 14px,#17102c 14px 28px); }
+[data-theme=construction] [data-brief=start] #arcade-controls-status { color: #63ffff; font-weight: bold; text-shadow: 3px 3px #662e8a; }
+[data-theme=construction] #arcade-begin { background: #fff15a; color: #110b32; border: 4px outset #fff7aa; border-radius: 0; font-family: Georgia, serif; }
+
+/* Matrix: a code grid, black glass and a narrow green command line. */
+:root[data-theme=matrix] { --arcade-font: 'Share Tech Mono', Consolas, monospace; --arcade-display: var(--arcade-font); }
+[data-theme=matrix] [data-brief=start] #arcade-tutorial { background: #010704; }
+[data-theme=matrix] [data-brief=start] #arcade-tutorial::before { inset: -40% 0; opacity: .17; background: repeating-linear-gradient(90deg,transparent 0 28px,#36e67b 29px 30px,transparent 31px 59px), repeating-linear-gradient(0deg,transparent 0 25px,#35b97699 26px 28px); transform: skewY(-12deg); animation: arcade-code 24s linear infinite; }
+[data-theme=matrix] [data-brief=start] #arcade-controls-status { color: #a1ffd2; font-weight: normal; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.04em; }
+[data-theme=matrix] #arcade-begin { background: #032416; border: 1px solid #39e68a; color: #a1ffd2; border-radius: 0; letter-spacing: .18em; text-transform: uppercase; }
+
+/* Y2K: chrome orbit, slanted typography and a cut-metal launch key. */
+:root[data-theme=y2k] { --arcade-font: Arial, Helvetica, sans-serif; --arcade-display: 'Orbitron', 'Arial Black', sans-serif; }
+[data-theme=y2k] [data-brief=start] #arcade-tutorial { background: radial-gradient(ellipse at 70% 30%,#7c9aff66,transparent 65%),#101d45 url('../assets/art/y2k-chrome-orbit-v1.png') center / cover; }
+[data-theme=y2k] [data-brief=start] #arcade-tutorial::before { inset: 0; background: linear-gradient(100deg,#071535e8,#071535aa,transparent); }
+[data-theme=y2k] [data-brief=start] #arcade-controls-status { color: #edf6ff; font-style: italic; text-transform: uppercase; font-size: clamp(26px, 4vw, 46px); letter-spacing: -.055em; text-shadow: 0 3px #263d70; }
+[data-theme=y2k] #arcade-begin { background: linear-gradient(#fff,#cad5ec 45%,#64799c 48%,#f1f8ff); color: #172b50; border: 1px solid #c3e2ff; border-radius: 0; clip-path: polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%); font-style: italic; font-weight: 900; }
+
+/* Aqua: fine pinstripes, a rounded Lucida sheet and a blue gel button. */
+:root[data-theme=aqua] { --arcade-font: 'Lucida Grande', Tahoma, sans-serif; --arcade-display: 'Lucida Sans Unicode', Tahoma, sans-serif; }
+[data-theme=aqua] #arcade-player { border: 1px solid #7095b2; box-shadow: 0 16px 60px #09243d55; }
+[data-theme=aqua] [data-brief=start] #arcade-tutorial { background: repeating-linear-gradient(#f4f7fa 0 2px,#e5ebf1 2px 4px); border-top: 1px solid #fff; }
+[data-theme=aqua] [data-brief=start] #arcade-tutorial::before { width: 180px; height: 180px; right: -70px; bottom: -60px; border: 24px solid #abcde455; border-radius: 50%; }
+[data-theme=aqua] [data-brief=start] #arcade-controls-status { color: #244c6b; font-weight: normal; font-size: clamp(28px, 4vw, 44px); text-shadow: 0 1px #fff; }
+[data-theme=aqua] #arcade-begin { color: #fff; border: 1px solid #3270ad; border-radius: 999px; background: linear-gradient(#e4faff,#79bdf1 25%,#2585cf 48%,#0a5baf 51%,#54a7e3); box-shadow: inset 0 1px #fff,0 3px 7px #24588640; text-shadow: 0 -1px #245886; }
+
+/* Frutiger Aero: open sky, oversized translucent bubbles and a grassy gel key. */
+:root[data-theme=aero] { --arcade-font: 'Segoe UI', Tahoma, sans-serif; --arcade-display: 'Segoe UI Light', 'Segoe UI', sans-serif; }
+[data-theme=aero] [data-brief=start] #arcade-tutorial { background: linear-gradient(#eaffffb0,#d2f7eecc), url('../assets/art/aero-sky-v3.jpg') center / cover; }
+[data-theme=aero] [data-brief=start] #arcade-tutorial::before { width: 220px; height: 220px; right: -65px; top: -80px; border-radius: 50%; border: 2px solid #fff9; background: radial-gradient(circle at 30% 20%,#fff9,transparent 40%),radial-gradient(circle at 70% 80%,#3cbddd44,transparent); box-shadow: inset 0 0 25px #fff8; animation: arcade-bubble 12s ease-in-out infinite; }
+[data-theme=aero] [data-brief=start] #arcade-tutorial::after { width: 100px; height: 100px; left: -35px; bottom: 15px; border-radius: 50%; background: radial-gradient(circle at 30% 20%,#fff9,#8ce8f133 40%); border: 1px solid #fff9; animation: arcade-bubble 16s ease-in-out infinite reverse; }
+[data-theme=aero] [data-brief=start] #arcade-controls-status { color: #06567e; font-weight: 300; font-size: clamp(32px, 5vw, 56px); text-shadow: 0 2px #fff9; }
+[data-theme=aero] #arcade-begin { background: linear-gradient(#eefbc9,#a7df54 30%,#7cc82c 48%,#459a15 51%,#8ed23d); color: #154c13; border: 1px solid #6ba936; border-radius: 999px; box-shadow: inset 0 1px #fff,0 5px 16px #2b823c30; font-weight: 600; }
+
+/* Metro: large light typography and a flat, asymmetric live tile. */
+:root[data-theme=metro] { --arcade-font: 'Segoe UI', Arial, sans-serif; --arcade-display: 'Segoe UI Light', 'Segoe UI', sans-serif; }
+[data-theme=metro] [data-brief=start] #arcade-tutorial { background: #14224b; align-items: flex-start; text-align: left; }
+[data-theme=metro] [data-brief=start] #arcade-tutorial::before { width: 35%; height: 100%; right: 0; top: 0; background: #7b2c9c; }
+[data-theme=metro] [data-brief=start] #arcade-controls-status { color: #fff; font-weight: 300; font-size: clamp(35px, 5vw, 58px); }
+[data-theme=metro] #arcade-begin { border: 0; background: #00a3cf; color: #fff; border-radius: 0; min-width: 160px; min-height: 64px; box-shadow: none; text-align: left; font-weight: 300; }
+
+/* Material: a folded paper corner and a raised indigo circular action. */
+:root[data-theme=material] { --arcade-font: 'Segoe UI', Arial, sans-serif; --arcade-display: var(--arcade-font); }
+[data-theme=material] [data-brief=start] #arcade-tutorial { background: #f1efea; }
+[data-theme=material] [data-brief=start] #arcade-tutorial::before { width: 180px; height: 180px; right: -90px; top: -90px; transform: rotate(45deg); background: #c7c7de; box-shadow: 0 3px 9px #28265235; }
+[data-theme=material] [data-brief=start] #arcade-controls-status { color: #343852; font-weight: 400; font-size: clamp(30px, 4vw, 46px); }
+[data-theme=material] #arcade-begin { min-width: 82px; width: 82px; height: 82px; padding: 0; border: 0; border-radius: 50%; background: #5755a7; color: #fff; box-shadow: 0 6px 14px #30306240; font-size: 19px; }
+
+/* Glass: deep ocean light behind a translucent surface and luminous pill. */
+:root[data-theme=glass] { --arcade-font: 'Segoe UI', Arial, sans-serif; --arcade-display: 'Segoe UI Light', 'Segoe UI', sans-serif; }
+[data-theme=glass] [data-brief=start] #arcade-tutorial { background: linear-gradient(#051831b8,#09182fcf),url('../assets/art/glass-abyss-depths-v1.jpg') center / cover; }
+[data-theme=glass] [data-brief=start] #arcade-tutorial::before { inset: 22px; border: 1px solid #d4f2ff30; border-radius: 30px; background: linear-gradient(135deg,#d3f5ff20,transparent 45%,#b3b0ff14); box-shadow: inset 0 1px #ffffff26; }
+[data-theme=glass] [data-brief=start] #arcade-controls-status { color: #e3f9ff; font-weight: 300; font-size: clamp(32px, 5vw, 54px); text-shadow: 0 2px 20px #6cb5ff55; }
+[data-theme=glass] #arcade-begin { border-radius: 999px; background: linear-gradient(135deg,#f1fcff30,#bcd9ff18); border: 1px solid #d2f3ff80; color: #eefaff; box-shadow: inset 0 1px #fff6,0 6px 20px #00102e40; }
+
+/* Field notes: ink, graph paper and a hand-drawn editorial underline. */
+:root[data-theme=field-notes] { --arcade-font: Georgia, 'Times New Roman', serif; --arcade-display: 'Caveat', 'Segoe Print', cursive; }
+[data-theme=field-notes] [data-brief=start] #arcade-tutorial { background: linear-gradient(90deg,#405d4520 1px,transparent 1px) 0 0 / 22px 22px,linear-gradient(#405d4514 1px,transparent 1px) 0 0 / 22px 22px,#f5f1e5; }
+[data-theme=field-notes] [data-brief=start] #arcade-tutorial::before { left: 24px; top: 20px; bottom: 20px; width: 2px; background: #b4625355; }
+[data-theme=field-notes] [data-brief=start] #arcade-controls-status { color: #314a3c; font-size: clamp(28px, 4vw, 43px); transform: rotate(-1deg); }
+[data-theme=field-notes] #arcade-begin { border: 0; border-bottom: 3px solid #44634d; border-radius: 0; background: transparent; color: #314a3c; box-shadow: none; font-family: Georgia,serif; font-style: italic; }
+
+@keyframes arcade-cursor { 50% { opacity: 0; } }
+@keyframes arcade-bubble { 50% { transform: translateY(16px) rotate(5deg); } }
+[data-theme=y2k] [data-brief=start] #arcade-tutorial { color: #edf6ff; }
+[data-theme=aqua] [data-brief=start] #arcade-tutorial { color: #244c6b; }
+[data-theme=aero] [data-brief=start] #arcade-tutorial { color: #06567e; }
+[data-theme=metro] [data-brief=start] #arcade-tutorial { color: #fff; }
+[data-theme=material] [data-brief=start] #arcade-tutorial { color: #343852; }
+[data-theme=glass] [data-brief=start] #arcade-tutorial { color: #e3f9ff; }
+[data-theme=field-notes] [data-brief=start] #arcade-tutorial { color: #314a3c; }
+@media (max-width: 640px) {
+    #arcade-player .arcade-room-header { padding: 10px 8px; gap: 8px; align-items: center; }
+    #arcade-player .arcade-room-header h2 { font-size: 22px; }
+    #arcade-player .arcade-controls-trigger { font-size: 16px; padding: 8px; }
+    #arcade-player .arcade-hud { padding: 8px 12px; gap: 18px; }
+    #arcade-player .arcade-hud dd { font-size: 28px; }
+    #arcade-player .arcade-hud dt { font-size: 12px; }
+    #arcade-player .arcade-camera-dock { grid-template-columns: 1fr; }
+    #arcade-player .camera-view { grid-column: auto; grid-row: auto; }
+    #arcade-player .camera-details { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { #arcade-tutorial::before, #arcade-tutorial::after, #arcade-controls-status::after { animation: none !important; } }

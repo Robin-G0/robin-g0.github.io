@@ -25,9 +25,10 @@ test('runner discards paused/tutorial inputs and bounds a slow simulation frame'
     assert.equal(runner.phase, 'playing', 'A slow frame must not create a blocking pause menu');
     const held = runner.elapsed;
     now += 5000; runner.step(now, { hold: true });
-    assert.equal(runner.elapsed, held, 'Tracking holds freeze gameplay and the round clock');
+    assert.ok(runner.elapsed > held, 'Missing hands never stop the arcade clock');
+    const resumed=runner.elapsed;
     now += 20; runner.step(now);
-    assert.ok(runner.elapsed - held < .021, 'Recovery has no catch-up burst');
+    assert.ok(runner.elapsed - resumed < .021, 'Recovery has no catch-up burst');
     runner.restart();
     assert.equal(runner.game.state.hits, 0);
     runner.finish(); runner.tutorial();
@@ -95,8 +96,9 @@ test('Pop-up Panic survives beyond the round limit and ends only on stack overfl
     assert.equal(runner.phase,'playing');assert.ok(runner.elapsed>89);
     assert.equal(last.remaining,null);assert.ok(last.elapsed>=89);
     const elapsed=runner.elapsed;
-    now+=2000;runner.step(now,{hold:true});assert.equal(runner.elapsed,elapsed);
-    runner.pause();now+=2000;runner.step(now);assert.equal(runner.elapsed,elapsed);runner.play();
+    now+=2000;runner.step(now,{hold:true});assert.ok(runner.elapsed>elapsed);
+    const continued=runner.elapsed;
+    runner.pause();now+=2000;runner.step(now);assert.equal(runner.elapsed,continued);runner.play();
     for(let tick=0;tick<300&&runner.phase==='playing';tick++){now+=100;runner.step(now);}
     assert.equal(runner.phase,'finished');
     assert.ok([0,1].some(stack=>runner.game.state.windows.filter(w=>w.stack===stack).length>STACK_LIMIT));

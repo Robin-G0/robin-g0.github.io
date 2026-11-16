@@ -32,7 +32,9 @@ The static site needs no server build.
 - `games/popup-panic.js`: directional batch clears, pressure, preview bags and animated settling.
 - `core/audio.js`: original synthesized cues and a mute control, with no audio downloads.
 - `core/game.js`: the small lifecycle used by every game.
-- `core/runner.js`: simulation time, tutorial, pause, restart and round duration.
+- `core/runner.js`: simulation time, tutorial, manual pause, restart and end conditions.
+- `core/pressure.js`: explicit survival/round policies for all 33 engines.
+- `themes.css`: arcade typography, era-specific materials and responsive presentation.
 - `lessons.js`: short control explanations and optional game tips for every engine.
 - `core/input.js`: keyboard, touch and accepted motion events share the same route.
 - `room.js`: the dialog, camera preview, controls and single animation loop.
@@ -107,11 +109,8 @@ a fixed viewport height, feedback reserves space, and gesture-driven focus does
 not scroll the page. The camera mirrors the video and wrist markers
 together, and reports shoulders and each wrist separately using confident public
 `coordinate()` observations inside the image. It does not invent finger tracking.
-A sustained tracking loss normally holds simulation without opening a pause menu.
-Link Maze opts out through `holdOnTrackingLoss: false`, respected by both the room
-and runner: its map preview and active countdown continue while hands are missing.
-Missing-input feedback remains visible without granting extra thinking time.
-A returning wrist in games that hold resumes with no catch-up burst.
+Missing hands never pause any arcade game. Simulation, clocks and difficulty
+continue; missing-input feedback remains beside the camera without covering play.
 Keyboard/touch input takes over without a camera gate. Slow frames are bounded,
 not turned into pause dialogs. Manual Pause and Controls remain explicit choices.
 The initial screen shows one large "Say hi (with hand) to start" prompt.
@@ -134,14 +133,15 @@ and an empty board earns another `100 × level`. Waiting builds valuable groups 
 risks the visible stack ceiling. Overflow allows 1.2 seconds to recover.
 This engine declares `endless: true`: the host shows elapsed survival time and
 does not apply the catalog's round duration. Only unresolved stack overflow ends
-play. Ordinary timed games and Link Maze's replenishing clock keep their own rules.
+play. The other arcade engines use the progression policies below; Link Maze
+keeps its replenishing clock and repeating maps.
 
 A shuffled three-of-each-direction bag and visible upcoming arrows make planning
 possible. Paired arrivals accelerate with simulation time from 1.5 seconds to
 0.65 seconds over the first minute, then keep shrinking through a smooth survival
 ramp, before the difficulty pace multiplier. The all-clear recovery delay scales
 down with the current interval instead of imposing a fixed spawn-rate ceiling.
-Pause and tracking holds freeze that ramp; slow frames do not queue spawn bursts.
+Manual Pause freezes that ramp; slow frames do not queue spawn bursts.
 Different directions from both wrists can clear in the same camera observation,
 with independent result plates and tap effects. Clearing gaps makes remaining
 windows settle; large sweeps get a burst and a short rising chiptune. Reduced-motion
@@ -194,14 +194,37 @@ The bank caps at 90 seconds and score floors at zero; time exhaustion ends play.
 
 A trusted engine may expose `remainingSeconds()` to own a replenishable clock.
 The runner displays that value and lets the engine end the round; engines without
-it retain their fixed duration. All clocks and previews freeze on manual Pause
-or Controls; tracking-loss holds are an explicit per-game policy. Tests exercise real game rules separately from browser
+it use an explicit arcade progression policy. A host without an arcade engine
+policy can still use a fixed duration. All clocks and previews freeze on manual
+Pause or Controls, and continue when hands disappear. Tests exercise real game rules separately from browser
 SDK-event fixtures; the latter do not establish physical recognition accuracy.
+
+## Arcade progression and visual identity
+
+`PRESSURE_RULES` maps each engine to a survival loop, repeating score goals, or its
+own progression. Survival games receive a smoothly increasing `env.pace`, cached
+once per simulation step. Puzzle score windows shorten over time, renew on score
+rather than button presses, and cost a life on expiry. Sequence playback and a
+solved puzzle's brief celebration retain their viewing time. A loss, not the
+catalog's old 60-second duration, ends an arcade run. Link Maze keeps capped map
+dimensions while later rounds offer less memorisation time.
+
+These policies never change camera inference rates, native gesture dwell or
+command cooldowns. Manual pause freezes both simulation and progression. Imported
+duration metadata remains supported for compatibility, but trusted arcade engines
+select their own survival/round policy.
+
+The eleven era screens use distinct materials, buttons and font families. Four
+small local WOFF2 fonts include licenses and source records in `assets/fonts`;
+no font-service requests occur at runtime. Canvas previews and games wait for
+their own typography before a final repaint, retaining a readable fallback.
+Intro motion respects reduced motion and stops being rendered during play.
 
 ## Add or import a game
 
 To add trusted executable code, write a factory in `games/`, register it in
-`registry.js`, and add its description to `catalog.js` and its rules to `lessons.js`. There is no dynamic module
+`registry.js`, and add its description to `catalog.js`, its pressure policy to
+`core/pressure.js` and its rules to `lessons.js`. There is no dynamic module
 path in imported data.
 
 For a small first experiment, copy a factory such as `binary` in `games/matrix.js`.

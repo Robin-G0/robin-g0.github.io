@@ -106,7 +106,7 @@ test('hiding both wrists neither extends maze memorisation nor freezes the count
 
 test('original powerup art animates in the map and freezes visually for reduced motion',async({page})=>{
     await open(page);
-    await page.evaluate(async()=>{const {loadArtwork}=await import('./arcade/core/painter.js?v=power-11');await loadArtwork('construction');});
+    await page.evaluate(async()=>{const {loadArtwork}=await import('./arcade/core/painter.js?v=pressure-19');await loadArtwork('construction');});
     await page.clock.runFor(32);
     const checksum=()=>page.locator('#arcade-canvas').evaluate(canvas=>{
         const data=canvas.getContext('2d').getImageData(0,180,canvas.width,canvas.height-180).data;

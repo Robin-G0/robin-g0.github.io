@@ -14,7 +14,7 @@ export function school(env) {
             if (s.time > s.next) {
                 const lane = integer(env.random, 0, 1); s.groups++;
                 if (s.groups % 3 === 0) s.swimmers.push({ lane, y: 40, shark: true });
-                else for (let i = 0; i < 3; i++) s.swimmers.push({ lane, y: 40 - i * 34, shark: false });
+                else for (let i = 0; i < 3; i++) s.swimmers.push({ lane, y: 40 - i * 34, shark: false, group: s.groups });
                 s.next = s.time + 3.5 / env.pace;
             }
             for (const fish of s.swimmers) {
@@ -24,7 +24,10 @@ export function school(env) {
                     if (fish.shark && s.gates[fish.lane]) { hurt(s, env, 'Close the gate for the warning silhouette.'); s.gates[fish.lane] = false; }
                     else if (fish.shark) reward(s, env, 20, 'Reef protected');
                     else if (s.gates[fish.lane]) reward(s, env, 5);
-                    else env.message('Open a gate for the fish.');
+                    else if (!fish.penalized) {
+                        hurt(s, env, 'Open a gate for the fish.');
+                        for (const peer of s.swimmers) if (peer.group === fish.group) peer.penalized = true;
+                    }
                 }
             }
             s.swimmers = s.swimmers.filter(fish => !fish.done);
@@ -102,6 +105,10 @@ export function garden(env) {
                 plant.water = Math.max(0, plant.water - .013 * dt * env.pace);
                 plant.light = Math.max(0, plant.light - .011 * dt * env.pace);
                 if (plant.water > .25 && plant.light > .25) { plant.growth += dt * .3; s.score += dt; }
+                plant.stress = plant.water <= .05 || plant.light <= .05 ? (plant.stress || 0) + dt : 0;
+                if (plant.stress >= 3) {
+                    hurt(s, env, 'A plant needs care.'); plant.water = .45; plant.light = .45; plant.stress = 0;
+                }
             }
             if (s.time >= s.next) { s.active = (s.active + 1) % 3; s.next = s.time + 6; }
         },

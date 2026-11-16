@@ -1,5 +1,6 @@
 import { InputRouter } from './input.js?v=gestures-7';
 import { seededRandom } from './random.js';
+import { PRESSURE_RULES, RoundPressure, pressureMultiplier } from './pressure.js';
 
 /** Owns simulation time. Games never own timers, animation loops or cameras. */
 export class GameRunner {
@@ -10,6 +11,7 @@ export class GameRunner {
         this.router = new InputRouter({ clock, feedback, actions: description.controls ? Object.keys(description.controls) : undefined, accept: event => {
             const lag = Math.max(0, this.clock() - event.timestamp) / 1000;
             this.game.input({ ...event, at: Math.max(0, this.game.state.time - lag) });
+            this.updatePressure();
             this.publish();
         } });
         this.create();
@@ -20,10 +22,17 @@ export class GameRunner {
         this.elapsed = 0;
         this.phase = 'tutorial';
         this.started = false;
+        this.pressurePolicy = PRESSURE_RULES[this.description.engine];
+        const runner = this, basePace = this.description.difficulty === 'standard' ? 1 : .8;
+        this.basePace = basePace; this.currentPace = basePace;
+        this.roundPressure = this.pressurePolicy?.kind === 'rounds'
+            ? new RoundPressure(this.pressurePolicy.seconds, basePace) : null;
         this.game = this.factory({ random: seededRandom(this.seed),
-            pace: this.description.difficulty === 'standard' ? 1 : .8,
+            get pace() { return runner.currentPace; },
             sound: event => this.sound(event), reducedMotion: this.reducedMotion,
             message: text => this.message(text), finish: text => this.finish(text) });
+        if (this.pressurePolicy && this.pressurePolicy.kind !== 'custom') this.game.endless = true;
+        if (this.roundPressure) this.game.remainingSeconds = () => this.roundPressure.remaining(this.elapsed);
         this.router.setPhase(this.phase);
     }
 
@@ -31,7 +40,20 @@ export class GameRunner {
         this.changed({ phase: this.phase, score: Math.floor(this.game.state.score),
             lives: Math.max(0, this.game.state.lives),
             elapsed: Math.floor(this.elapsed),
-            remaining: this.game.endless ? null : Math.max(0, Math.ceil(this.game.remainingSeconds?.() ?? (this.description.duration - this.elapsed))) });
+            clockLabel: this.roundPressure ? 'Next score' : this.game.endless ? 'Survived' : 'Time',
+            remaining: this.game.remainingSeconds ? Math.max(0, Math.ceil(this.game.remainingSeconds()))
+                : this.game.endless ? null : Math.max(0, Math.ceil(this.description.duration - this.elapsed)) });
+    }
+
+    updatePressure() {
+        if (!this.roundPressure || this.phase !== 'playing') return;
+        const state = this.game.state;
+        const waiting = state.phase === 'show' || state.solved === true;
+        if (this.roundPressure.step(this.elapsed, state.score, waiting)) {
+            state.lives = Math.max(0, state.lives - 1);
+            this.message('Time up');
+            if (!state.lives) this.finish('Time up');
+        }
     }
 
     play() {
@@ -62,8 +84,7 @@ export class GameRunner {
         this.message(text); this.publish();
     }
 
-    step(timestamp, { hold = false } = {}) {
-        if (hold && this.game.holdOnTrackingLoss !== false) { this.lastFrame = timestamp; return; }
+    step(timestamp) {
         if (this.phase !== 'playing') { this.lastFrame = timestamp; return; }
         const gap = Math.max(0, (timestamp - this.lastFrame) / 1000);
         this.lastFrame = timestamp;
@@ -72,7 +93,9 @@ export class GameRunner {
         let remaining = Math.min(.1, gap, fixedDuration ? this.description.duration - this.elapsed : Infinity);
         while (remaining > .000001 && this.phase === 'playing') {
             const dt = Math.min(1 / 60, remaining);
+            if (this.pressurePolicy?.pace) this.currentPace = this.basePace * pressureMultiplier(this.elapsed);
             this.game.update(dt); this.elapsed += dt; remaining -= dt;
+            this.updatePressure();
         }
         if (fixedDuration && this.elapsed >= this.description.duration - .000001) this.finish();
     }

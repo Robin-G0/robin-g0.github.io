@@ -16,7 +16,7 @@ async function open(page,game='popups'){
     await page.goto('/?theme=construction#arcade');await page.locator('[data-game=construction-'+game+']').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
     await page.evaluate(()=>window.motionTest.observe());
-    await page.evaluate(async()=>{const{loadArtwork}=await import('./arcade/core/painter.js?v=power-11');await loadArtwork('construction');});
+    await page.evaluate(async()=>{const{loadArtwork}=await import('./arcade/core/painter.js?v=pressure-19');await loadArtwork('construction');});
     await page.clock.runFor(64);
 }
 test('idle canvases stop repainting while hands-free resume and active-rate inference remain available',async({page})=>{

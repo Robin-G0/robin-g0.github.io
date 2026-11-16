@@ -1,8 +1,8 @@
-import { engines } from './registry.js?v=greeting-18';
-import { GameRunner } from './core/runner.js?v=greeting-18';
+import { engines } from './registry.js?v=pressure-19';
+import { GameRunner } from './core/runner.js?v=pressure-19';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork } from './core/painter.js?v=power-11';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=pressure-19';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=directions-16';
 import { arcadeProfile, popupProfile } from './mig/profile.js?v=targets-12';
 import { ArcadeAudio } from './core/audio.js';
@@ -76,7 +76,7 @@ export class GameRoom {
         this.$('#arcade-begin').focus({ preventScroll: true });
         this.toggleCamera();
         this.request = requestAnimationFrame(time => this.frame(time));
-        loadArtwork(this.palette.theme).then(images => {
+        Promise.all([loadArtwork(this.palette.theme), loadTypography(this.palette)]).then(([images]) => {
             if (!this.closed) { this.painter.images = images; this.needsPaint = true; }
         });
     }
@@ -195,7 +195,8 @@ export class GameRoom {
         this.$('#arcade-tutorial').scrollTop = 0;
         this.$('#arcade-neutral-cue').hidden = !this.sixDirections;
         this.$('#arcade-lesson-goal').textContent = this.description.goal;
-        this.$('#arcade-lesson-tip').textContent = this.instructions.tip;
+        this.$('#arcade-lesson-tip').textContent = this.runner.roundPressure
+            ? `Score before the clock runs out. Each timeout costs a life. ${this.instructions.tip}` : this.instructions.tip;
         this.$('#arcade-controls-tips').open = false;
         for (const side of ['left', 'right']) {
             this.$(`[data-tutorial-explanation=${side}]`).textContent = this.instructions[side];
@@ -249,7 +250,7 @@ export class GameRoom {
         this.dialog.dataset.phase = state.phase;
         this.text('#arcade-score', state.score);
         this.text('#arcade-time', `${state.remaining == null ? state.elapsed : state.remaining}s`);
-        this.text('.arcade-hud > div:nth-child(2) dt', state.remaining == null ? 'Survived' : 'Time');
+        this.text('.arcade-hud > div:nth-child(2) dt', state.clockLabel || (state.remaining == null ? 'Survived' : 'Time'));
         this.text('#arcade-lives', state.lives);
         this.$('#arcade-tutorial').hidden = state.phase !== 'tutorial';
         this.$('#arcade-paused').hidden = state.phase !== 'paused';
@@ -391,10 +392,10 @@ export class GameRoom {
             this.request = requestAnimationFrame(time => this.frame(time));
             return;
         }
-        let trackingHold = false;
+        let trackingMissing = false;
         if (this.camera.running) {
             const stale = this.trackingAt != null && timestamp - this.trackingAt > 1500;
-            trackingHold = this.inputMode === 'motion' && (!this.visible || stale);
+            trackingMissing = this.inputMode === 'motion' && (!this.visible || stale);
             if (stale) {
                 this.visible = false;
                 this.startWristVisible = false;
@@ -402,12 +403,10 @@ export class GameRoom {
                 this.cameraStatus();
             }
         }
-        if (this.cameraStarting && this.inputMode === 'motion') trackingHold = true;
-        const trackingMissing = trackingHold;
-        trackingHold &&= this.runner.game.holdOnTrackingLoss !== false;
-        this.dialog.dataset.tracking = trackingMissing ? trackingHold ? 'held' : 'missing' : 'ready';
+        if (this.cameraStarting && this.inputMode === 'motion') trackingMissing = true;
+        this.dialog.dataset.tracking = trackingMissing ? 'missing' : 'ready';
         this.text('#arcade-tracking-hint', this.cameraStarting ? 'Camera…' : 'Show a wrist');
-        this.$('#arcade-tracking-hint').hidden = !trackingMissing || this.runner.phase !== 'playing';
+        this.$('#arcade-tracking-hint').hidden = true; // Missing hands are reported beside the camera, without covering play.
         const initialStart = this.runner.phase === 'tutorial' && this.dialog.dataset.brief === 'start';
         const navigation = this.navigation.step({ visible: initialStart ? this.startWristVisible : this.visible,
             lastSeen: this.trackingAt, lostSince: initialStart ? this.startLostAt : this.lostAt }, timestamp);
@@ -434,7 +433,7 @@ export class GameRoom {
             const group = this.$(`[data-wrist-controls=${wrist}]`);
             if (group && group.dataset.pulse !== String(pulse)) group.dataset.pulse = String(pulse);
         }
-        this.runner.step(timestamp, { hold: trackingHold });
+        this.runner.step(timestamp);
         // A paused/tutorial canvas is static. Camera feedback and navigation stay live.
         if (this.runner.phase === 'playing' || this.needsPaint) {
             this.painter.background();
