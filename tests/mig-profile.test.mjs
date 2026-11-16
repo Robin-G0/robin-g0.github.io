@@ -1,13 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import createMIG from '../vendor/motion-input-grid/runtime/mig.mjs';
-import { arcadeProfile, popupProfile } from '../arcade/mig/profile.js';
+import { arcadeProfile, popupProfile, constructionLiftProfile } from '../arcade/mig/profile.js';
 import { GestureGate } from '../arcade/mig/gesture-gate.js';
 import { visiblePoint } from '../arcade/mig/camera.js';
 const wasm = await createMIG();
 const home = {left:[6.5,5.5], right:[2.5,5.5]};
 const targets = {left_up:[6.5,2], left_left:[10,5.5], left_right:[2.5,5.5],
     right_up:[2.5,2], right_left:[6.5,5.5], right_right:[-1,5.5]};
+
+test('Maze and Juggler raises start one cell higher and independently accept both wrists',()=>{
+    const h=harness({profile:constructionLiftProfile});
+    try {
+        h.dwell([6.5,3.1],[2.5,3.1]);
+        assert.deepEqual(h.events,[],'Former low-edge resting poses no longer trigger raises');
+        h.dwell([6.5,2.9],[2.5,2.9]);
+        assert.deepEqual(h.events,['left_up','right_up']);
+        h.dwell([6.5,2.9],[2.5,2.9],40,25);
+        assert.equal(h.events.length,2,'Held raises never repeat');
+        h.dwell(home.left,home.right);h.dwell([6.5,2.9],home.right);
+        assert.equal(h.events.at(-1),'left_up');
+    }finally{h.close();}
+});
 function harness({aspect=1,width=.3,shoulderY=.3,profile=arcadeProfile,cooldownMs=0}={}) {
     const tracker = new wasm.Tracker(), gate = new GestureGate({cooldownMs}), events = [];
     assert.equal(tracker.load(JSON.stringify(profile)), '');

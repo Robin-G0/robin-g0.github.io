@@ -156,7 +156,20 @@ test('popup camera guides and downloaded profile use the higher Up and side band
     }
     await page.locator('#arcade-close').click();
     await page.locator('[data-game=construction-maze]').click();
-    expect(await page.locator('#arcade-player a[download]').getAttribute('href')).toContain('wrist-raises.json');
+    expect(await page.locator('#arcade-player a[download]').getAttribute('href')).toContain('construction-lifts.json');
+    for(const engine of ['maze','juggle']) {
+        if(engine==='juggle') {
+            await page.locator('#arcade-close').click();
+            await page.locator('[data-game=construction-juggle]').click();
+        }
+        await page.evaluate(()=>window.motionTest.observe());
+        const download=await page.request.get(await page.locator('#arcade-player a[download]').getAttribute('href'));
+        const profile=await download.json();
+        expect(await page.evaluate(()=>window.motionTest.profile)).toEqual(profile);
+        expect(profile.inputs.map(input=>input.action)).toEqual(['left_up','right_up']);
+        for(const input of profile.inputs) expect(input.steps[0].constraints[0].cell).toEqual([-9,-9,27,12]);
+        await expect(page.locator('#arcade-trigger-zones [data-trigger]')).toHaveCount(2);
+    }
 });
 
 test('preview and individual wrist feedback are visible before starting', async ({ page }) => {

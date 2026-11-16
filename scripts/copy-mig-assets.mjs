@@ -2,7 +2,7 @@ import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { arcadeProfile, popupProfile } from '../arcade/mig/profile.js';
+import { arcadeProfile, popupProfile, constructionLiftProfile } from '../arcade/mig/profile.js';
 
 // Serve the installed npm package locally. No CDN and no fork of its tracker.
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -36,6 +36,7 @@ await cp(join(installed, 'LICENSE'), join(published, 'LICENSE'));
 await mkdir(join(root, 'arcade/profiles'), { recursive: true });
 await writeFile(join(root, 'arcade/profiles/wrist-raises.json'), JSON.stringify(arcadeProfile, null, 2) + '\n');
 await writeFile(join(root, 'arcade/profiles/popup-directions.json'), JSON.stringify(popupProfile, null, 2) + '\n');
+await writeFile(join(root, 'arcade/profiles/construction-lifts.json'), JSON.stringify(constructionLiftProfile, null, 2) + '\n');
 await writeFile(join(published, 'package.json'), JSON.stringify({
     name: metadata.name, version: metadata.version, type: 'module', license: metadata.license,
     runtimeSource: { repository: source.repository, commit: source.commit, files: source.files }

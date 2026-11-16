@@ -47,3 +47,12 @@ function profile(zones) {
 
 export const arcadeProfile = profile(wristZones);
 export const popupProfile = profile(popupZones);
+
+// Maze and Juggler use wrist raises only. Move the lower edge from Y=4 to Y=3
+// without changing other games or evaluating unused horizontal commands.
+export const constructionLiftProfile = {
+    schema_version: 2, tracking: { hands: false },
+    inputs: WRISTS.map(wrist => region(wrist, 'up', {
+        [wrist]: { up: [-9, -9, 27, 12] }
+    }))
+};
