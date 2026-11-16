@@ -37,33 +37,54 @@ test('Invaders gives a full warning, one hit grace and bounded effects/actors',(
     advance(1.2);s.bombs=[{lane:3,y:317,launchAt:0}];g.update(.02);assert.equal(s.lives,2);
     assert.ok(s.bullets.length<=16&&s.bombs.length<=6&&s.bursts.length<=6);
 });
-test('Lander fuel, braking cooldown and safe/perfect grading match the visible rules',()=>{
-    const {g,s,advance}=setup(lander);s.velocity=60;
-    g.input({action:'left_up'});assert.equal(s.velocity,42);assert.equal(s.fuel,96);
-    s.velocity=60;g.input({action:'left_up'});assert.equal(s.fuel,96,'Charging brake costs nothing');
-    advance(LANDER.brakeSeconds+.01);s.velocity=60;g.input({action:'left_up'});assert.equal(s.fuel,92);
+test('each single Lander thruster brakes and steers; a paired burn brakes without sideways movement',()=>{
+    for(const action of ['left','right']){
+        const {g,s,advance}=setup(lander);s.velocity=60;
+        g.input({action});assert.equal(s.x,360,'The combination window does not introduce a premature side step');
+        advance(.13);assert.equal(s.x,360+(action==='left'?LANDER.step:-LANDER.step));
+        assert.equal(s.fuel,96);assert.ok(s.velocity<45&&s.velocity>42);
+    }
+    const {g,s}=setup(lander);s.velocity=60;
+    g.input({action:'left'});g.input({action:'right'});
+    assert.equal(s.x,360);assert.equal(s.velocity,24);assert.equal(s.fuel,92);assert.equal(s.pulse,'center');
+    assert.equal(s.pending,null);
+});
+test('nearly simultaneous Lander raises combine in either order and duplicate pulses do not add fuel costs',()=>{
+    for(const first of ['left','right']){
+        const {g,s,advance}=setup(lander);s.velocity=60;
+        g.input({action:first});g.input({action:first});advance(.08);
+        g.input({action:first==='left'?'right':'left'});
+        assert.equal(s.pulse,'center');assert.equal(s.x,360);assert.equal(s.fuel,92);
+        assert.ok(s.velocity<27);advance(.2);assert.equal(s.fuel,92,'A combined burn is consumed once');
+    }
+});
+test('an imminent touchdown flushes a pending single burn before the chord window expires',()=>{
+    const {g,s}=setup(lander);s.x=s.padX;s.y=319.8;s.velocity=45;
+    g.input({action:'left'});g.update(.02);
+    assert.equal(s.pending,null);assert.equal(s.landings,1);assert.equal(s.touchdownGood,true);
+    assert.ok(s.velocity<LANDER.safeSpeed);
+});
+test('Lander grading, recovery and fuel exhaustion retain straightforward behavior',()=>{
+    const {g,s,advance,results}=setup(lander);
     assert.equal(landingPoints(33,100),0);assert.equal(landingPoints(32,50),200);assert.equal(landingPoints(8,50),400);
     s.x=s.padX;s.y=319.99;s.velocity=7;s.fuel=50;g.update(.01);
-    assert.equal(s.landings,1);assert.equal(s.score,400);assert.ok(s.recoveryUntil>s.time);
-    advance(1.2);assert.equal(s.fuel,100);assert.ok(s.y>=64&&s.y<65);
-});
-test('Lander crashes cost one life, fuel cannot go negative and upward travel is bounded',()=>{
-    const {g,s,advance,results}=setup(lander);
-    s.fuel=5;g.input({action:'right_up'});assert.equal(s.fuel,5);
-    s.y=55;s.velocity=-38;g.update(.01);assert.equal(s.y,55);assert.equal(s.velocity,0);
+    assert.equal(s.landings,1);assert.equal(s.score,400);advance(1.2);assert.equal(s.fuel,100);
+    s.fuel=4;s.velocity=60;const x=s.x;
+    g.input({action:'left'});g.input({action:'right'});
+    assert.equal(s.fuel,0);assert.equal(s.x,x,'Low fuel must not turn a paired burn into a side thrust');assert.equal(s.velocity,42);
+    g.input({action:'left'});advance(.13);assert.equal(s.x,x);assert.equal(s.fuel,0);
     for(let i=0;i<3;i++){
         s.y=319.99;s.velocity=50;g.update(.01);assert.equal(s.lives,2-i);
         if(i<2)advance(1.2);
     }
     assert.deepEqual(results,['Game over']);
 });
-test('Lander permits several landings with at least one second between discrete decisions',()=>{
+test('Lander permits several landings with at least one second between simple thruster decisions',()=>{
     const {g,s,results}=setup(lander);let last=-10,moves=0;
     for(let i=0;i<7200&&!results.length;i++){
         if(s.time-last>=1&&!s.recoveryUntil){
-            const action=Math.abs(s.x-s.padX)>18?(s.x>s.padX?'left_left':'right_right'):
-                s.velocity>43?'right_up':s.velocity>28?'left_up':null;
-            if(action){g.input({action});last=s.time;moves++;}
+            if(Math.abs(s.x-s.padX)>18){g.input({action:s.x>s.padX?'right':'left'});last=s.time;moves++;}
+            else if(s.velocity>28){g.input({action:'left'});g.input({action:'right'});last=s.time;moves++;}
         }
         g.update(1/60);
     }
@@ -116,21 +137,18 @@ test('revised rules isolate old score boards and reject incompatible friend targ
     assert.equal(readChallenge(challengeLink('https://example.com/',old,{name:'ALICE',score:999}),games),null);
 });
 
-test('Lander steering cancels exactly inside the flight bounds and has no horizontal momentum',()=>{
+test('separate opposite Lander thrusters cancel lateral steps, and pause discards pending input',()=>{
     const {g,s,advance}=setup(lander);
-    for(const x of [264,312,360,408,456]){
-        s.x=x;const fuel=s.fuel,velocity=s.velocity;
-        g.input({action:'left_left'});assert.equal(s.x,x-LANDER.step);
-        g.input({action:'right_right'});assert.equal(s.x,x);
-        g.input({action:'left_right'});assert.equal(s.x,x+LANDER.step);
-        g.input({action:'right_left'});assert.equal(s.x,x);
-        assert.equal(s.fuel,fuel);assert.equal(s.velocity,velocity);
+    for(const first of ['left','right']){
+        s.x=360;s.fuel=100;s.velocity=60;
+        g.input({action:first});advance(.15);
+        g.input({action:first==='left'?'right':'left'});advance(.15);
+        assert.equal(s.x,360);assert.equal(s.fuel,92);
     }
-    s.x=360;advance(1);assert.equal(s.x,360,'Waiting cannot introduce lateral drift');
-    s.x=LANDER.minX;g.input({action:'left_left'});assert.equal(s.x,LANDER.minX);
-    s.x=LANDER.maxX;g.input({action:'right_right'});assert.equal(s.x,LANDER.maxX);
-    s.velocity=60;g.input({action:'right_up'});assert.equal(s.velocity,60-LANDER.thrust);
-    s.velocity=60;s.brakeAt=-10;g.input({action:'left_up'});assert.equal(s.velocity,60-LANDER.brake);
+    s.x=360;const fuel=s.fuel;
+    g.input({action:'left'});advance(.05);g.pause();g.resume();advance(.3);
+    assert.equal(s.x,360);assert.equal(s.fuel,fuel);assert.equal(s.pending,null);
+    advance(1);assert.equal(s.x,360,'There is no horizontal inertia');
 });
 
 test('Lander accepts a broad pad edge but rejects off-pad touchdowns, with reachable repeatable pads',()=>{

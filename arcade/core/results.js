@@ -1,4 +1,4 @@
-import {challengeLink, compareChallenge} from './challenges.js?v=phosphor-32';
+import {challengeLink, compareChallenge} from './challenges.js?v=phosphor-33';
 
 /** Shared results UI for every engine/theme. Games only publish their score. */
 export class ArcadeResults {

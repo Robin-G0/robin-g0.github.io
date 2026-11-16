@@ -33,8 +33,6 @@
 @keyframes phosphor-shot { to { stroke-dashoffset: -28; } }
 @keyframes phosphor-corner { 0%,100% { opacity: .35; } 40%,65% { opacity: 1; } }
 @media(max-width:600px) {
-    [data-engine=lander] .arcade-inputs { grid-template-columns: 1fr; }
-    [data-engine=lander] .wrist-buttons .action-name { font-size: 16px; }
     [data-theme=phosphor] #arcade-player .arcade-room-header { padding: 10px; gap: 8px; }
     [data-theme=phosphor] #arcade-player .arcade-room-header .eyebrow { display: none; }
     [data-theme=phosphor] #arcade-player .arcade-room-header h2 { font-size: 23px; }

@@ -1,6 +1,6 @@
 import { arcadeProfile } from './profile.js?v=targets-25';
 import { GestureGate } from './gesture-gate.js?v=directions-16';
-import { BindingGate } from './bindings.js?v=phosphor-32';
+import { BindingGate } from './bindings.js?v=phosphor-33';
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)

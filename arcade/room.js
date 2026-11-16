@@ -1,21 +1,21 @@
-import { engines } from './registry.js?v=phosphor-32';
+import { engines } from './registry.js?v=phosphor-33';
 import { GameRunner } from './core/runner.js?v=arcade-28';
-import { bindAlternativeControls } from './core/input.js?v=phosphor-32';
+import { bindAlternativeControls } from './core/input.js?v=phosphor-33';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=phosphor-32';
-import { ArcadeAudio } from './core/audio.js?v=phosphor-32';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=phosphor-33';
+import { ArcadeAudio } from './core/audio.js?v=phosphor-33';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=phosphor-32';
+import { lessonFor } from './lessons.js?v=phosphor-33';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
 import { FrameBudget } from './core/frame-budget.js';
-import { gameConfig } from './core/game-config.js?v=phosphor-32';
-import { ArcadeResults } from './core/results.js?v=phosphor-32';
-import { localScores } from './core/scores.js?v=phosphor-32';
-import { GameGuide, wavingHand } from './core/guide.js?v=phosphor-32';
+import { gameConfig } from './core/game-config.js?v=phosphor-33';
+import { ArcadeResults } from './core/results.js?v=phosphor-33';
+import { localScores } from './core/scores.js?v=phosphor-33';
+import { GameGuide, wavingHand } from './core/guide.js?v=phosphor-33';
 import { seededRandom } from './core/random.js';
-import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=phosphor-32';
+import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=phosphor-33';
 
 export class GameRoom {
     constructor(dialog, description, opener, {challenge = null} = {}) {
@@ -91,7 +91,7 @@ export class GameRoom {
         this.cancelCountdown();
         this.showPlacement({ shoulders: false, left: null, right: null });
         this.dialog.dataset.camera = 'off';
-        this.$('#arcade-feedback').textContent = description.inputScheme==='flight-directions'?'Raise L to brake, R to thrust. Sweep to steer.':this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
+        this.$('#arcade-feedback').textContent = description.engine==='lander'?'Lift L or R. Both together fire the center engine.':this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
         this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
         this.results = new ArcadeResults(dialog,description,this.scores,challenge,{
@@ -196,14 +196,9 @@ export class GameRoom {
                     const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
                     button.dataset.arcadeInput = `${wrist}_${direction}`;
                     button.setAttribute('aria-label', `${wrist} wrist ${direction}`);
-                    if(this.description.inputScheme==='flight-directions')button.setAttribute('aria-label',`${this.description.controls[`${wrist}_${direction}`]}: ${wrist} wrist ${direction}`);
                     const arrow = document.createElement('span'); arrow.className = 'action-key'; arrow.textContent = ARROWS[direction];
                     const key = document.createElement('kbd'); key.textContent = (wrist === 'left' ? ['A', 'W', 'D'] : ['J', 'I', 'L'])[index];
                     button.append(arrow);
-                    if(this.description.inputScheme==='flight-directions'&&direction==='up'){
-                        const label=document.createElement('span');label.className='action-name';
-                        label.textContent=wrist==='left'?'Brake':'Thrust';button.append(label);
-                    }
                     button.append(key); buttons.append(button);
                 });
                 group.append(title, buttons); area.append(group);
@@ -211,7 +206,7 @@ export class GameRoom {
                 const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
                 button.dataset.arcadeInput = wrist;
                 const arrow = document.createElement('span'); arrow.className = 'action-key';
-                arrow.textContent = ['maze', 'juggle'].includes(this.description.engine) ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
+                arrow.textContent = ['maze', 'juggle', 'lander'].includes(this.description.engine) ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
                 const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.bindingPlan.mapped ? controlLabels(this.description)[wrist] : this.description.controls[wrist];
                 button.append(arrow, label); area.append(button);
             }
