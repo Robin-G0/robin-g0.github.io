@@ -12,11 +12,11 @@
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="stylesheet" href="./assets/site.css?v=construction-default-1">
   <link rel="stylesheet" href="./assets/themes.css?v=36b27ceddb">
-  <link rel="stylesheet" href="./arcade/arcade.css?v=bindings-29">
+  <link rel="stylesheet" href="./arcade/arcade.css?v=challenge-30">
   <link rel="stylesheet" href="./arcade/themes.css?v=pressure-19">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=construction-default-1"></script>
-  <script type="module" src="./arcade/app.js?v=bindings-29"></script>
+  <script type="module" src="./arcade/app.js?v=challenge-30"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -74,6 +74,7 @@
       <div class="window-chrome" aria-hidden="true"><span class="window-lights"><i></i><i></i><i></i></span><span>Arcade</span><span class="window-actions">_ □ ×</span></div>
       <div class="section-heading"><div><p class="eyebrow">05 / Motion Input Grid</p><h2 id="arcade-title">Arcade</h2></div><span class="text-link">Three games for this era</span></div>
       <p class="arcade-intro">Short rounds. Play with wrist movements, the keyboard, or the touch buttons.</p>
+      <aside id="arcade-challenge-invite" class="challenge-invite" hidden><p id="arcade-challenge-summary"></p><div><button id="arcade-play-challenge" class="button primary" type="button">Play challenge</button><button id="arcade-dismiss-challenge" type="button">Dismiss</button></div></aside>
       <div class="arcade-list" id="arcade-games"></div>
       <div class="arcade-imports"><button type="button" id="arcade-import-button">Import bindings</button><input type="file" id="arcade-import-file" accept=".json,application/json" hidden><a href="./arcade/profiles/popup-directions.json" download>Example bindings JSON</a><button id="arcade-clear-bindings" type="button" hidden>Reset all bindings</button></div>
       <details class="preset-help"><summary>How do bindings work?</summary><p>Export a JSON configuration from Motion Input Grid, import it here, then open a game and choose Bindings. Assign one input to each game control. Unassigned controls use the game defaults. Your configuration and choices stay in this browser.</p></details>
@@ -84,6 +85,7 @@
   <dialog id="theme-picker" aria-labelledby="picker-title"><div class="picker-heading"><div><p class="eyebrow">Eleven visual eras</p><h2 id="picker-title">Choose an atmosphere</h2></div><button class="close-picker" id="close-themes" type="button" aria-label="Close theme picker">×</button></div><div class="picker-controls"><button type="button" class="button" id="choose-daily">Default theme</button><button type="button" class="button" id="choose-random">Another random theme ↻</button><button type="button" class="button" id="toggle-mode" aria-pressed="false">Dark appearance</button></div><p class="picker-hint">Construction is the default for now. Choose an era to explore it, or share its URL.</p><div id="theme-options" class="theme-options"></div></dialog>
   <dialog id="arcade-player" aria-labelledby="arcade-title-current" aria-describedby="arcade-goal">
     <header class="arcade-room-header"><div><h2 id="arcade-title-current"><span id="arcade-game-title"></span></h2><p id="arcade-goal"></p></div><button id="arcade-help" class="arcade-controls-trigger" type="button">Controls</button><button id="arcade-close" class="arcade-room-close" type="button" aria-label="Close game" autofocus>×</button></header>
+    <p id="arcade-friend-target" class="friend-target" hidden></p>
     <dl class="arcade-hud"><div><dt>Score</dt><dd id="arcade-score">0</dd></div><div><dt>Time</dt><dd id="arcade-time">60s</dd></div><div><dt>Attempts</dt><dd id="arcade-lives">3</dd></div><div><dt>Hi score</dt><dd id="arcade-best">00000</dd></div></dl>
 
 
@@ -112,7 +114,7 @@
       <span id="arcade-playfield-input" class="arcade-playfield-input" role="status" hidden></span>
       <p id="arcade-playfield-message" class="arcade-playfield-message" role="status" hidden></p>
       <div class="arcade-overlay" id="arcade-paused" hidden><h3>Paused</h3><button id="arcade-resume" class="button primary" type="button">Resume</button></div>
-      <div class="arcade-overlay" id="arcade-result" hidden><h3>Done</h3><p><strong id="arcade-final-score">0</strong></p><p id="arcade-score-note" role="status"></p><form id="arcade-score-form"><label for="arcade-name">NAME</label><input id="arcade-name" type="text" maxlength="5" minlength="5" pattern="[A-Z0-9]{5}" autocomplete="off" spellcheck="false" aria-label="Five-character arcade name" value="GUEST" required><button id="arcade-save-score" type="submit">Save</button></form><ol id="arcade-scoreboard" aria-label="Local top five"></ol><button id="arcade-again" class="button primary" type="button">Replay</button></div>
+      <div class="arcade-overlay" id="arcade-result" hidden><h3>Done</h3><p><strong id="arcade-final-score">0</strong></p><p id="arcade-score-note" role="status"></p><form id="arcade-score-form"><label for="arcade-name">NAME</label><input id="arcade-name" type="text" maxlength="5" minlength="5" pattern="[A-Z0-9]{5}" autocomplete="off" spellcheck="false" aria-label="Five-character arcade name" value="GUEST" required><button id="arcade-save-score" type="submit">Save</button></form><ol id="arcade-scoreboard" aria-label="Local top five"></ol><p id="arcade-challenge-result" role="status"></p><input id="arcade-challenge-link" type="url" readonly aria-label="Challenge link to copy" hidden><p id="arcade-share-status" role="status"></p><div class="arcade-result-actions"><button id="arcade-challenge-friend" class="button" type="button">Challenge a friend</button><button id="arcade-again" class="button primary" type="button">Replay</button></div></div>
     </div>
     <div class="arcade-inputs"><button class="arcade-action" data-arcade-input="left" type="button"><span class="action-key" aria-hidden="true">←</span><span><span class="action-name"></span><small>Left wrist · ← / A</small></span></button><button class="arcade-action" data-arcade-input="right" type="button"><span class="action-key" aria-hidden="true">→</span><span><span class="action-name"></span><small>Right wrist · → / D</small></span></button></div>
     <p id="arcade-feedback" role="status" aria-live="polite"></p>

@@ -3,8 +3,11 @@ import { engines } from './registry.js?v=arcade-28';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { localBindings } from './mig/bindings.js?v=bindings-29';
-import { GameRoom } from './room.js?v=bindings-29';
+import { GameRoom } from './room.js?v=challenge-30';
 
+import {ChallengeStore, readChallenge} from './core/challenges.js?v=challenge-30';
+
+const challenges = new ChallengeStore(games);
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');
 const dialog = document.querySelector('#arcade-player');
@@ -13,7 +16,9 @@ let revision = 0;
 
 function openGame(description, opener) {
     room?.dispose();
-    room = new GameRoom(dialog, description, opener);
+    const target = challenges.target?.game === description.id ? challenges.target : null;
+    const selected = target ? challenges.description() : description;
+    room = new GameRoom(dialog, selected, opener, {challenge:target});
 }
 
 function preview(canvas, description, palette, images) {
@@ -94,3 +99,34 @@ window.addEventListener('pageshow', event => {
     renderCollection();
 });
 renderCollection();
+
+function showChallenge() {
+    const description = challenges.description();
+    document.querySelector('#arcade-challenge-invite').hidden = !description;
+    document.querySelector('#arcade-challenge-summary').textContent = description ?
+        `${challenges.target.name} challenges you: ${challenges.target.score} in ${description.title}` : '';
+}
+function receiveChallenge() {
+    if (!new URLSearchParams(location.hash.split('?')[1]).has('challenge')) return;
+    challenges.set(readChallenge(location.href,games));
+    const description = challenges.description();
+    if (description) {
+        root.dataset.theme = description.theme;
+        document.querySelector('#arcade').scrollIntoView({block:'start'});
+    }
+    showChallenge();
+}
+document.querySelector('#arcade-play-challenge').addEventListener('click',event=>{
+    const description = challenges.description();
+    if (!description) return;
+    root.dataset.theme = description.theme;
+    // The theme observer rebuilds the collection before opening the dialog.
+    const opener = event.currentTarget;
+    queueMicrotask(()=>openGame(description,opener));
+});
+document.querySelector('#arcade-dismiss-challenge').addEventListener('click',()=>{
+    challenges.set(null);showChallenge();
+    if (new URLSearchParams(location.hash.split('?')[1]).has('challenge')) history.replaceState(null,'',`${location.pathname}${location.search}#arcade`);
+});
+window.addEventListener('hashchange',receiveChallenge);
+receiveChallenge();showChallenge();

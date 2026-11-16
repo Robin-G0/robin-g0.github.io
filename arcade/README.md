@@ -33,6 +33,9 @@ The static site needs no server build.
 - `core/audio.js`: original synthesized cues and a mute control, with no audio downloads.
 - `core/game.js`: the small lifecycle used by every game.
 - `core/runner.js`: simulation time, tutorial, manual pause, restart and end conditions.
+- `core/game-config.js`: shared built-in profile and cooldown selection.
+- `core/results.js`: shared scores, name entry, challenge comparison and share UI.
+- `core/challenges.js`: validated friend links and a separate browser-session target.
 - `core/pressure.js`: explicit survival/round policies for all 33 engines.
 - `themes.css`: arcade typography, era-specific materials and responsive presentation.
 - `lessons.js`: short control explanations and optional game tips for every engine.
@@ -262,6 +265,20 @@ inputs still work natively but are labelled as having no body preview.
 
 The tutorial's controls card and downloadable profile reflect custom assignments.
 The other two cards still explain the actual game loop and rewards/hazards.
+
+## Friend challenges
+
+Every engine finishes through the shared results component. Challenge a friend
+copies a link carrying the game's best local score, that record's name and the
+difficulty. If clipboard access fails, a selectable link appears. A recipient
+sees an invitation, explicitly starts the game, and gets a higher/tied/lower
+comparison on finish. Their target stays separate from personal records and
+persists for retries in the tab's session. Dismiss removes it and the URL payload.
+
+These are friendly, editable score claims. Links do not promise identical random
+boards, verified rankings, or automatic replies. All behavior is static browser
+JavaScript; there is no backend or peer library. New engines inherit the UI by
+using the existing runner/finish contract instead of implementing separate results.
 
 ## Runtime efficiency
 

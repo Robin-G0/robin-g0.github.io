@@ -4,21 +4,21 @@ import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=bindings-29';
-import { arcadeProfile, popupProfile, constructionLiftProfile } from './mig/profile.js?v=targets-25';
 import { ArcadeAudio } from './core/audio.js?v=arcade-28';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
 import { lessonFor } from './lessons.js?v=arcade-28';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
 import { FrameBudget } from './core/frame-budget.js';
-import { WRIST_DIRECTION_COOLDOWN_MS } from './games/popup-panic.js?v=survival-17';
+import { gameConfig } from './core/game-config.js?v=challenge-30';
+import { ArcadeResults } from './core/results.js?v=challenge-30';
 import { localScores } from './core/scores.js?v=bindings-29';
 import { GameGuide, wavingHand } from './core/guide.js?v=bindings-29';
 import { seededRandom } from './core/random.js';
 import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=bindings-29';
 
 export class GameRoom {
-    constructor(dialog, description, opener) {
+    constructor(dialog, description, opener, {challenge = null} = {}) {
         this.dialog = dialog; this.description = description; this.opener = opener;
         dialog.querySelector('#arcade-binding-panel').hidden = true;
         for (const button of dialog.querySelectorAll('#arcade-binding-panel button')) button.disabled = false;
@@ -38,13 +38,12 @@ export class GameRoom {
         this.dialog.dataset.brief = 'start';
         this.$('#arcade-tutorial').removeAttribute('aria-labelledby');
         this.$('#arcade-tutorial').setAttribute('aria-label', 'Start game');
-        this.sixDirections = description.inputScheme === 'wrist-directions';
-        const constructionLifts = ['maze', 'juggle'].includes(description.engine);
-        this.defaultProfile = description.engine === 'popups' ? popupProfile : constructionLifts ? constructionLiftProfile : arcadeProfile;
+        const config = gameConfig(description);
+        this.sixDirections = config.directional;
+        this.defaultProfile = config.profile;
         this.bindingPlan = compileBindings(description,this.defaultProfile,localBindings.profile,localBindings.assignments(description));
         const profile = this.bindingPlan.profile;
-        const profileFile = description.engine === 'popups' ? 'popup-directions' : constructionLifts ? 'construction-lifts' : 'wrist-raises';
-        this.$('a[download]').href = `./arcade/profiles/${profileFile}.json?v=targets-25`;
+        this.$('a[download]').href = `./arcade/profiles/${config.profileFile}.json?v=targets-25`;
         this.defaultProfileURL = this.$('a[download]').href;
         this.wristPulseUntil = {};
         this.markerMotion = Object.fromEntries(WRISTS.map(wrist => [wrist, new MarkerMotion()]));
@@ -83,7 +82,7 @@ export class GameRoom {
         this.$('#arcade-start-icon').innerHTML = wavingHand;
         this.camera = new MotionCamera({
             profile, mapped:this.bindingPlan.mapped,
-            cooldownMs: description.engine === 'popups' ? WRIST_DIRECTION_COOLDOWN_MS : 0,
+            cooldownMs: config.cooldownMs,
             onInput: (action, timestamp, details) => details?.mapped ? this.mappedInput(action,timestamp) : this.motionInput(action, timestamp),
             onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
         });
@@ -94,6 +93,9 @@ export class GameRoom {
         this.$('#arcade-feedback').textContent = this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
         this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
+        this.results = new ArcadeResults(dialog,description,this.scores,challenge,{
+            signal:this.abort.signal,onScoresChanged:()=>this.runner.publish()
+        });
         this.updateBindingDisplay();
         this.runner.publish();
         dialog.showModal();
@@ -151,19 +153,6 @@ export class GameRoom {
             } catch(error) {if(!this.closed)this.text('#arcade-binding-status',error.message);}
             finally {if(!this.closed){button.disabled=false;this.$('#arcade-binding-apply').disabled=false;event.target.value='';}}
         },{signal});
-        this.$('#arcade-score-form').addEventListener('submit', event => {
-            event.preventDefault();
-            const name = this.$('#arcade-name').value;
-            if (this.scores.rename(this.description, this.savedRunId, name)) {
-                this.renderScores();
-                this.text('#arcade-score-note', this.scores.saved ? 'Saved in this browser' : 'Session only');
-            }
-        }, { signal });
-        this.$('#arcade-name').addEventListener('input', () => {
-            const input = this.$('#arcade-name');
-            input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,5);
-            this.$('#arcade-save-score').disabled = input.value.length !== 5;
-        }, { signal });
         on('#arcade-pause', () => {
             if(this.bindingPanelOpen || this.guideOpen)return;
             this.cancelCountdown();
@@ -442,13 +431,7 @@ export class GameRoom {
         }
         this.updateCameraLayout();
         if (justFinished) {
-            const previous = this.scores.list(this.description)[0]?.score ?? -1;
-            this.savedRunId = this.scores.record(this.description, state.score);
-            this.$('#arcade-score-form').hidden = !this.savedRunId;
-            this.$('#arcade-name').value = this.scores.data.name;
-            this.$('#arcade-save-score').disabled = false;
-            this.text('#arcade-score-note', state.score > previous ? 'NEW HIGH SCORE' : this.savedRunId ? 'Saved locally' : 'TOP FIVE');
-            this.renderScores();
+            this.results.finish(state.score);
             this.cameraForReplay = Boolean(this.camera?.running || this.cameraStarting);
             if (this.cameraForReplay) this.stopCamera();
         }
@@ -481,18 +464,6 @@ export class GameRoom {
         this.text('#arcade-start-suffix', greeting ? ' to start' : '');
         this.$('#arcade-start-icon').hidden = !greeting;
         this.$('#arcade-start-suffix').hidden = !greeting;
-    }
-
-    renderScores() {
-        const list = this.$('#arcade-scoreboard');
-        list.replaceChildren(...this.scores.list(this.description).map((record,index) => {
-            const item = document.createElement('li');
-            item.dataset.current = String(record.id === this.savedRunId);
-            for (const [tag,text] of [['span',String(index+1).padStart(2,'0')],['b',record.name],['strong',String(record.score)]]) {
-                const cell = document.createElement(tag); cell.textContent = text; item.append(cell);
-            }
-            return item;
-        }));
     }
 
     updateCameraLayout() {
@@ -690,7 +661,7 @@ export class GameRoom {
         cancelAnimationFrame(this.request); this.abort.abort();
         this.resizeObserver?.disconnect();
         this.camera.stop(); this.runner.dispose(); this.sound.dispose();
-        this.guide.dispose();
+        this.guide.dispose(); this.results.dispose();
         if(this.bindingDownloadURL)URL.revokeObjectURL(this.bindingDownloadURL);
         this.canvas.width = this.canvas.height = 1;
         this.painter = null; this.elements.clear();
