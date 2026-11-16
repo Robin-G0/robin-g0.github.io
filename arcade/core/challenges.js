@@ -2,10 +2,11 @@ const STORAGE_KEY = 'mig-arcade-challenge-v1';
 const difficulties = new Set(['gentle', 'standard']);
 
 function validate(value, catalog) {
-    if (!value || value.v !== 1 || !catalog.some(game => game.id === value.game) ||
+    const game = catalog.find(game => game.id === value?.game);
+    if (!value || value.v !== 1 || !game ||
         typeof value.name !== 'string' || !/^[A-Z0-9]{5}$/.test(value.name) || !Number.isSafeInteger(value.score) || value.score < 0 ||
-        !difficulties.has(value.difficulty)) return null;
-    return {v:1, game:value.game, name:value.name, score:value.score, difficulty:value.difficulty};
+        !difficulties.has(value.difficulty) || (value.rules ?? 1) !== (game.scoreVersion || 1)) return null;
+    return {v:1, game:value.game, name:value.name, score:value.score, difficulty:value.difficulty,rules:game.scoreVersion || 1};
 }
 
 /** Challenge data is a friendly target, never a verified score or executable game. */
@@ -22,7 +23,7 @@ export function challengeLink(address, description, record) {
     // Keep payload in the fragment: static hosting does not need to receive it.
     url.search = new URLSearchParams({theme:description.theme}).toString();
     url.hash = `arcade?${new URLSearchParams({challenge:JSON.stringify({v:1,game:description.id,
-        difficulty:description.difficulty || 'gentle',name:record.name,score:record.score})})}`;
+        difficulty:description.difficulty || 'gentle',name:record.name,score:record.score,rules:description.scoreVersion || 1})})}`;
     return url.href;
 }
 

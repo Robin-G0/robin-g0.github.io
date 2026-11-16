@@ -3,7 +3,8 @@ const MAX_GAMES = 64, MAX_ENTRIES = 5;
 const validName = name => typeof name === 'string' && /^[A-Z0-9]{5}$/.test(name);
 
 export function scoreKey(description) {
-    return `${description.engine}:${description.difficulty || 'gentle'}`;
+    const version = description.scoreVersion > 1 ? `:v${description.scoreVersion}` : '';
+    return `${description.engine}:${description.difficulty || 'gentle'}${version}`;
 }
 
 function browserStorage() {

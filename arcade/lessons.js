@@ -1,8 +1,8 @@
 // Explain actual rules, not just the two action names. Keep new engines here too.
 const instructions = {
-    invaders: ['Move the ship one step left.', 'Move the ship one step right.', 'Shots fire automatically. Line up under the descending aliens.'],
-    lander: ['Fire a short upward thrust; this uses fuel.', 'Slow your descent with the air brake.', 'Reach the pad with a descent speed below 32. Leave time between thrusts.'],
-    snake: ['Queue a left turn for the next grid step.', 'Queue a right turn for the next grid step.', 'Turns are relative to the snake. One corner is queued at a time; collect the + signs.'],
+    invaders: ['Raise L to move one lane left.', 'Raise R to move one lane right.', 'Fire is automatic. Amber ! marks an incoming shot: leave its lane. Quick kills build a chain up to x4. A clean fleet earns a wave bonus and one shield. Breaches or unshielded hits cost a life.'],
+    lander: ['Raise L for a short thrust: 6 fuel.', 'Raise R to brake a fast descent to 15: 12 fuel, 2.4 seconds to recharge.', 'Land at 32 or less. At 8 or less the landing score doubles. Unused fuel earns more points. Brake early, then use thrust for a precise touchdown. Fuel refills on the next pad. Three crashes end the run.'],
+    snake: ['Raise L to queue a relative left turn.', 'Raise R to queue a relative right turn.', 'The outlined cell shows the next step. You can replace a queued turn before the clock ticks. A quick signal earns 40, otherwise 20. Every fourth pickup adds 80 and trims two tail cells. Avoid the wall and your body; three collisions end the run.'],
     sort: ['Send the current file to Images.', 'Send the current file to Text.', 'PNG and JPG belong in Images. TXT and MD belong in Text. Watch the deadline bar.'],
     stack: ['Drop the moving window onto the stack.', 'Reverse its horizontal movement.', 'Wait until the moving window overlaps the one below. Poor overlap costs an attempt.'],
     ski: ['Move one lane left.', 'Move one lane right.', 'Choose the empty lane before the row of trees reaches the skier.'],

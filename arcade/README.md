@@ -309,3 +309,14 @@ existing Chromium/Edge executable, or install Playwright Chromium.
 Synthetic observations do not establish webcam accuracy, comfort, or smartphone
 performance. Those require a real player, camera, lighting and device. Do not
 describe the automated tests as physical-camera validation.
+
+
+## Phosphor engines
+
+`games/phosphor/` separates Invaders, Lander and Snake rules from their CRT display
+helpers and three-card SVG tutorials. Phosphor uses the two-input wrist-Up profile
+with the established raise geometry, rather than evaluating unused side actions.
+Portrait rendering and game-owned outcome feedback are explicit host settings.
+The revised games use scoreVersion 2: prior records stay stored separately, and
+old challenge links are rejected with a compatibility message. Keep versioned
+boards and links aligned when changing scoring in another engine.

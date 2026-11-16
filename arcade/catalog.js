@@ -1,15 +1,15 @@
 import { WRIST_COMMANDS, commandLabel } from './core/commands.js';
 
-function entry(theme, engine, title, goal, left, right, duration = 60) {
+function entry(theme, engine, title, goal, left, right, options = {}) {
     return Object.freeze({ id: `${theme}-${engine}`, theme, engine, title, goal,
         controls: engine === 'popups' ? Object.fromEntries(WRIST_COMMANDS.map(action => [action, commandLabel(action)])) : { left, right },
-        inputScheme: engine === 'popups' ? 'wrist-directions' : 'wrist-up', duration, difficulty: 'gentle' });
+        inputScheme: engine === 'popups' ? 'wrist-directions' : 'wrist-up', duration:60, difficulty: 'gentle', ...options });
 }
 
 export const games = Object.freeze([
-    entry('phosphor', 'invaders', 'Terminal Invaders', 'Clear the fleet before it reaches your ship.', 'Move left', 'Move right'),
-    entry('phosphor', 'lander', 'Lunar Lander', 'Land softly on the illuminated pad.', 'Thrust', 'Air brake'),
-    entry('phosphor', 'snake', 'ASCII Snake', 'Collect the signals without crossing your trail.', 'Turn left', 'Turn right'),
+    entry('phosphor', 'invaders', 'Terminal Invaders', 'Line up. Dodge warned shots. Clear the next fleet.', 'Move left', 'Move right', {scoreVersion:2}),
+    entry('phosphor', 'lander', 'Lunar Lander', 'Save fuel. Brake early. Touch down gently.', 'Thrust', 'Retro brake', {scoreVersion:2}),
+    entry('phosphor', 'snake', 'ASCII Snake', 'Route the signal. Queue a corner. Collect the next cache.', 'Turn left', 'Turn right', {scoreVersion:2}),
     entry('desktop95', 'sort', 'Folder Sort', 'Send each file to the matching folder.', 'Left folder', 'Right folder'),
     entry('desktop95', 'stack', 'Window Stack', 'Place each moving window on the stack.', 'Place window', 'Reverse slide'),
     entry('desktop95', 'ski', 'Ski Run', 'Pass the gates and avoid the trees.', 'Left lane', 'Right lane'),

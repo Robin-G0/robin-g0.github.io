@@ -1,11 +1,11 @@
-import { games, gamesForTheme } from './catalog.js?v=arcade-28';
-import { engines } from './registry.js?v=arcade-28';
+import { games, gamesForTheme } from './catalog.js?v=phosphor-31';
+import { engines } from './registry.js?v=phosphor-31';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { localBindings } from './mig/bindings.js?v=bindings-29';
-import { GameRoom } from './room.js?v=challenge-30';
+import { GameRoom } from './room.js?v=phosphor-31';
 
-import {ChallengeStore, readChallenge} from './core/challenges.js?v=challenge-30';
+import {ChallengeStore, readChallenge} from './core/challenges.js?v=phosphor-31';
 
 const challenges = new ChallengeStore(games);
 const root = document.documentElement;
@@ -110,6 +110,7 @@ function receiveChallenge() {
     if (!new URLSearchParams(location.hash.split('?')[1]).has('challenge')) return;
     challenges.set(readChallenge(location.href,games));
     const description = challenges.description();
+    document.querySelector('#arcade-challenge-note').hidden = Boolean(description);
     if (description) {
         root.dataset.theme = description.theme;
         document.querySelector('#arcade').scrollIntoView({block:'start'});
@@ -126,6 +127,7 @@ document.querySelector('#arcade-play-challenge').addEventListener('click',event=
 });
 document.querySelector('#arcade-dismiss-challenge').addEventListener('click',()=>{
     challenges.set(null);showChallenge();
+    document.querySelector('#arcade-challenge-note').hidden = true;
     if (new URLSearchParams(location.hash.split('?')[1]).has('challenge')) history.replaceState(null,'',`${location.pathname}${location.search}#arcade`);
 });
 window.addEventListener('hashchange',receiveChallenge);

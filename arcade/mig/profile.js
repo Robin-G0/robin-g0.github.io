@@ -47,6 +47,8 @@ function profile(zones) {
 
 export const arcadeProfile = profile(wristZones);
 export const popupProfile = profile(popupZones);
+// Keep the established raise geometry, evaluating only the two used commands.
+export const wristRaiseProfile = {...arcadeProfile,inputs:arcadeProfile.inputs.filter(input=>input.action.endsWith('_up'))};
 
 // Maze and Juggler use wrist raises only. Move the lower edge from Y=4 to Y=3
 // without changing other games or evaluating unused horizontal commands.

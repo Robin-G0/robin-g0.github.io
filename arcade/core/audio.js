@@ -29,7 +29,8 @@ export class ArcadeAudio {
     play({ kind = 'input', count = 1, chain = 1, perfect = false, action = 'left' } = {}) {
         if (!this.enabled || this.disposed || this.context?.state !== 'running') return;
         const [type, base] = this.profile;
-        const outcomeNotes = { bounce: perfect ? [0, 7, 12] : [action === 'left' ? 0 : 7],
+        const outcomeNotes = { thrust: [-12,-7], brake: [7,0,-5], turn:[action==='left'?0:7],
+            bounce: perfect ? [0, 7, 12] : [action === 'left' ? 0 : 7],
             powerup: [0, 4, 7, 12], rescue: [7, 0, 7], miss: [0, -5, -12] };
         const notes = outcomeNotes[kind] || (kind === 'clear'
             ? [0, 4, 7, 12].slice(0, perfect ? 4 : Math.min(3, 1 + Math.floor(count / 2)))

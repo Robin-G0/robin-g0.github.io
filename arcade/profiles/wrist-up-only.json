@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "tracking": {
+    "hands": false
+  },
+  "inputs": [
+    {
+      "id": "left_up",
+      "name": "left wrist up",
+      "action": "left_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "left_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "left_up_hold",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                13
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "left_up_zone",
+              "landmark": "left_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                13
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "right_up",
+      "name": "right wrist up",
+      "action": "right_up",
+      "mirror": false,
+      "space": "body",
+      "cooldown_ms": 0,
+      "action_mode": "single_press",
+      "steps": [
+        {
+          "id": "right_up_settle",
+          "mode": "simultaneous",
+          "hold_ms": 120,
+          "constraints": [
+            {
+              "id": "right_up_hold",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                13
+              ],
+              "type": "required",
+              "priority": "high"
+            },
+            {
+              "id": "right_up_zone",
+              "landmark": "right_wrist",
+              "cell": [
+                -9,
+                -9,
+                27,
+                13
+              ],
+              "type": "trigger",
+              "priority": "high"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

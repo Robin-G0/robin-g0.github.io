@@ -1,19 +1,19 @@
-import { engines } from './registry.js?v=arcade-28';
+import { engines } from './registry.js?v=phosphor-31';
 import { GameRunner } from './core/runner.js?v=arcade-28';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=bindings-29';
-import { ArcadeAudio } from './core/audio.js?v=arcade-28';
+import { ArcadeAudio } from './core/audio.js?v=phosphor-31';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=arcade-28';
+import { lessonFor } from './lessons.js?v=phosphor-31';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
 import { FrameBudget } from './core/frame-budget.js';
-import { gameConfig } from './core/game-config.js?v=challenge-30';
-import { ArcadeResults } from './core/results.js?v=challenge-30';
-import { localScores } from './core/scores.js?v=bindings-29';
-import { GameGuide, wavingHand } from './core/guide.js?v=bindings-29';
+import { gameConfig } from './core/game-config.js?v=phosphor-31';
+import { ArcadeResults } from './core/results.js?v=phosphor-31';
+import { localScores } from './core/scores.js?v=phosphor-31';
+import { GameGuide, wavingHand } from './core/guide.js?v=phosphor-31';
 import { seededRandom } from './core/random.js';
 import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=bindings-29';
 
@@ -39,6 +39,7 @@ export class GameRoom {
         this.$('#arcade-tutorial').removeAttribute('aria-labelledby');
         this.$('#arcade-tutorial').setAttribute('aria-label', 'Start game');
         const config = gameConfig(description);
+        this.gameConfig = config;
         this.sixDirections = config.directional;
         this.defaultProfile = config.profile;
         this.bindingPlan = compileBindings(description,this.defaultProfile,localBindings.profile,localBindings.assignments(description));
@@ -216,7 +217,7 @@ export class GameRoom {
         const box = this.canvas.parentElement.getBoundingClientRect();
         // The rising-stack board grows vertically on narrow screens; UI text and
         // arrows keep their proportions instead of stretching a landscape image.
-        const height = ['popups', 'maze', 'juggle'].includes(this.description.engine) && box.width
+        const height = this.gameConfig.portraitBoard && box.width
             ? Math.max(420, Math.round(720 * box.height / box.width)) : 420;
         if (this.canvas.height !== height * 2) {
             this.canvas.height = height * 2;
@@ -488,11 +489,11 @@ export class GameRoom {
             this.recognisedUntil = performance.now() + 1800;
             this.$('#arcade-recognition').textContent = this.bindingPlan.mapped ?
                 `${this.bindingPlan.labels[action]} → ${controlLabels(this.description)[action]}` : decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
-            if (!['popups', 'maze', 'juggle'].includes(this.description.engine)) this.sound.play({ action });
+            if (!this.gameConfig.outcomeFeedback && !['popups', 'maze', 'juggle'].includes(this.description.engine)) this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
             if (points > 0) this.messageUntil = 0; // The target callout already shows the result.
-            this.$('#arcade-playfield-input').textContent = this.description.engine === 'juggle' ? '' : `${label}${points > 0 ? ` +${points}` : ''}`;
+            this.$('#arcade-playfield-input').textContent = this.gameConfig.outcomeFeedback || this.description.engine === 'juggle' ? '' : `${label}${points > 0 ? ` +${points}` : ''}`;
             this.$('#arcade-playfield-input').dataset.action = action;
         } else if (kind === 'duplicate') this.message('Recognised. Lower your wrist before the next lift.');
         else if (kind === 'late') this.message('That input arrived too late. Try the next one.');
@@ -645,7 +646,7 @@ export class GameRoom {
             this.dialog.dataset.mazeStage = this.runner.game.state.stage;
             this.dialog.dataset.mazeLevel = this.runner.game.state.level;
         }
-        this.$('#arcade-playfield-input').hidden = this.description.engine === 'juggle' || timestamp > (this.recognisedUntil || 0);
+        this.$('#arcade-playfield-input').hidden = this.gameConfig.outcomeFeedback || this.description.engine === 'juggle' || timestamp > (this.recognisedUntil || 0);
         this.$('#arcade-playfield-message').hidden = timestamp > (this.messageUntil || 0);
         if (timestamp > (this.nextHUD || 0)) { this.runner.publish(); this.nextHUD = timestamp + 150; }
         if (timestamp > (this.pulseUntil || 0)) {

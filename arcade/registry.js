@@ -1,4 +1,4 @@
-import * as phosphor from './games/phosphor.js?v=tutorial-3';
+import * as phosphor from './games/phosphor.js?v=phosphor-31';
 import * as desktop from './games/desktop95.js?v=tutorial-3';
 import * as web from './games/construction.js?v=arcade-28';
 import * as matrix from './games/matrix.js?v=tutorial-3';
