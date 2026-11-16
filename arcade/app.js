@@ -1,9 +1,9 @@
-import { games, gamesForTheme } from './catalog.js?v=survival-17';
-import { engines } from './registry.js?v=ready-21';
+import { games, gamesForTheme } from './catalog.js?v=juggler-26';
+import { engines } from './registry.js?v=juggler-26';
 import { seededRandom } from './core/random.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=pressure-19';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=juggler-26';
 import { parseGameFile } from './core/import-game.js';
-import { GameRoom } from './room.js?v=targets-25';
+import { GameRoom } from './room.js?v=juggler-26';
 
 const root = document.documentElement;
 const list = document.querySelector('#arcade-games');

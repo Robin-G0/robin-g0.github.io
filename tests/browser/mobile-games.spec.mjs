@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-for (const engine of ['maze', 'popups']) {
+for (const engine of ['maze', 'popups', 'juggle']) {
     test(`${engine}: phone touch targets, board and camera stay usable through rotation`, async ({ page }) => {
         await page.clock.install();
         await page.route('https://raw.githubusercontent.com/**', r => r.abort());

@@ -1,13 +1,13 @@
-import { engines } from './registry.js?v=ready-21';
+import { engines } from './registry.js?v=juggler-26';
 import { GameRunner } from './core/runner.js?v=ready-21';
 import { bindAlternativeControls } from './core/input.js?v=power-11';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=pressure-19';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=juggler-26';
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=targets-25';
 import { arcadeProfile, popupProfile, constructionLiftProfile } from './mig/profile.js?v=targets-25';
-import { ArcadeAudio } from './core/audio.js';
+import { ArcadeAudio } from './core/audio.js?v=juggler-26';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=ready-21';
+import { lessonFor } from './lessons.js?v=juggler-26';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=targets-25';
 import { FrameBudget } from './core/frame-budget.js';
@@ -148,7 +148,7 @@ export class GameRoom {
                 const button = document.createElement('button'); button.type = 'button'; button.className = 'arcade-action';
                 button.dataset.arcadeInput = wrist;
                 const arrow = document.createElement('span'); arrow.className = 'action-key';
-                arrow.textContent = this.description.engine === 'maze' ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
+                arrow.textContent = ['maze', 'juggle'].includes(this.description.engine) ? (wrist === 'left' ? 'L' : 'R') : ARROWS[wrist];
                 const label = document.createElement('span'); label.className = 'action-name'; label.textContent = this.description.controls[wrist];
                 button.append(arrow, label); area.append(button);
             }
@@ -160,7 +160,7 @@ export class GameRoom {
         const box = this.canvas.parentElement.getBoundingClientRect();
         // The rising-stack board grows vertically on narrow screens; UI text and
         // arrows keep their proportions instead of stretching a landscape image.
-        const height = ['popups', 'maze'].includes(this.description.engine) && box.width
+        const height = ['popups', 'maze', 'juggle'].includes(this.description.engine) && box.width
             ? Math.max(420, Math.round(720 * box.height / box.width)) : 420;
         if (this.canvas.height !== height * 2) {
             this.canvas.height = height * 2;
@@ -292,11 +292,11 @@ export class GameRoom {
             this.pulseUntil = performance.now() + 180;
             this.recognisedUntil = performance.now() + 1800;
             this.$('#arcade-recognition').textContent = decodeGesture(action) ? commandLabel(action) : `${action === 'left' ? 'L' : 'R'} ↑`;
-            if (!['popups', 'maze'].includes(this.description.engine)) this.sound.play({ action });
+            if (!['popups', 'maze', 'juggle'].includes(this.description.engine)) this.sound.play({ action });
             const game = this.runner.game;
             const points = game.state.inputFeedback?.points || 0;
             if (points > 0) this.messageUntil = 0; // The target callout already shows the result.
-            this.$('#arcade-playfield-input').textContent = `${label}${points > 0 ? ` +${points}` : ''}`;
+            this.$('#arcade-playfield-input').textContent = this.description.engine === 'juggle' ? '' : `${label}${points > 0 ? ` +${points}` : ''}`;
             this.$('#arcade-playfield-input').dataset.action = action;
         } else if (kind === 'duplicate') this.message('Recognised. Lower your wrist before the next lift.');
         else if (kind === 'late') this.message('That input arrived too late. Try the next one.');
@@ -449,7 +449,7 @@ export class GameRoom {
             this.dialog.dataset.mazeStage = this.runner.game.state.stage;
             this.dialog.dataset.mazeLevel = this.runner.game.state.level;
         }
-        this.$('#arcade-playfield-input').hidden = timestamp > (this.recognisedUntil || 0);
+        this.$('#arcade-playfield-input').hidden = this.description.engine === 'juggle' || timestamp > (this.recognisedUntil || 0);
         this.$('#arcade-playfield-message').hidden = timestamp > (this.messageUntil || 0);
         if (timestamp > (this.nextHUD || 0)) { this.runner.publish(); this.nextHUD = timestamp + 150; }
         if (timestamp > (this.pulseUntil || 0)) {

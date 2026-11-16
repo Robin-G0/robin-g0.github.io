@@ -262,24 +262,24 @@
 @media (max-width: 480px) { [data-engine=popups] .arcade-inputs { grid-template-columns: 1fr; } }
 /* Keep the whole board and touch inputs together on phones; camera stays below. */
 @media (max-width: 640px) {
-    :is([data-engine=maze], [data-engine=popups]) .arcade-room-header { padding: 10px 8px; gap: 8px; align-items: center; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-room-header .eyebrow { display: none; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-room-header h2 { font-size: 22px; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-controls-trigger { font-size: 16px; padding: 8px; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-hud { padding: 6px 10px; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-hud dd { font-size: 28px; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-room-header { padding: 10px 8px; gap: 8px; align-items: center; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-room-header .eyebrow { display: none; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-room-header h2 { font-size: 22px; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-controls-trigger { font-size: 16px; padding: 8px; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-hud { padding: 6px 10px; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-hud dd { font-size: 28px; }
     [data-engine=maze] .arcade-stage { height: clamp(340px, calc(100dvh - 290px), 500px); min-height: 340px; }
-    [data-engine=popups] .arcade-stage { height: clamp(280px, calc(100dvh - 290px), 440px); min-height: 280px; max-height: none; aspect-ratio: auto; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
+    :is([data-engine=popups], [data-engine=juggle]) .arcade-stage { height: clamp(280px, calc(100dvh - 290px), 440px); min-height: 280px; max-height: none; aspect-ratio: auto; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
     [data-engine=popups] .wrist-controls { flex-direction: column; gap: 2px; }
     [data-engine=popups] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
     [data-engine=popups] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
     [data-engine=popups] .wrist-buttons { width: 100%; gap: 2px; }
     [data-engine=popups] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; }
     [data-engine=popups] .wrist-buttons kbd { display: none; }
-    [data-engine=maze] .arcade-action { padding: 6px; gap: 8px; min-height: 64px; }
-    [data-engine=maze] .arcade-action .action-name { font-size: 16px; }
-    :is([data-engine=maze], [data-engine=popups]) .arcade-toolbar { padding: 6px 8px; gap: 6px 16px; }
+    :is([data-engine=maze], [data-engine=juggle]) .arcade-action { padding: 6px; gap: 8px; min-height: 64px; }
+    :is([data-engine=maze], [data-engine=juggle]) .arcade-action .action-name { font-size: 16px; }
+    :is([data-engine=maze], [data-engine=popups], [data-engine=juggle]) .arcade-toolbar { padding: 6px 8px; gap: 6px 16px; }
     [data-engine=maze] .arcade-camera-dock { grid-template-columns: 1fr; }
     [data-engine=maze] .camera-view { grid-column: auto; grid-row: auto; }
     [data-engine=maze] .camera-details { display: block; }

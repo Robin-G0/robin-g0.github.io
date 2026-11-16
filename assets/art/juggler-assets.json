@@ -1,0 +1,16 @@
+{
+  "description": "Original pixel art inspired by 1996-2001 web GIF motifs; not historical downloads.",
+  "license": "CC0-1.0",
+  "generator": "scripts/create-juggler-art.py",
+  "era_reference": "https://www.lib.ncsu.edu/projects/hall-gifs",
+  "frames": 12,
+  "frame_ms": 120,
+  "sprites": [
+    "floppy",
+    "globe",
+    "mail",
+    "ball",
+    "slow",
+    "net"
+  ]
+}

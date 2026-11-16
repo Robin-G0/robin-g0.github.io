@@ -3,7 +3,9 @@ const photoFiles = {
     chrome: 'y2k-chrome-orbit-v1.png', fish: 'aero-fish-orange-v3.png',
     jelly: 'glass-abyss-jellyfish-v1.png', earth: 'glass-space-earth-v1.png',
     ...Object.fromEntries(['points', 'seconds', 'reveal', 'tax', 'delay', 'flip']
-        .map(effect => [`maze-${effect}`, `maze-${effect}-strip.png`]))
+        .map(effect => [`maze-${effect}`, `maze-${effect}-strip.png`])),
+    ...Object.fromEntries(['floppy', 'globe', 'mail', 'ball', 'slow', 'net']
+        .map(name => [`juggler-${name}`, `juggler-${name}-strip.png`]))
 };
 const imageCache = new Map();
 
@@ -17,7 +19,7 @@ export async function loadArtwork(theme) {
     if (typeof Image === 'undefined') return new Map();
     const needed = theme === 'aero' ? ['aero', 'fish'] : theme === 'glass' ? ['glass', 'jelly', 'earth']
         : theme === 'y2k' ? ['chrome'] : theme === 'construction'
-            ? ['points', 'seconds', 'reveal', 'tax', 'delay', 'flip'].map(effect => `maze-${effect}`) : [];
+            ? Object.keys(photoFiles).filter(name => name.startsWith('maze-') || name.startsWith('juggler-')) : [];
     await Promise.all(needed.map(async name => {
         if (imageCache.has(name)) return;
         const image = new Image();

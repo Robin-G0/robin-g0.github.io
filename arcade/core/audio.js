@@ -29,7 +29,11 @@ export class ArcadeAudio {
     play({ kind = 'input', count = 1, chain = 1, perfect = false, action = 'left' } = {}) {
         if (!this.enabled || this.disposed || this.context?.state !== 'running') return;
         const [type, base] = this.profile;
-        const notes = kind === 'clear' ? [0, 4, 7, 12].slice(0, perfect ? 4 : Math.min(3, 1 + Math.floor(count / 2))) : [action === 'left' ? 0 : 7];
+        const outcomeNotes = { bounce: perfect ? [0, 7, 12] : [action === 'left' ? 0 : 7],
+            powerup: [0, 4, 7, 12], rescue: [7, 0, 7], miss: [0, -5, -12] };
+        const notes = outcomeNotes[kind] || (kind === 'clear'
+            ? [0, 4, 7, 12].slice(0, perfect ? 4 : Math.min(3, 1 + Math.floor(count / 2)))
+            : [action === 'left' ? 0 : 7]);
         const lift = kind === 'clear' ? Math.min(12, chain - 1) : 0;
         notes.forEach((note, index) => {
             if (this.nodes.size >= 12) return;
