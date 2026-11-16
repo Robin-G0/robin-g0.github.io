@@ -22,6 +22,7 @@ export class GameRunner {
         this.elapsed = 0;
         this.phase = 'tutorial';
         this.started = false;
+        this.resultText = null;
         this.pressurePolicy = PRESSURE_RULES[this.description.engine];
         const runner = this, basePace = this.description.difficulty === 'standard' ? 1 : .8;
         this.basePace = basePace; this.currentPace = basePace;
@@ -38,6 +39,7 @@ export class GameRunner {
 
     publish() {
         this.changed({ phase: this.phase, score: Math.floor(this.game.state.score),
+            result: this.resultText,
             lives: Math.max(0, this.game.state.lives),
             elapsed: Math.floor(this.elapsed),
             clockLabel: this.roundPressure ? 'Next score' : this.game.endless ? 'Survived' : 'Time',
@@ -80,6 +82,7 @@ export class GameRunner {
 
     finish(text = 'Round complete') {
         if (this.phase !== 'playing') return;
+        this.resultText = text;
         this.phase = 'finished'; this.game.pause(); this.router.setPhase(this.phase);
         this.message(text); this.publish();
     }

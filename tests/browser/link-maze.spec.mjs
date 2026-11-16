@@ -102,6 +102,39 @@ test('hiding both wrists neither extends maze memorisation nor freezes the count
     await page.clock.runFor(3000);
     expect(parseInt(await page.locator('#arcade-time').textContent())).toBeLessThanOrEqual(before-2);
     await expect(page.locator('#arcade-paused')).not.toBeVisible();
+    await expect(page.locator('#arcade-tracking-hint')).toHaveCount(0);
+});
+
+test('round four reveals lethal traps and selecting one immediately reports a fatal loss',async({page})=>{
+    test.setTimeout(60000); // Play three complete previews before inspecting the fourth map.
+    const random=seededRandom(seed>>>0);
+    await open(page);
+    let map;
+    for(let round=1;round<=3;round++){
+        map=generateMaze(random,Math.min(3,round),round);
+        await page.clock.runFor((map.preview+.3)*1000);
+        for(const side of map.shortRoute){await page.keyboard.press(side?'ArrowRight':'ArrowLeft');await page.clock.runFor(30);}
+        await expect(page.locator('#arcade-player')).toHaveAttribute('data-maze-stage','arrival');
+        await page.clock.runFor(1400);
+    }
+    map=generateMaze(random,3,4);
+    const queue=[{id:0,path:[]}],seen=new Set();let path;
+    while(queue.length){
+        const current=queue.shift();if(seen.has(current.id))continue;seen.add(current.id);
+        if(map.nodes[current.id].effect==='fatal'){path=current.path;break;}
+        map.nodes[current.id].children.forEach((id,side)=>queue.push({id,path:[...current.path,side]}));
+    }
+    expect(path).toBeTruthy();
+    await page.clock.runFor(13000);
+    let current=0,flipped=0;
+    for(const side of path){
+        const input=flipped?1-side:side;flipped=Math.max(0,flipped-1);
+        current=map.nodes[current].children[side];
+        if(map.nodes[current].effect==='flip')flipped=3;
+        await page.keyboard.press(input?'ArrowRight':'ArrowLeft');await page.clock.runFor(30);
+    }
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
+    await expect(page.locator('#arcade-result h3')).toHaveText('Fatal trap');
 });
 
 test('original powerup art animates in the map and freezes visually for reduced motion',async({page})=>{

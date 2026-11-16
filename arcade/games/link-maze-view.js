@@ -1,5 +1,5 @@
-import { LINK_EFFECTS } from './link-maze-map.js?v=mobile-14';
-import { drawLinkEffect } from './link-maze-art.js';
+import { LINK_EFFECTS } from './link-maze-map.js?v=traps-20';
+import { drawLinkEffect } from './link-maze-art.js?v=traps-20';
 import { Painter } from '../core/painter.js?v=pressure-19';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
@@ -13,7 +13,7 @@ function mapPoint(map, node, height) {
 }
 
 function mapDrawing(s, p) {
-    const { map } = s;
+    const { map } = s, effects = map.effects || LINK_EFFECTS;
     const top = 148, bottom = p.h - 78;
     const x = node => mapPoint(map, node, p.h).x;
     const y = node => mapPoint(map, node, p.h).y;
@@ -25,14 +25,14 @@ function mapDrawing(s, p) {
         }
     }
     for (const node of map.nodes) {
-        const effect = LINK_EFFECTS[node.effect], width = 8;
+        const effect = effects[node.effect], width = 8;
         p.rect(x(node) - width / 2, y(node) - width / 2, width, width, effect.color);
         if (node.id && node.children.length) {
             const w = 56, height = p.compact ? 32 : 26;
             p.rect(x(node) - w / 2, y(node) - height / 2, w, height, navy);
             p.outline(x(node) - w / 2, y(node) - height / 2, w, height, effect.color);
-            const label = { none: '·', reveal: 'P2', flip: '↔2' }[node.effect] || effect.label;
-            p.text(label, x(node), y(node), p.compact ? 28 : 22, effect.color, 'center');
+            const label = { none: '·', reveal: 'P2' }[node.effect] || effect.label.replace(' ', '');
+            p.text(label, x(node), y(node), p.compact && label.length < 4 ? 28 : 22, effect.color, 'center');
         }
         if (!node.children.length) p.line([[x(node), y(node) - 5], [x(node), top - 28]], '#4e386d', 1);
     }
@@ -69,12 +69,13 @@ function overview(s, p, reducedMotion) {
 }
 
 function links(s, p, reducedMotion) {
+    const effects = s.map.effects || LINK_EFFECTS;
     const { h } = p, top = Math.max(132, Math.round(h * .28)), active = s.flipped > 0;
     const playerY = h - 76;
     const pulse = !reducedMotion ? Math.sin(s.time * 3) * 2 : 0;
     p.text(`/LOCAL/${String(s.completed + 1).padStart(2, '0')}/PAGE-${s.current}`, 44, 107, p.compact ? 30 : 23, '#b7a5dc');
     const recent = s.outcome && s.time - s.outcome.at < 1.6;
-    const effect = recent ? LINK_EFFECTS[s.outcome.effect] : null;
+    const effect = recent ? effects[s.outcome.effect] : null;
     if (active || s.peek) p.text(active ? `↔ ${s.flipped}` : `PEEK ${s.peek}`, 590, 107, 35, active ? '#ffbe70' : cyan, 'center');
     for (let side = 0; side < 2; side++) {
         const left = side ? 380 : 40, center = left + 150;
@@ -84,8 +85,8 @@ function links(s, p, reducedMotion) {
             : [[360, playerY - 43], [center, top + 110]];
         p.line(wire, active ? '#ffbe70' : '#4e386d', 3);
         const next = s.map.nodes[s.map.nodes[s.current].children[active ? 1 - side : side]];
-        const content = s.peek ? LINK_EFFECTS[next.effect] : null;
-        const flashColor = selected ? LINK_EFFECTS[s.flash.effect].color : cyan;
+        const content = s.peek ? effects[next.effect] : null;
+        const flashColor = selected ? effects[s.flash.effect].color : cyan;
         p.rect(left, top, 300, 110, selected ? flashColor : '#241747');
         p.outline(left, top, 300, 110, selected ? ink : active ? '#ffbe70' : cyan, selected ? 5 : 2);
         p.text(wrist(side), center, top + 33, 60, selected ? navy : cyan, 'center');
@@ -94,10 +95,10 @@ function links(s, p, reducedMotion) {
     }
     p.rect(306, playerY - 43 + pulse, 108, 86, '#241747');
     p.outline(306, playerY - 43 + pulse, 108, 86, cyan, 3);
-    const illustrated = effect && effect !== LINK_EFFECTS.none &&
+    const illustrated = effect && s.outcome.effect !== 'none' &&
         drawLinkEffect(p, s.outcome.effect, 360, playerY + pulse, 82, s.time, reducedMotion);
     if (!illustrated) p.text('@', 360, playerY + pulse, 60, cyan, 'center');
-    if (effect && effect !== LINK_EFFECTS.none) {
+    if (effect && s.outcome.effect !== 'none') {
         p.rect(245, playerY - 105, 230, 58, navy);
         p.text(effect.label, 360, playerY - 76, p.compact ? 54 : 43, effect.color, 'center');
     }
@@ -108,7 +109,7 @@ function links(s, p, reducedMotion) {
 export function renderMaze(s, p, reducedMotion = false) {
     p.rect(14, 64, 692, p.h - 72, navy); p.outline(14, 64, 692, p.h - 72, '#634491', 2);
     p.rect(16, 66, 688, 22, '#342258');
-    p.text(`LINK MAZE   /   LEVEL ${s.level}`, 32, 77, 16, '#b7a5dc');
+    p.text(`LINK MAZE   /   ROUND ${s.map.round || s.completed + 1}`, 32, 77, p.compact ? 26 : 18, '#b7a5dc');
     if (s.stage === 'preview') {
         p.text(`MEMORISE  ${Math.max(0, Math.ceil(s.until - s.time))}`, 360, 34, p.compact ? 48 : 35, yellow, 'center');
         overview(s, p, reducedMotion);
@@ -117,7 +118,7 @@ export function renderMaze(s, p, reducedMotion = false) {
         p.text('+8s', 360, p.h * .54, 70, cyan, 'center');
         p.text(`+${s.outcome.points}`, 360, p.h * .7, 42, ink, 'center');
     } else if (s.stage === 'over') {
-        p.text('TIME UP', 360, p.h * .5, 60, yellow, 'center');
+        p.text(s.reason === 'fatal' ? 'TRAP!' : 'TIME UP', 360, p.h * .5, 60, yellow, 'center');
     } else {
         p.text('FIND THE HOMEPAGE', 360, 34, p.compact ? 42 : 30, yellow, 'center');
         links(s, p, reducedMotion);

@@ -38,6 +38,63 @@ test('time-seeded mazes get deeper with bounded width and every route reaches th
     assert.notDeepEqual(generateMaze(seededRandom(1700000000),2),generateMaze(seededRandom(1700000001),2));
 });
 
+test('both maze halves mix plain, bonus and penalty pages while a clean route always exists',()=>{
+    const harmful=new Set(['tax','delay','flip','fatal']),bonus=new Set(['points','seconds','reveal']);
+    for(let seed=0;seed<250;seed++)for(const round of [1,2,3,4,7,10]){
+        const map=generateMaze(seededRandom(seed),Math.min(3,round),round);
+        const halves=[true,false].map(left=>map.nodes.filter(n=>n.id&&n.children.length&&(n.x<.5)===left));
+        for(const cells of halves){
+            assert.ok(cells.some(n=>n.effect==='none'),'Both sides contain ordinary pages');
+            assert.ok(cells.some(n=>bonus.has(n.effect)),'Bonuses never all sit on one side');
+            assert.ok(cells.some(n=>harmful.has(n.effect)),'Penalties never all sit on one side');
+            assert.ok(cells.filter(n=>n.effect==='none').length/cells.length>=.3);
+        }
+        const rate=(cells,set)=>cells.filter(n=>set.has(n.effect)).length/cells.length;
+        assert.ok(Math.abs(rate(halves[0],bonus)-rate(halves[1],bonus))<.12);
+        assert.ok(Math.abs(rate(halves[0],harmful)-rate(halves[1],harmful))<.12);
+        assert.ok(map.route.every(id=>!harmful.has(map.nodes[id].effect)));
+        // Find a clean route independently of the generator's solution metadata.
+        const memo=new Map();
+        function clean(id){
+            if(memo.has(id))return memo.get(id);
+            const n=map.nodes[id],ok=!harmful.has(n.effect)&&(!n.children.length||n.children.some(clean));
+            memo.set(id,ok);return ok;
+        }
+        assert.equal(clean(0),true);
+        assert.equal(map.nodes.some(n=>n.effect==='fatal'),round>3);
+        assert.ok(map.nodes.some(n=>n.effect==='none'&&n.id&&!map.route.includes(n.id)&&n.children.length),'Plain pages are not just a marked safe path');
+    }
+});
+
+test('later rounds apply the harsher penalty values printed in their map',()=>{
+    for(const [round,tax,delay,flip] of [[1,25,5,2],[4,100,11,3],[8,200,19,5]]){
+        for(const effect of ['tax','delay','flip']){
+            const {g}=create(),s=g.state;s.completed=round-1;s.stage='navigate';s.score=1000;s.remaining=40;
+            s.map=generateMaze(seededRandom(8),Math.min(3,round),round);
+            nextEffect(g,effect);g.input({action:'left'});
+            if(effect==='tax')assert.equal(s.score,1000-tax);
+            if(effect==='delay')assert.equal(s.remaining,40-delay);
+            if(effect==='flip')assert.equal(s.flipped,flip);
+            assert.equal(s.map.effects.tax.label,`\u2212${tax}`);
+            assert.equal(s.map.effects.delay.label,`\u2212${delay}s`);
+            assert.equal(s.map.effects.flip.label,`\u2194 ${flip}`);
+        }
+    }
+});
+
+test('round four spawns lethal traps and stepping on one immediately ends the run',()=>{
+    const run=create(),g=run.g,s=g.state;
+    for(let round=1;round<=3;round++){
+        assert.equal(s.map.nodes.some(n=>n.effect==='fatal'),false);
+        advance(g,s.map.preview+.05);
+        for(const side of s.map.shortRoute)g.input({action:side?'right':'left'});
+        advance(g,1.4);
+    }
+    assert.equal(s.map.round,4);assert.ok(s.map.nodes.some(n=>n.effect==='fatal'));
+    s.stage='navigate';s.remaining=90;nextEffect(g,'fatal');g.input({action:'left'});
+    assert.equal(run.finished,true);assert.equal(s.stage,'over');assert.equal(s.reason,'fatal');assert.equal(s.remaining,0);
+});
+
 test('preview reveals before navigation and costs no time; inputs cannot skip it',()=>{
     const {g}=create(),s=g.state;
     g.input({action:'left'});assert.equal(s.current,0);

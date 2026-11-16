@@ -7,7 +7,7 @@ const instructions = {
     stack: ['Drop the moving window onto the stack.', 'Reverse its horizontal movement.', 'Wait until the moving window overlaps the one below. Poor overlap costs an attempt.'],
     ski: ['Move one lane left.', 'Move one lane right.', 'Choose the empty lane before the row of trees reaches the skier.'],
     popups: ['Left wrist clears the left stack.', 'Right wrist clears the right stack.', 'Match the arrow. Move into an arrow box. Hold briefly, then move on; no home return. Bigger groups score more. Empty moves cost nothing.'],
-    maze: ['Raise your left wrist for L.', 'Raise your right wrist for R.', 'Choose and memorise a route before the map hides. Every link reaches home. Home adds 8 seconds. Green = bonus; pink = penalty. PEEK reveals two choices; orange swaps two choices. Preview time is free.'],
+    maze: ['Raise your left wrist for L.', 'Raise your right wrist for R.', 'Memorise a route. Plain pages are safe. Penalties grow each round; DIE ends the run from round 4. A penalty-free route always exists. Home adds 8 seconds. PEEK shows two choices; orange swaps them. Preview time is free.'],
     juggle: ['Bounce the falling GIF in the left lane.', 'Bounce the falling GIF in the right lane.', 'Lift when a GIF is coming down through the lower half, before it reaches the yellow platform.'],
     parry: ['Raise the left guard briefly.', 'Raise the right guard briefly.', 'Watch which side the attack comes from. Raise that guard near impact, not when the attack first appears.'],
     binary: ['Rotate the current row one position.', 'Change its first bit between 0 and 1.', 'Make CURRENT match TARGET. Rotating lets you bring any bit into the first position.'],

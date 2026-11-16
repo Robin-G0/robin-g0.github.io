@@ -172,6 +172,10 @@ local random stream. Forward-only branches can rejoin shared pages, with at most
 six pages per row. This bounds rendering and keeps deeper maps readable on phones.
 Every branch terminates; shortcuts and longer routes have different costs.
 Maps grow to 8, 10 and 12 rows, then retain the third level's size bounds.
+Each half of the map gets approximately 25% bonus pages, 30% penalty pages and
+45% ordinary pages. Positions and effect types are shuffled independently of
+creation order. The protected route cannot receive penalties, but is no longer
+filled with bonuses; the renderer never styles or prints that route specially.
 
 The full map grows upward from START at the bottom to END at the top. Screen-left
 and screen-right keep their horizontal meaning in both preview and navigation.
@@ -189,6 +193,12 @@ Python and Pillow: scripts/create-link-maze-art.py.
 A run starts with 45 seconds. Home adds 8 seconds and points, then generates a
 new map. Pages can add 40 points or 5 seconds, reveal destinations for two
 choices, subtract 25 points or 5 seconds, or swap the next two destinations.
+Those are first-round penalties. Each later round adds 25 points to the tax,
+2 seconds to the time penalty (capped at 20), and another swapped choice every
+two rounds (capped at six). Preview and PEEK labels use the same round values.
+From round 4, both halves can contain clearly marked DIE pages that end the run
+immediately; their red pixel-skull cue is drawn locally. A fully penalty-free
+path remains available in every map, including later rounds.
 A peek displays the destinations actually selected by the current swap state.
 The bank caps at 90 seconds and score floors at zero; time exhaustion ends play.
 

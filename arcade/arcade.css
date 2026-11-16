@@ -224,7 +224,6 @@
 .camera-details .camera-positioning { font-size: 18px; }
 .camera-heading .button, .arcade-camera-dock button:not(.button) { font-size: 18px; }
 #arcade-recognition, #arcade-countdown { font-size: 32px; }
-.arcade-tracking-hint { position: absolute; top: 10px; left: 12px; z-index: 2; margin: 0; padding: 8px 12px; font-size: 22px; background: var(--bg); color: var(--ink); border: 1px solid var(--border); pointer-events: none; }
 [data-engine=popups] #arcade-playfield-input, [data-engine=popups] #arcade-playfield-message { display: none !important; }
 [data-engine=maze] #arcade-playfield-input, [data-engine=maze] #arcade-playfield-message { display: none !important; }
 [data-engine=maze] .arcade-hud > div:last-child { display: none; }
