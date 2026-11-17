@@ -1,4 +1,5 @@
 import { integer } from '../core/random.js';
+import { createFilenameGenerator } from './folder-sort-names.js';
 
 // Every filename is fictional. Classification follows the extension, not the joke.
 export const FILE_TYPES = {
@@ -49,6 +50,7 @@ function shuffle(values, random) {
 /** Balanced categories and independent extension bags prevent long one-sided runs. */
 export function createFileDeck(random) {
     let level = -1, categories = [], bags = {};
+    const filename = createFilenameGenerator(random);
     return sorted => {
         const next = fileStage(sorted);
         if (next !== level) { level = next; categories = []; bags = {}; }
@@ -58,8 +60,8 @@ export function createFileDeck(random) {
             const types = stages.slice(0, level + 1).flatMap(stage => stage.types);
             bags[category] = shuffle(types.filter(type => FILE_TYPES[type].category === category), random);
         }
-        const extension = bags[category].pop(), names = FILE_TYPES[extension].names;
-        return `${names[integer(random, 0, names.length - 1)]}.${extension}`;
+        const extension = bags[category].pop();
+        return filename(extension, FILE_TYPES[extension]);
     };
 }
 

@@ -4,6 +4,7 @@ import {sort,stack,ski} from '../arcade/games/desktop95.js';
 import {seededRandom} from '../arcade/core/random.js';
 import {createFileDeck,fileType,knowledge} from '../arcade/games/folder-sort-files.js';
 import {GameRunner} from '../arcade/core/runner.js';
+import {generatedNameCount,NAME_HISTORY_SIZE} from '../arcade/games/folder-sort-names.js';
 const setup=factory=>{const e={random:seededRandom(32),pace:1,message(){},finished:false,finish(text){e.finished=true;e.result=text;}};return {e,g:factory(e)};};
 test('folder sort previews files, rewards a real series, and ignores receipt-time duplicate inputs',()=>{
     const {g}=setup(sort);g.state.lives=2;
@@ -58,6 +59,27 @@ test('file types unlock progressively and each deck balances media against text'
         const seen=new Set(Array.from({length:200},()=>draw(milestone).split('.').at(-1)));
         formats.forEach(ext=>assert.ok(seen.has(ext),`${ext} unlocked after ${milestone}`));
     }
+});
+
+test('filenames use a large deterministic vocabulary without repeating stems across recent files or unlocks',()=>{
+    assert.ok(generatedNameCount>10000);
+    for(const seed of [1,32,400]){
+        const draw=createFileDeck(seededRandom(seed)),replay=createFileDeck(seededRandom(seed)),history=[];
+        for(let i=0;i<1500;i++){
+            const sorted=i<300?0:Math.floor((i-300)/3),file=draw(sorted),stem=file.slice(0,file.lastIndexOf('.'));
+            assert.equal(file,replay(sorted));assert.ok(fileType(file));
+            assert.ok(!history.includes(stem),`Repeated ${stem} within ${NAME_HISTORY_SIZE} draws`);
+            history.push(stem);if(history.length>NAME_HISTORY_SIZE)history.shift();
+        }
+    }
+});
+
+test('folder categories describe their contents rather than teaching PNG and TXT as the only formats',()=>{
+    const {g}=setup(sort),labels=[];
+    const painter=new Proxy({compact:false,h:420,text(value){labels.push(String(value));}},{get:(p,key)=>p[key]??(()=>{})});
+    g.render(painter);
+    assert.ok(labels.includes('(pictures, video, sound)'));assert.ok(labels.includes('(message, code, text)'));
+    assert.ok(!labels.includes('PNG'));assert.ok(!labels.includes('TXT'));
 });
 
 test('sort keeps the first five files simple, grows its multiplier and resets only the chain on a mistake',()=>{

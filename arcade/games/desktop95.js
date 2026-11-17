@@ -1,7 +1,7 @@
 import { game, reward } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
-import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-4';
-import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js';
+import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-5';
+import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=desktop95-5';
 
 // A lost third heart is a game over, not a completed round.
 function loseHeart(state,env,message) {
@@ -39,7 +39,8 @@ export function sort(env) {
             window95(p,'Folder Sort \u2014 C:\\Inbox',`${s.sorted} copied / chain ${s.streak}`,s.score,s.lives);
             p.rect(24,compact?81:72,672,p.h-(compact?162:153),C.light);
             p.text('MEDIA',160,compact?108:96,compact?30:18,C.blue,'center');p.text('TEXT',560,compact?108:96,compact?30:18,C.blue,'center');
-            if(!s.sorted){p.text('PNG',160,compact?148:122,compact?27:14,C.shadow,'center');p.text('TXT',560,compact?148:122,compact?27:14,C.shadow,'center');}
+            p.text('(pictures, video, sound)',160,compact?145:121,compact?20:13,C.dark,'center');
+            p.text('(message, code, text)',560,compact?145:121,compact?20:13,C.dark,'center');
             folder(p,160,folderY,'L / Media',receipt?.side==='left',compact?1.35:1);
             folder(p,560,folderY,'R / Text',receipt?.side==='right',compact?1.35:1);
             fileIcon(p,360,compact?160:110,type.icon,compact?1.5:1.05);

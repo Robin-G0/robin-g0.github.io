@@ -1,4 +1,4 @@
-import { engines } from './registry.js?v=desktop95-4';
+import { engines } from './registry.js?v=desktop95-5';
 import { GameRunner } from './core/runner.js?v=arcade-28';
 import { bindAlternativeControls } from './core/input.js?v=phosphor-33';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
@@ -6,14 +6,14 @@ import { Painter, readPalette, loadArtwork, loadTypography } from './core/painte
 import { MotionCamera, visiblePoint } from './mig/camera.js?v=phosphor-33';
 import { ArcadeAudio } from './core/audio.js?v=phosphor-33';
 import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=desktop95-4';
+import { lessonFor } from './lessons.js?v=desktop95-5';
 import { MarkerMotion } from './mig/marker-motion.js';
 import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
 import { FrameBudget } from './core/frame-budget.js';
-import { gameConfig } from './core/game-config.js?v=desktop95-4';
+import { gameConfig } from './core/game-config.js?v=desktop95-5';
 import { ArcadeResults } from './core/results.js?v=phosphor-33';
 import { localScores } from './core/scores.js?v=phosphor-33';
-import { GameGuide, greetingHand } from './core/guide.js?v=desktop95-4';
+import { GameGuide, greetingHand } from './core/guide.js?v=desktop95-5';
 import { seededRandom } from './core/random.js';
 import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=phosphor-33';
 

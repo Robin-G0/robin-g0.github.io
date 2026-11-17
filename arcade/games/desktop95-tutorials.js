@@ -5,7 +5,7 @@ const window=(x,y,width=120)=>`<rect x="${x}" y="${y}" width="${width}" height="
 
 export const desktop95Diagrams={
     sort:[
-        frame(folder(90,55)+folder(310,55)+text('L \u2191',90,129,35)+text('R \u2191',310,129,35)+text('MEDIA',90,169,25)+text('TEXT',310,169,25)),
+        frame(folder(90,45)+folder(310,45)+text('L \u2191',90,113,35)+text('R \u2191',310,113,35)+text('MEDIA',90,147,25)+text('TEXT',310,147,25)+text('(pictures, video, sound)',90,174,13)+text('(message, code, text)',310,174,13)),
         frame(text('PNG',65,44,30)+text('TXT',200,44,30)+text('JPG',335,44,30)+folder(110,106)+folder(290,106)+'<path d="M65 58l45 27M200 58l90 27M335 58L110 85"/>'),
         frame(text('KNOWLEDGE',200,32,29)+'<rect x="45" y="54" width="310" height="25" style="fill:#c0c0c0;stroke:#808080"/><path style="stroke:#000080;stroke-width:17;stroke-dasharray:10 3" d="M50 66h205"/>'+text('USER > HACKER',200,110,27)+text('CHAIN = x2 ... x8',200,152,30))
     ],
