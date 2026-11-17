@@ -48,21 +48,20 @@ function shuffled(values, random) {
 export function createFilenameGenerator(random) {
     const bags = new Map(), recent = new Set(), history = [];
 
-    function generated(kind) {
-        let bag = bags.get(kind);
+    function nextName(extension, type) {
+        let bag = bags.get(extension);
         if (!bag?.length) {
-            bag = shuffled(subjects[kind].flatMap(subject => adjectives.map(adjective => `${adjective}_${subject}`)), random);
-            bags.set(kind, bag);
+            const combinations = subjects[type.icon].flatMap(subject => adjectives.map(adjective => `${adjective}_${subject}`));
+            // References get exactly one entry, just like every generated name.
+            bag = shuffled([...new Set([...combinations, ...type.names])], random);
+            bags.set(extension, bag);
         }
         return bag.pop();
     }
 
     return (extension, type) => {
-        // Familiar jokes remain occasional easter eggs, rather than the entire vocabulary.
-        const specials = type.names.filter(name => !recent.has(name));
-        let name = specials.length && random() < .15
-            ? specials[integer(random, 0, specials.length - 1)] : generated(type.icon);
-        while (recent.has(name)) name = generated(type.icon);
+        let name = nextName(extension, type);
+        while (recent.has(name)) name = nextName(extension, type);
         recent.add(name); history.push(name);
         if (history.length > NAME_HISTORY_SIZE) recent.delete(history.shift());
         return `${name}.${extension}`;

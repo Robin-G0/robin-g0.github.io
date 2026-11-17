@@ -4,7 +4,7 @@ import {sort,stack,ski} from '../arcade/games/desktop95.js';
 import {seededRandom} from '../arcade/core/random.js';
 import {createFileDeck,fileType,knowledge} from '../arcade/games/folder-sort-files.js';
 import {GameRunner} from '../arcade/core/runner.js';
-import {generatedNameCount,NAME_HISTORY_SIZE} from '../arcade/games/folder-sort-names.js';
+import {generatedNameCount,NAME_HISTORY_SIZE,createFilenameGenerator} from '../arcade/games/folder-sort-names.js';
 const setup=factory=>{const e={random:seededRandom(32),pace:1,message(){},finished:false,finish(text){e.finished=true;e.result=text;}};return {e,g:factory(e)};};
 test('folder sort previews files, rewards a real series, and ignores receipt-time duplicate inputs',()=>{
     const {g}=setup(sort);g.state.lives=2;
@@ -80,6 +80,25 @@ test('folder categories describe their contents rather than teaching PNG and TXT
     g.render(painter);
     assert.ok(labels.includes('(pictures, video, sound)'));assert.ok(labels.includes('(message, code, text)'));
     assert.ok(!labels.includes('PNG'));assert.ok(!labels.includes('TXT'));
+});
+
+test('joke filenames have one place in the ordinary name bag, with no weighted shortcut',()=>{
+    const draw=createFilenameGenerator(seededRandom(32));
+    const type={icon:'text',names:['caramel','rockyou','passwords','hello_world']};
+    const count=generatedNameCount/5+type.names.length;
+    const names=Array.from({length:count},()=>draw('txt',type));
+    assert.equal(new Set(names).size,count);
+    for(const name of type.names)assert.equal(names.filter(file=>file===`${name}.txt`).length,1);
+});
+
+test('Folder Sort replays get fresh files while an explicit seed remains reproducible',()=>{
+    for(const explicit of [false,true]){
+        const description={engine:'sort',difficulty:'gentle',randomizeReplay:true,...(explicit?{seed:32}:{})};
+        const runner=new GameRunner(description,sort),opening=[runner.game.state.file,...runner.game.state.queue];
+        runner.restart();const next=[runner.game.state.file,...runner.game.state.queue];
+        if(explicit)assert.deepEqual(next,opening);else assert.notDeepEqual(next,opening);
+        runner.dispose();
+    }
 });
 
 test('sort keeps the first five files simple, grows its multiplier and resets only the chain on a mistake',()=>{

@@ -66,6 +66,26 @@ test('Folder Sort finishes into versioned scores, sharing and replay',async({pag
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
 });
 
+test('the deployed module chain generates a different opening on Restart',async({page})=>{
+    await page.route('**/arcade/core/runner.js?*',async route=>{
+        const response=await route.fetch();
+        await route.fulfill({response,body:(await response.text())+`
+            const create=GameRunner.prototype.create;
+            GameRunner.prototype.create=function(options){
+                const result=create.call(this,options);
+                if(this.description.engine==='sort')window.sortTestRunner=this;
+                return result;
+            };
+        `});
+    });
+    await page.reload();
+    await page.locator('[data-game=desktop95-sort]').click();await page.locator('#arcade-no-camera').click();
+    const opening=await page.evaluate(()=>[window.sortTestRunner.game.state.file,...window.sortTestRunner.game.state.queue]);
+    await page.locator('#arcade-restart').click();
+    const replay=await page.evaluate(()=>[window.sortTestRunner.game.state.file,...window.sortTestRunner.game.state.queue]);
+    expect(replay).not.toEqual(opening);
+});
+
 test('classic system palette, bundled font and cursor hand survive a dark browser preference',async({page})=>{
     await page.emulateMedia({colorScheme:'dark'});
     await page.evaluate(()=>localStorage.setItem('appearance','dark'));

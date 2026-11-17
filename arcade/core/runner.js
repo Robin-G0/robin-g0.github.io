@@ -17,7 +17,10 @@ export class GameRunner {
         this.create();
     }
 
-    create() {
+    create({ freshSeed = false } = {}) {
+        // Games may opt into fresh replays. Explicit seeds retain reproducible runs.
+        if (freshSeed && this.description.randomizeReplay && this.description.seed == null)
+            this.seed = (this.seed + 0x9e3779b9) >>> 0;
         this.game?.dispose();
         this.elapsed = 0;
         this.phase = 'tutorial';
@@ -75,11 +78,11 @@ export class GameRunner {
 
     tutorial() {
         if (this.phase === 'closed') return;
-        if (this.phase === 'finished') { this.create(); this.publish(); return; }
+        if (this.phase === 'finished') { this.create({freshSeed:true}); this.publish(); return; }
         this.game.pause(); this.phase = 'tutorial'; this.router.setPhase(this.phase); this.publish();
     }
 
-    restart() { this.create(); this.play(); }
+    restart() { this.create({freshSeed:true}); this.play(); }
 
     finish(text = 'Round complete') {
         if (this.phase !== 'playing') return;

@@ -1,6 +1,6 @@
 import { PRESSURE_RULES } from './pressure.js';
 import {phosphorDiagrams,phosphorCaptions} from '../games/phosphor/tutorials.js?v=phosphor-33';
-import {desktop95Diagrams,desktop95Captions} from '../games/desktop95-tutorials.js?v=desktop95-5';
+import {desktop95Diagrams,desktop95Captions} from '../games/desktop95-tutorials.js?v=desktop95-6';
 
 const art = name => new URL(`../../assets/art/${name}`,import.meta.url).href;
 const handPath = 'M27 44V20c0-5 7-5 7 0v13V9c0-5 7-5 7 0v24V6c0-5 7-5 7 0v27V13c0-5 7-5 7 0v31l7-9c4-5 10-1 7 4L56 61c-4 7-10 11-18 11-11 0-18-7-20-17l-4-15c-1-6 7-8 9-2z';

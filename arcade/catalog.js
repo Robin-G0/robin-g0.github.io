@@ -10,7 +10,7 @@ export const games = Object.freeze([
     entry('phosphor', 'invaders', 'Terminal Invaders', 'Use cover. Dodge warned shots. Clear the next fleet.', 'Move left', 'Move right', {scoreVersion:3}),
     entry('phosphor', 'lander', 'Lunar Lander', 'Two thrusters. Line up. Land softly.', 'Left jet', 'Right jet', {scoreVersion:4}),
     entry('phosphor', 'snake', 'ASCII Snake', 'Route the signal. Queue a corner. Collect the next cache.', 'Turn left', 'Turn right', {scoreVersion:2}),
-    entry('desktop95', 'sort', 'Folder Sort', 'Send each file to the matching folder.', 'Media folder', 'Text folder', {scoreVersion:3}),
+    entry('desktop95', 'sort', 'Folder Sort', 'Send each file to the matching folder.', 'Media folder', 'Text folder', {scoreVersion:3,randomizeReplay:true}),
     entry('desktop95', 'stack', 'Window Stack', 'Place each moving window on the stack.', 'Place window', 'Reverse slide', {scoreVersion:2}),
     entry('desktop95', 'ski', 'Ski Run', 'Pass the gates and avoid the trees.', 'Left lane', 'Right lane', {scoreVersion:2}),
     entry('construction', 'popups', 'Pop-up Panic', 'Keep both stacks below the top bar.', 'Clear ←', 'Clear →'),

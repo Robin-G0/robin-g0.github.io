@@ -1,9 +1,9 @@
-import { games, gamesForTheme } from './catalog.js?v=desktop95-5';
-import { engines } from './registry.js?v=desktop95-5';
+import { games, gamesForTheme } from './catalog.js?v=desktop95-6';
+import { engines } from './registry.js?v=desktop95-6';
 import { seededRandom } from './core/random.js';
 import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
 import { localBindings } from './mig/bindings.js?v=phosphor-33';
-import { GameRoom } from './room.js?v=desktop95-5';
+import { GameRoom } from './room.js?v=desktop95-6';
 
 import {ChallengeStore, readChallenge} from './core/challenges.js?v=phosphor-33';
 

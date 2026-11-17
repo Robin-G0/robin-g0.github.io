@@ -1,7 +1,7 @@
 import { game, reward } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
-import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-5';
-import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=desktop95-5';
+import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-6';
+import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=desktop95-6';
 
 // A lost third heart is a game over, not a completed round.
 function loseHeart(state,env,message) {
