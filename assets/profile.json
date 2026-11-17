@@ -95,26 +95,26 @@
       "name": "Desktop 95",
       "era": "1995-1998",
       "radius": 0,
-      "font": "Tahoma, Arial, sans-serif",
+      "font": "W95FA, \"MS Sans Serif\", sans-serif",
       "light": {
         "bg": "#c0c0c0",
-        "ink": "#111111",
-        "muted": "#373737",
+        "ink": "#000000",
+        "muted": "#000000",
         "border": "#808080",
         "accent": "#000080",
-        "soft": "#d7d7e5",
-        "gold": "#633800",
-        "goldbg": "#e9dab5"
+        "soft": "#ffffff",
+        "gold": "#800000",
+        "goldbg": "#ffff00"
       },
       "dark": {
-        "bg": "#303b3b",
-        "ink": "#ffffff",
-        "muted": "#d0dada",
-        "border": "#788888",
-        "accent": "#8fbaff",
-        "soft": "#445457",
-        "gold": "#ffe090",
-        "goldbg": "#5b5036"
+        "bg": "#c0c0c0",
+        "ink": "#000000",
+        "muted": "#000000",
+        "border": "#808080",
+        "accent": "#000080",
+        "soft": "#ffffff",
+        "gold": "#800000",
+        "goldbg": "#ffff00"
       }
     },
     {

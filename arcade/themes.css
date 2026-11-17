@@ -43,9 +43,9 @@
 @media(prefers-reduced-motion:reduce) { .phosphor-diagram * { animation: none !important; } }
 
 /* Windows 95: gray controls, bevels and an uninterrupted navy title strip. */
-:root[data-theme=desktop95] { --arcade-font: Tahoma, Verdana, sans-serif; --arcade-display: var(--arcade-font); }
+:root[data-theme=desktop95] { --arcade-font: W95FA, 'MS Sans Serif', sans-serif; --arcade-display: var(--arcade-font); }
 [data-theme=desktop95] #arcade-player { background: #c0c0c0; color: #111; border: 3px outset #eee; border-radius: 0; }
-[data-theme=desktop95] .arcade-room-header { background: linear-gradient(90deg, #000080, #237cad); color: #fff; margin: 3px; }
+[data-theme=desktop95] .arcade-room-header { background: #000080; color: #fff; margin: 3px; }
 [data-theme=desktop95] [data-brief=start] #arcade-tutorial { background: #c0c0c0; color: #111; }
 [data-theme=desktop95] [data-brief=start] #arcade-tutorial::before { width: 72px; height: 72px; top: 18px; left: 20px; background: conic-gradient(#169734 0 25%,#168adc 0 50%,#ffce00 0 75%,#ef4428 0); transform: skewY(-8deg); opacity: .2; }
 [data-theme=desktop95] [data-brief=start] #arcade-controls-status { color: #111; font-size: clamp(27px, 4vw, 42px); }
@@ -144,3 +144,32 @@
 [data-theme=desktop95] #arcade-player button:active { border-style:inset; box-shadow:none; }
 [data-theme=desktop95] #arcade-player button:focus-visible { outline:2px dotted #000080; outline-offset:3px; }
 [data-theme=desktop95] .arcade-room-header { background:#000080; }
+
+/* Windows 95 system colors also apply to tutorials, results and diagnostics. */
+[data-theme=desktop95] #arcade-player {
+    color:#000000; border:2px solid; border-color:#ffffff #000000 #000000 #ffffff;
+    box-shadow:inset -1px -1px #808080,inset 1px 1px #dfdfdf;
+}
+[data-theme=desktop95] #arcade-player :is(h2,h3,h4,.eyebrow,.arcade-hud dd,#arcade-name,#arcade-scoreboard) {
+    font-family:var(--arcade-font); letter-spacing:normal;
+}
+[data-theme=desktop95] #arcade-player button {
+    background:#c0c0c0; color:#000000; border:2px solid;
+    padding:8px 12px;
+    border-color:#ffffff #000000 #000000 #ffffff; border-radius:0;
+    box-shadow:inset -1px -1px #808080,inset 1px 1px #dfdfdf;
+}
+[data-theme=desktop95] #arcade-player button:active {
+    border-color:#000000 #ffffff #ffffff #000000;
+    box-shadow:inset 1px 1px #808080;
+}
+[data-theme=desktop95] #arcade-player button:focus-visible { outline:1px dotted #000000; outline-offset:-6px; }
+[data-theme=desktop95] #arcade-player button:disabled { color:#808080; text-shadow:1px 1px #ffffff; }
+[data-theme=desktop95] #arcade-player :is(.arcade-overlay,.arcade-hud,.camera-details) { background:#c0c0c0; }
+[data-theme=desktop95] #arcade-player .arcade-room-header :is(p,.eyebrow) { color:#ffffff; }
+[data-theme=desktop95] .arcade-walkthrough { border:2px solid; border-color:#808080 #ffffff #ffffff #808080; }
+[data-theme=desktop95] .guide-progress span { border-radius:0; }
+[data-theme=desktop95] .guide-progress [aria-current=step] { background:#000080; color:#ffffff; }
+[data-theme=desktop95] .desktop95-diagram { font-family:var(--arcade-font); shape-rendering:crispEdges; }
+[data-theme=desktop95] [data-brief=start] #arcade-tutorial::before { display:none; }
+[data-theme=desktop95] .desktop95-hand { image-rendering:pixelated; object-fit:contain; animation-timing-function:steps(3,end); }

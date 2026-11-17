@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {sort,stack,ski} from '../arcade/games/desktop95.js';
 import {seededRandom} from '../arcade/core/random.js';
+import {createFileDeck,fileType,knowledge} from '../arcade/games/folder-sort-files.js';
+import {GameRunner} from '../arcade/core/runner.js';
 const setup=factory=>{const e={random:seededRandom(32),pace:1,message(){},finished:false,finish(text){e.finished=true;e.result=text;}};return {e,g:factory(e)};};
 test('folder sort previews files, rewards a real series, and ignores receipt-time duplicate inputs',()=>{
     const {g}=setup(sort);g.state.lives=2;
@@ -38,5 +40,52 @@ test('desktop95 timed actions do not change state while paused or after dispose'
         const before=structuredClone(g.state);g.input({action:'left'});g.update(2);
         assert.deepEqual(g.state,before);g.resume();g.update(.1);g.dispose();
         const ended=structuredClone(g.state);g.update(2);g.input({action:'right'});assert.deepEqual(g.state,ended);
+    }
+});
+
+test('file types unlock progressively and each deck balances media against text',()=>{
+    for(const [sorted,allowed] of [[0,['txt','png']],[5,['txt','png','jpg','gif','bmp','md','rtf']]]){
+        const draw=createFileDeck(seededRandom(23)),seen=new Set();
+        for(let i=0;i<100;i+=2){
+            const pair=[draw(sorted),draw(sorted)];
+            assert.notEqual(fileType(pair[0]).category,fileType(pair[1]).category);
+            pair.forEach(file=>{const ext=file.split('.').at(-1);assert.ok(allowed.includes(ext));seen.add(ext);});
+        }
+        assert.deepEqual([...seen].sort(),allowed.sort());
+    }
+    const draw=createFileDeck(seededRandom(7));
+    for(const [milestone,formats] of [[15,['js','py','wav','mp3']],[25,['mp4','webm','json','css']],[35,['cpp','rs','flac','mkv']],[45,['sh','sql','opus','avif']]]){
+        const seen=new Set(Array.from({length:200},()=>draw(milestone).split('.').at(-1)));
+        formats.forEach(ext=>assert.ok(seen.has(ext),`${ext} unlocked after ${milestone}`));
+    }
+});
+
+test('sort keeps the first five files simple, grows its multiplier and resets only the chain on a mistake',()=>{
+    const {g}=setup(sort);
+    for(let i=0;i<16;i++){
+        if(i<5)for(const file of [g.state.file,...g.state.queue])assert.match(file,/\.(txt|png)$/);
+        g.input({action:g.state.correct});g.update(.5);
+    }
+    assert.equal(g.state.level,2);assert.equal(knowledge(g.state.streak).title,'Developer');
+    assert.equal(knowledge(10).multiplier,3);assert.equal(knowledge(40).title,'Hacker');
+    const score=g.state.score;
+    g.input({action:g.state.correct==='left'?'right':'left'});
+    assert.equal(g.state.score,score);assert.equal(g.state.streak,0);
+    assert.equal(knowledge(g.state.streak).multiplier,1);assert.equal(g.state.level,2);
+});
+
+test('the real ski runner increases gate speed and frequency over time in both difficulties',()=>{
+    for(const difficulty of ['gentle','standard']){
+        let now=0,earlySpeed,lateSpeed,firstInterval,lastInterval;
+        const runner=new GameRunner({engine:'ski',difficulty,seed:32},ski,{clock:()=>now});runner.play();
+        for(let i=0;i<7500;i++){
+            const s=runner.game.state,gate=s.gates.find(g=>!g.passed);
+            if(gate)s.lane=gate.gap; // Perfect routing isolates world pressure from player mistakes.
+            const y=gate?.y,next=s.nextGate;now+=16;runner.step(now);
+            if(gate&&s.time>1){const speed=(gate.y-y)/.016;earlySpeed??=speed;if(s.time>90)lateSpeed=speed;}
+            if(s.nextGate!==next){firstInterval??=s.nextGate-s.time;lastInterval=s.nextGate-s.time;}
+        }
+        assert.equal(runner.phase,'playing');assert.ok(lateSpeed>earlySpeed*1.4);
+        assert.ok(lastInterval<firstInterval);runner.dispose();
     }
 });

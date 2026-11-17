@@ -61,7 +61,30 @@ test('Folder Sort finishes into versioned scores, sharing and replay',async({pag
     await page.locator('#arcade-challenge-friend').click();
     const link=await page.locator('#arcade-challenge-link').inputValue();
     const target=JSON.parse(new URLSearchParams(new URL(link).hash.split('?')[1]).get('challenge'));
-    expect(target.game).toBe('desktop95-sort');expect(target.rules).toBe(2);
+    expect(target.game).toBe('desktop95-sort');expect(target.rules).toBe(3);
     await page.locator('#arcade-again').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
+});
+
+test('classic system palette, bundled font and cursor hand survive a dark browser preference',async({page})=>{
+    await page.emulateMedia({colorScheme:'dark'});
+    await page.evaluate(()=>localStorage.setItem('appearance','dark'));
+    await page.reload();await page.locator('[data-game=desktop95-sort]').click();
+    await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
+    const colors=await page.evaluate(async()=>{
+        await document.fonts.load('24px W95FA');
+        const root=getComputedStyle(document.documentElement),button=getComputedStyle(document.querySelector('#arcade-begin'));
+        return {bg:root.getPropertyValue('--bg').trim(),ink:root.getPropertyValue('--ink').trim(),
+            button:button.backgroundColor,font:button.fontFamily,loaded:document.fonts.check('24px W95FA')};
+    });
+    expect(colors).toMatchObject({bg:'#c0c0c0',ink:'#000000',button:'rgb(192, 192, 192)',loaded:true});
+    expect(colors.font).toContain('W95FA');
+    await page.clock.runFor(350);
+    await expect(page.locator('#arcade-controls-status')).toHaveText('Say hi to start');
+    await expect(page.locator('#arcade-start-icon img')).toHaveAttribute('src',/desktop95-link-hand\.svg$/);
+    await expect(page.locator('#arcade-start-icon img')).toBeVisible();
+    await page.screenshot({path:'../arcade-review/desktop95-classic-greeting.png'});
+    await page.locator('#arcade-guide').click();
+    await expect(page.locator('.guide-caption')).toContainText('media');
+    expect(await page.locator('#arcade-walkthrough').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(192, 192, 192)');
 });

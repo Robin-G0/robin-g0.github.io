@@ -1,6 +1,7 @@
 import { game, reward } from '../core/game.js?v=tutorial-3';
 import { clamp, integer } from '../core/random.js';
-import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-3';
+import { C, bevel, window95, folder, fileIcon, tree } from './desktop95-art.js?v=desktop95-4';
+import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js';
 
 // A lost third heart is a game over, not a completed round.
 function loseHeart(state,env,message) {
@@ -9,17 +10,14 @@ function loseHeart(state,env,message) {
 }
 
 export function sort(env) {
-    const files=['photo.png','notes.txt','holiday.jpg','readme.md','icon.bmp','letter.rtf','party.gif','todo.txt'];
-    let bag=[];
-    function draw() {
-        if(!bag.length) {bag=[...files];for(let i=bag.length-1;i>0;i--){const j=integer(env.random,0,i);[bag[i],bag[j]]=[bag[j],bag[i]];}}
-        return bag.pop();
-    }
-    const s={file:draw(),queue:[draw(),draw()],streak:0,sorted:0,deadline:5,budget:5,ready:0,receipt:null};
-    const side=file=>/\.(png|jpg|bmp|gif)$/.test(file)?'left':'right';
-    s.correct=side(s.file);
+    const draw=createFileDeck(env.random);
+    const s={file:draw(0),queue:[draw(0),draw(0)],streak:0,sorted:0,level:0,deadline:5,budget:5,ready:0,receipt:null};
+    s.correct=fileSide(s.file);
     function next() {
-        s.file=s.queue.shift();s.queue.push(draw());s.correct=side(s.file);
+        const level=fileStage(s.sorted);
+        // Refresh previews at unlocks; no advanced extension appears before its milestone.
+        if(level!==s.level){s.level=level;s.queue=[draw(s.sorted),draw(s.sorted)];}
+        s.file=s.queue.shift();s.queue.push(draw(s.sorted));s.correct=fileSide(s.file);
         s.budget=Math.max(1.8,5/env.pace);s.ready=s.time+.45;s.deadline=s.ready+s.budget;
     }
     return game(s,{
@@ -27,7 +25,7 @@ export function sort(env) {
         input(s,e){
             if(s.time<s.ready||!['left','right'].includes(e.action))return;
             if(e.action===s.correct){s.streak++;s.sorted++;const bonus=s.streak%5===0;
-                reward(s,env,20+Math.min(5,Math.floor(s.streak/5))*10,bonus?'Five-file bonus!':'');env.sound?.({kind:bonus?'powerup':'clear'});
+                reward(s,env,20*knowledge(s.streak).multiplier,bonus?'Knowledge up!':'');env.sound?.({kind:bonus?'powerup':'clear'});
                 if(bonus)s.lives=Math.min(3,s.lives+1);
                 s.receipt={side:e.action,file:s.file,at:s.time,ok:true};
             } else {s.streak=0;env.sound?.({kind:'miss'});loseHeart(s,env,'Wrong folder: check the extension.');s.receipt={side:e.action,file:s.file,at:s.time,ok:false};}
@@ -37,24 +35,24 @@ export function sort(env) {
         render(s,p){
             const compact=p.compact,folderY=compact?p.h-215:246;
             const receipt=s.receipt&&s.time-s.receipt.at<.45?s.receipt:null;
+            const rank=knowledge(s.streak),type=fileType(s.file);
             window95(p,'Folder Sort \u2014 C:\\Inbox',`${s.sorted} copied / chain ${s.streak}`,s.score,s.lives);
-            p.rect(24,compact?81:72,672,p.h-(compact?162:153),'#f4f4f4');
-            p.text('IMAGES',160,compact?108:96,compact?30:18,C.blue,'center');p.text('DOCUMENTS',560,compact?108:96,compact?30:18,C.blue,'center');
-            if(compact){
-                p.text('PNG JPG',160,144,27,'#555','center');p.text('BMP GIF',160,175,27,'#555','center');
-                p.text('TXT MD',560,144,27,'#555','center');p.text('RTF',560,175,27,'#555','center');
-            }else{
-                p.text('PNG \u00b7 JPG \u00b7 BMP \u00b7 GIF',160,119,13,'#555','center');p.text('TXT \u00b7 MD \u00b7 RTF',560,119,13,'#555','center');
-            }
-            folder(p,160,folderY,'L / Images',receipt?.side==='left',compact?1.35:1);
+            p.rect(24,compact?81:72,672,p.h-(compact?162:153),C.light);
+            p.text('MEDIA',160,compact?108:96,compact?30:18,C.blue,'center');p.text('TEXT',560,compact?108:96,compact?30:18,C.blue,'center');
+            if(!s.sorted){p.text('PNG',160,compact?148:122,compact?27:14,C.shadow,'center');p.text('TXT',560,compact?148:122,compact?27:14,C.shadow,'center');}
+            folder(p,160,folderY,'L / Media',receipt?.side==='left',compact?1.35:1);
             folder(p,560,folderY,'R / Text',receipt?.side==='right',compact?1.35:1);
-            fileIcon(p,360,compact?160:135,side(s.file)==='left',compact?1.5:1.15);
-            p.text(s.file,360,compact?290:230,compact?40:20,'#111','center');
-            const barY=compact?325:253;
+            fileIcon(p,360,compact?160:110,type.icon,compact?1.5:1.05);
+            p.text(s.file,360,compact?290:199,Math.min(compact?36:20,570/(s.file.length*.62)),C.dark,'center');
+            const barY=compact?325:222;
             bevel(p,275,barY,170,compact?24:16,true);p.rect(279,barY+4,162*clamp((s.deadline-s.time)/s.budget,0,1),compact?16:8,C.blue);
-            p.text('NEXT',360,compact?385:290,compact?24:11,'#555','center');
+            p.text('NEXT',360,compact?385:257,compact?24:11,C.shadow,'center');
             if(compact)s.queue.forEach((file,index)=>p.text(file,360,420+index*34,27,'#333','center'));
-            else p.text(s.queue.join('  \u2192  '),360,312,12,'#333','center');
+            else p.text(s.queue.join('  /  '),360,276,11,C.dark,'center');
+            const meterY=compact?520:320;
+            p.text(`Knowledge: ${rank.title}  x${rank.multiplier}`,360,meterY-(compact?30:19),compact?27:15,C.blue,'center');
+            bevel(p,250,meterY,220,compact?22:14,true);
+            for(let i=0;i<20;i++)if(i<Math.floor(rank.progress*20))p.rect(254+i*10.6,meterY+3,8,compact?16:8,C.blue);
             if(receipt){const x=receipt.side==='left'?160:560;p.text(receipt.ok?'\u2713 Copied':'\u00d7 Type',x,folderY-(compact?65:53),compact?30:19,receipt.ok?'#176a49':'#a32626','center');}
 
         }

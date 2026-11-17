@@ -30,5 +30,14 @@
     "source": "https://fonts.gstatic.com/s/caveat/v23/Wnz6HAc5bAfYB2Q7ZjYY.woff2",
     "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/OFL.txt",
     "bytes": 74932
+  },
+  {
+    "family": "W95FA",
+    "designer": "Alina Sava",
+    "file": "w95fa.woff2",
+    "weight": "400",
+    "source": "https://cdn.jsdelivr.net/fontsource/fonts/win95fa@latest/latin-400-normal.woff2",
+    "license": "w95fa-OFL.txt",
+    "bytes": 7880
   }
 ]
