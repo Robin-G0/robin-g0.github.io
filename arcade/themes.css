@@ -138,3 +138,9 @@
     #arcade-player .camera-details { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { #arcade-tutorial::before, #arcade-tutorial::after, #arcade-controls-status::after { animation: none !important; } }
+
+/* Desktop95 controls retain the original raised/sunken desktop materials. */
+[data-theme=desktop95] #arcade-player button { border-radius:0; border:2px outset #fff; background:#c0c0c0; color:#111; box-shadow:1px 1px #202020; }
+[data-theme=desktop95] #arcade-player button:active { border-style:inset; box-shadow:none; }
+[data-theme=desktop95] #arcade-player button:focus-visible { outline:2px dotted #000080; outline-offset:3px; }
+[data-theme=desktop95] .arcade-room-header { background:#000080; }

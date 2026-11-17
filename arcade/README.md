@@ -321,3 +321,13 @@ Portrait rendering and game-owned outcome feedback are explicit host settings.
 Invaders uses scoreVersion 3, Lander v4, and Snake v2. Prior records stay stored separately, and
 old challenge links are rejected with a compatibility message. Keep versioned
 boards and links aligned when changing scoring in another engine.
+
+
+## Windows 95 engines
+
+`games/desktop95.js` keeps Folder Sort, Window Stack and Ski Run on the shared host.
+`desktop95-art.js` draws responsive original desktop materials, while
+`desktop95-tutorials.js` supplies specific three-card teaching. The engines use two
+native wrist-Up bindings, their own object feedback and outcome cues, and score
+rules v2. Window Stack's marked snap band matches the actual acceptance rule even
+for narrow windows. Portrait projection keeps logical rules and timing unchanged.

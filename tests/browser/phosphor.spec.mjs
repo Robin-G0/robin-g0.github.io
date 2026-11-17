@@ -92,7 +92,11 @@ test('Lander uses two native raises and a paired burn stays centered in the actu
     await page.locator('[data-game=phosphor-lander]').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
     await page.evaluate(async()=>{
-        const {GameRoom}=await import('/arcade/room.js?v=phosphor-33');
+        // Instrument the module the page actually uses, including its current cache version.
+        const appURL=document.querySelector('script[src*="arcade/app.js"]').src;
+        const source=await (await fetch(appURL)).text();
+        const path=source.match(/import\s*\{\s*GameRoom\s*\}\s*from\s*['"]([^'"]+)/)[1];
+        const {GameRoom}=await import(new URL(path,appURL).href);
         const frame=GameRoom.prototype.frame;
         GameRoom.prototype.frame=function(time){frame.call(this,time);window.flightState={...this.runner.game.state};};
         window.motionTest.observe();
