@@ -331,3 +331,36 @@ boards and links aligned when changing scoring in another engine.
 native wrist-Up bindings, their own object feedback and outcome cues, and score
 rules v2. Window Stack's marked snap band matches the actual acceptance rule even
 for narrow windows. Portrait projection keeps logical rules and timing unchanged.
+
+## Metro engines
+
+`games/metro.js` re-exports three modules in `games/metro/`. `display.js` draws flat
+colour tiles, white glyphs, square lives and light Segoe-style text; where Segoe UI
+Light is absent the bundled Open Sans 300 (OFL, by Segoe's designer) stands in, so
+phones keep the identity. `tutorials.js` holds the three cards per engine. All three
+use the pose-only wrist-up profile, engine-owned feedback and sound, portrait boards
+and score rules v2; older boards and friend links stay separate.
+
+- Live Tiles (`memory`): a blue/purple sequence that starts at two tiles. Watching is
+  free time. A tile whose flash has started can be answered live for 20; repeating
+  after the show pays 10. Finishing adds 10 per tile, doubled when every tile was
+  live. Unrevealed inputs are harmless. A wrong tile costs a heart and replays the
+  same order; cadence shrinks from 1.1 s to .55 s with rounds. 24 s score rounds.
+- Tile Merge (`merge`): a seven-cell row. The previewed tile (a shuffled bag of six
+  2s and two 4s) enters the end you slid away from. Each merge scores its value;
+  two merges in a slide double the sum. A slide that moves nothing spawns nothing.
+  A full row without equal neighbours costs a heart and keeps only its biggest
+  tile. Seven cells were chosen by simulation: a greedy preview player outlasts
+  random slides by about 60%, while alternating slides avoid blocks but barely
+  score, so the 20 s score round is what makes stalling expensive.
+- Metro Line (`rail`): survival. Trains queue by themselves every max(1.5, 3.2/pace)
+  seconds on a four-slot platform. L toggles the junction, R dispatches the front
+  train, which takes max(1.3, 2.6/pace) seconds and is routed by the junction at
+  half way. Arrivals pay 20; a same-line arrival within 1.6 s of the previous one
+  adds a 10 convoy bonus. A fifth waiting train cancels the oldest for a heart; a
+  wrong station costs a heart. Empty or busy platforms make R harmless.
+
+Deterministic tests cover live/repeat scoring, the show-phase clock, merge bags,
+spawn sides, blocked resets, the policy comparison, junction timing, convoys,
+overflow, idle loss and reduced-motion equivalence. These are simulated cadence
+checks, not evidence of physical comfort or webcam accuracy.

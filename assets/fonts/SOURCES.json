@@ -39,5 +39,15 @@
     "source": "https://cdn.jsdelivr.net/fontsource/fonts/win95fa@latest/latin-400-normal.woff2",
     "license": "w95fa-OFL.txt",
     "bytes": 7880
+  },
+  {
+    "family": "Open Sans",
+    "designer": "Steve Matteson",
+    "file": "open-sans.woff2",
+    "weight": "300 400",
+    "role": "Segoe UI stand-in for the Metro theme where the system font is absent",
+    "source": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSGmu1aB.woff2",
+    "license": "open-sans-OFL.txt",
+    "bytes": 35156
   }
 ]

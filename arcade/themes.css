@@ -3,6 +3,7 @@
 @font-face { font-family: 'Share Tech Mono'; src: url('../assets/fonts/share-tech-mono.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Orbitron'; src: url('../assets/fonts/orbitron.woff2') format('woff2'); font-weight: 400 900; font-display: swap; }
 @font-face { font-family: 'Caveat'; src: url('../assets/fonts/caveat.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Open Sans'; src: url('../assets/fonts/open-sans.woff2') format('woff2'); font-weight: 300 400; font-display: swap; }
 #arcade-player { font-family: var(--arcade-font, var(--font)); }
 #arcade-player .arcade-action, #arcade-player .arcade-controls-trigger { font-family: inherit; }
 [data-brief=start] #arcade-tutorial { isolation: isolate; overflow: hidden; padding: clamp(20px, 5%, 48px); }
@@ -89,8 +90,8 @@
 [data-theme=aero] [data-brief=start] #arcade-controls-status { color: #06567e; font-weight: 300; font-size: clamp(32px, 5vw, 56px); text-shadow: 0 2px #fff9; }
 [data-theme=aero] #arcade-begin { background: linear-gradient(#eefbc9,#a7df54 30%,#7cc82c 48%,#459a15 51%,#8ed23d); color: #154c13; border: 1px solid #6ba936; border-radius: 999px; box-shadow: inset 0 1px #fff,0 5px 16px #2b823c30; font-weight: 600; }
 
-/* Metro: large light typography and a flat, asymmetric live tile. */
-:root[data-theme=metro] { --arcade-font: 'Segoe UI', Arial, sans-serif; --arcade-display: 'Segoe UI Light', 'Segoe UI', sans-serif; }
+/* Metro: large light typography, flat live tiles and no chrome. Open Sans stands in for Segoe UI. */
+:root[data-theme=metro] { --arcade-font: 'Segoe UI', 'Open Sans', Arial, sans-serif; --arcade-display: 'Segoe UI Light', 'Open Sans', 'Segoe UI', sans-serif; }
 [data-theme=metro] [data-brief=start] #arcade-tutorial { background: #14224b; align-items: flex-start; text-align: left; }
 [data-theme=metro] [data-brief=start] #arcade-tutorial::before { width: 35%; height: 100%; right: 0; top: 0; background: #7b2c9c; }
 [data-theme=metro] [data-brief=start] #arcade-controls-status { color: #fff; font-weight: 300; font-size: clamp(35px, 5vw, 58px); }
@@ -173,3 +174,21 @@
 [data-theme=desktop95] .desktop95-diagram { font-family:var(--arcade-font); shape-rendering:crispEdges; }
 [data-theme=desktop95] [data-brief=start] #arcade-tutorial::before { display:none; }
 [data-theme=desktop95] .desktop95-hand { image-rendering:pixelated; object-fit:contain; animation-timing-function:steps(3,end); }
+
+/* Metro rooms stay flat: square buttons, a solid walkthrough and lowercase light headings. */
+[data-theme=metro] #arcade-player { border: 0; border-radius: 0; box-shadow: none; }
+[data-theme=metro] #arcade-player :is(button,input,select) { border-radius: 0; }
+[data-theme=metro] #arcade-player button { border: 0; box-shadow: none; }
+[data-theme=metro] #arcade-player .arcade-action[data-pulse=true] { outline: 3px solid #fff; outline-offset: -3px; }
+[data-theme=metro] .arcade-walkthrough { background: var(--bg); }
+[data-theme=metro] .guide-title { font-family: var(--arcade-display); font-weight: 300; letter-spacing: -.03em; text-transform: lowercase; }
+[data-theme=metro] .guide-progress span { border-radius: 0; }
+[data-theme=metro] .guide-progress [aria-current=step] { background: #087aa5; color: #fff; }
+[data-theme=metro] .guide-figure { flex: 0 0 auto; } /* Cards keep their natural height; the room scrolls instead of overlapping the title. */
+[data-theme=metro] .metro-diagram text { font-weight: 300; }
+[data-theme=metro] .metro-diagram path { stroke-linecap: square; }
+.metro-flash { animation: metro-flash 3.6s linear infinite; animation-delay: var(--delay, 0s); }
+.metro-train { animation: metro-train 3s ease-in-out infinite; }
+@keyframes metro-flash { 0%, 100% { opacity: .35; } 8%, 20% { opacity: 1; } 28% { opacity: .35; } }
+@keyframes metro-train { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-58px); } }
+@media(prefers-reduced-motion:reduce) { .metro-diagram * { animation: none !important; } }

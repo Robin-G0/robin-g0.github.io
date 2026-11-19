@@ -1,6 +1,7 @@
 import { PRESSURE_RULES } from './pressure.js';
 import {phosphorDiagrams,phosphorCaptions} from '../games/phosphor/tutorials.js?v=phosphor-33';
 import {desktop95Diagrams,desktop95Captions} from '../games/desktop95-tutorials.js?v=desktop95-6';
+import {metroDiagrams,metroCaptions} from '../games/metro/tutorials.js?v=metro-1';
 
 const art = name => new URL(`../../assets/art/${name}`,import.meta.url).href;
 const handPath = 'M27 44V20c0-5 7-5 7 0v13V9c0-5 7-5 7 0v24V6c0-5 7-5 7 0v27V13c0-5 7-5 7 0v31l7-9c4-5 10-1 7 4L56 61c-4 7-10 11-18 11-11 0-18-7-20-17l-4-15c-1-6 7-8 9-2z';
@@ -21,6 +22,7 @@ function controls(directions) {
 const diagrams = {
     ...desktop95Diagrams,
     ...phosphorDiagrams,
+    ...metroDiagrams,
     popups: [controls(true),frame([90,250].map((x,i)=>[0,1,2].map(n=>
         `<g class="${i?'':'guide-clear'}"><rect x="${x}" y="${123-n*35}" width="70" height="30" rx="2"/>${label(i?'\u2192':'\u2190',x+35,147-n*35,29)}</g>`).join('')).join('')+label('+90',125,35,31)),
         frame('<path d="M35 35H365" class="danger"/>'+label('TOP',200,25,18)+
@@ -33,6 +35,7 @@ const diagrams = {
 const captions = {
     ...desktop95Captions,
     ...phosphorCaptions,
+    ...metroCaptions,
     popups:['Each wrist owns one stack. Match its arrow.','One move clears every matching arrow.','Bigger groups score more. Stay below the top.'],
     maze:['Lift L or R. Lower to repeat.','Look. Remember. Choose L or R.','HOME adds time. Avoid penalties and DIE.'],
     juggle:['Lift L or R. Lower to repeat.','Catch inside the band. Touch the line for \u00d72.','Catch gifts for slow time or one rescue.']

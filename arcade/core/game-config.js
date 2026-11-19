@@ -5,7 +5,7 @@ import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=survival-17
 export function gameConfig(description) {
     const directional = description.inputScheme==='wrist-directions';
     const lifts = ['maze','juggle'].includes(description.engine);
-    const illustrated = ['invaders','lander','snake','sort','stack','ski'].includes(description.engine);
+    const illustrated = ['invaders','lander','snake','sort','stack','ski','memory','merge','rail'].includes(description.engine);
     return {
         directional,
         profile: directional ? popupProfile : lifts ? constructionLiftProfile : illustrated ? wristRaiseProfile : arcadeProfile,
