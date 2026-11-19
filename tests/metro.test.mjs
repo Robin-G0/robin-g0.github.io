@@ -61,7 +61,9 @@ test('an idle Live Tiles run loses through the host round clock, which pauses wh
 
 test('Tile Drop landings merge below and sideways in chains, overflow full columns, retire small tiles and label big ones',()=>{
     let columns=[[2],[],[],[],[]];
-    assert.deepEqual(landTile(columns,0,2),{overflow:false,points:4,merges:1,value:4,row:0});assert.deepEqual(columns,[[4],[],[],[],[]]);
+    const first=landTile(columns,0,2);
+    assert.deepEqual([first.overflow,first.points,first.merges,first.value,first.row],[false,4,1,4,0]);assert.deepEqual(columns,[[4],[],[],[],[]]);
+    assert.deepEqual(first.events,[{column:0,row:0,value:4,step:1,joined:1}]);
     columns=[[2],[],[2],[],[]];
     assert.equal(landTile(columns,1,2).value,8,'Two equal side neighbours quadruple');assert.deepEqual(columns,[[],[8],[],[],[]]);
     columns=[[4],[2],[],[],[]];
@@ -70,6 +72,15 @@ test('Tile Drop landings merge below and sideways in chains, overflow full colum
     assert.deepEqual(columns,[[],[8],[],[],[]]);
     columns=[[2,4,8,16,32,64],[],[],[],[]];
     assert.equal(landTile(columns,0,2).overflow,true);assert.equal(columns[0].length,DROP.rows);
+    // Cascade: absorbing the left neighbour drops its 8 next to another 8, which merges as a second chain step.
+    columns=[[8],[2,8],[],[],[]];
+    const cascade=landTile(columns,2,2);
+    assert.deepEqual(columns,[[16],[],[4],[],[]]);assert.equal(cascade.merges,2);assert.equal(cascade.points,4*1+16*2);
+    assert.deepEqual(cascade.events.map(e=>[e.column,e.row,e.value,e.step]),[[2,0,4,1],[0,0,16,2]]);
+    // Equal tiles left touching by a retirement merge on the next landing, lowest and leftmost first.
+    columns=[[4],[4],[],[],[2]];
+    const sweep=landTile(columns,4,8);
+    assert.deepEqual(columns,[[8],[],[],[],[2,8]]);assert.equal(sweep.merges,1);assert.equal(sweep.events[0].column,0);
     columns=[[2,4],[8,2],[],[2],[16]];
     assert.equal(retireBelow(columns,4),3);assert.deepEqual(columns,[[4],[8],[],[],[16]]);
     assert.deepEqual(spawnRange(2),[2,4,8]);assert.deepEqual(spawnRange(8,5),[8,16,32,64,128]);
@@ -91,12 +102,20 @@ test('Tile Drop moves on single raises with a capped .2 s refund, drops on a cho
     const value=s.value,next=s.next;
     g.input({action:'left'});g.input({action:'right'});
     assert.deepEqual(s.columns[3],[value]);assert.equal(s.drops,1);assert.equal(s.value,next,'Both raises together drop at once and the preview advances');
+    const sounds=[];
+    const chain=merge({pace:1,random:seededRandom(5),message(){},sound:e=>sounds.push(e),finish(){}});chain.start();
+    Object.assign(chain.state,{columns:[[8],[2,8],[],[],[]],column:2,value:2});chain.input({action:'left'});chain.input({action:'right'});
+    assert.equal(chain.state.score,36);assert.equal(chain.state.longestChain,2);
+    assert.deepEqual(chain.state.effects.map(e=>[e.column,e.row,e.step,+(e.at-chain.state.time).toFixed(2)]),[[2,0,1,0],[0,0,2,.12]],'Merges replay .12 s apart');
+    assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,0,'Cascade cues wait for their frame');
+    chain.update(.13);assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,2);
+    assert.ok(chain.state.bursts.some(b=>b.text.startsWith('CHAIN ×2')));
     assert.equal(s.pending,null);assert.equal(s.column,3,'A chord does not also move');assert.equal(s.refunds,0,'The next tile starts with a fresh refund allowance');
     assert.equal(s.budget,DROP.budget);assert.ok(Math.abs(s.deadline-s.time-DROP.budget)<1e-9);
     const before=s.drops;advance(DROP.budget+.05);assert.equal(s.drops,before+1,'The deadline drops the tile by itself');
     s.columns=[[128],[],[],[2],[2,8]];s.column=0;s.value=128;s.best=128;
     g.input({action:'left'});g.input({action:'right'});
-    assert.equal(s.floor,4);assert.equal(s.retirements,1);assert.deepEqual(s.columns,[[256],[],[],[],[8]],'Reaching 128 times the floor retires every 2');
+    assert.equal(s.floor,4);assert.equal(s.retirements,1);assert.deepEqual(s.columns,[[256],[],[],[4],[8]],'The touching 2s cascade into a 4 before the floor doubles; nothing left to retire');
     assert.ok(s.value>=4&&s.next>=4);
     assert.deepEqual(results,[]);
 });

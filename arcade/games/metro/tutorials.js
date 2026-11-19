@@ -33,6 +33,6 @@ export const metroDiagrams = {
 };
 export const metroCaptions = {
     memory: ['Raise L for the blue tile, R for the purple tile.', 'Slots fill as tiles flash. Repeat them in order, or follow along live for ×2.', 'Each tile 10, live 20. Finishing adds 10 per tile. Three wrongs end the run.'],
-    merge: ['Raise L or R to move the waiting tile; each move buys .2 s. Both together drop it now.', 'It falls when its bar runs out and merges with equal neighbours, in chains.', 'Chains score more. Reaching 128 × the smallest tile retires the small ones. One life: a full column ends the run.'],
+    merge: ['Raise L or R to move the waiting tile; each move buys .2 s. Both together drop it now.', 'It falls when its bar runs out and merges with equal neighbours; anything that then touches keeps merging.', 'Chains score more. Reaching 128 × the smallest tile retires the small ones. One life: a full column ends the run.'],
     rail: ['Raise L to switch junction 1. Raise R to switch junction 2 on the open branch.', 'Trains leave on time from the board. Set the junctions before each train reaches them.', 'Arrivals score; convoys add more. New stations open at 40 s and 90 s. A wrong station costs a heart.']
 };

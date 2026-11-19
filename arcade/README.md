@@ -355,8 +355,11 @@ and score rules v2; older boards and friend links stay separate.
   columns. L/R move the waiting tile one column; both raises within .12 s drop it
   now; otherwise it drops when its bar runs out, max(1.8, 4.2/pace) seconds. It
   merges with an equal tile below and equal side neighbours (value times 2 per
-  joined tile), then checks again; each merge scores its value times the chain
-  step. Spawns are the floor and the next 2 to 4 powers of two (variety grows
+  joined tile); then the whole board keeps merging while equal tiles touch,
+  including tiles that just fell, lowest and leftmost first. Each merge scores
+  its value times its chain step; the cascade is replayed one merge per .12 s
+  with a flat pop, a square ripple and a rising cue (`display.js` effects run on
+  simulation time and never touch rules or RNG). Spawns are the floor and the next 2 to 4 powers of two (variety grows
   with retirements). When the best tile reaches 128 times the floor, tiles below
   the doubled floor retire, so the board never saturates. One life: a full column
   ends the run. Each real move refunds .2 s to the deadline, at most four times

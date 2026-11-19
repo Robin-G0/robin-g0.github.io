@@ -1,6 +1,6 @@
 import { game } from '../../core/game.js';
 import { integer } from '../../core/random.js';
-import { METRO, light, header, pruneBursts, loseLife } from './display.js';
+import { METRO, light, header, addEffect, pruneEffects, pruneBursts, loseLife } from './display.js';
 
 // A growing tree: one junction and two stations, then a third station behind a second
 // junction at 40 s, then a fourth behind a third junction at 90 s. Trains leave on a
@@ -26,7 +26,7 @@ export function destination(stage, side, choice) {
 
 export function rail(env) {
     const s = { time: 0, root: 0, children: [0, 0], stage: 0, schedule: [], trains: [], served: 0, convoy: 0, lastArrival: { letter: '', at: -10 },
-        switchedAt: -10, childSwitchedAt: -10, refusedAt: -10, bursts: [], ended: false, ids: 0 };
+        switchedAt: -10, childSwitchedAt: -10, refusedAt: -10, bursts: [], effects: [], ended: false, ids: 0 };
     const burst = (text, letter, good = true) => { s.bursts.push({ text, letter, good, at: s.time }); s.bursts = s.bursts.slice(-6); };
     function fillSchedule() {
         while (s.schedule.length < RAIL.ahead) {
@@ -47,7 +47,7 @@ export function rail(env) {
             env.sound?.({ kind: 'turn', action: s.children[s.root] ? 'right' : 'left' });
         },
         update(s, dt) {
-            pruneBursts(s); if (s.ended) return;
+            pruneBursts(s); pruneEffects(s); if (s.ended) return;
             const stage = stageAt(s.time);
             if (stage > s.stage) {
                 s.stage = stage; const opened = STATIONS.find(station => station.stage === stage);
@@ -73,7 +73,8 @@ export function rail(env) {
                     s.score += points; s.served++; s.convoy = convoy ? s.convoy + 1 : 0;
                     s.lastArrival = { letter: train.letter, at: s.time };
                     burst(convoy ? `CONVOY +${points}` : `+${points}`, reached.letter);
-                    env.sound?.({ kind: convoy ? 'powerup' : 'clear', count: convoy ? 3 : 1 });
+                    addEffect(s, { kind: 'arrive', letter: reached.letter, convoy });
+                    env.sound?.({ kind: convoy ? 'powerup' : 'clear', count: convoy ? 3 : 1, chain: Math.min(4, s.convoy + 1) });
                 } else {
                     s.convoy = 0; s.lastArrival = { letter: '', at: -10 };
                     burst(`${train.letter} SENT TO ${reached.letter}`, reached.letter, false); loseLife(s, env);
@@ -108,7 +109,15 @@ export function rail(env) {
             light(p, '1 · L', 360 + 28 * k, rootY + 2, 16 * k, 'ink', 'left', 400);
             for (const station of openStations(s.stage)) {
                 if (station === selected) p.circle(slotX[station.slot], stationY, radius + 6 * k, 'ink', false);
-                p.circle(slotX[station.slot], stationY, radius, station.color);
+                // An arrival pops the station and sends a flat ring outward; reduced motion keeps a steady highlight.
+                const arrive = s.effects.find(e => e.kind === 'arrive' && e.letter === station.letter && s.time - e.at < .7), age = arrive ? s.time - arrive.at : 1;
+                let r = radius;
+                if (arrive && !env.reducedMotion) {
+                    r = radius * (age < .25 ? 1 + .18 * Math.sin(age / .25 * Math.PI) : 1);
+                    const c = p.c; c.save(); c.globalAlpha = Math.max(0, 1 - age / .7) * .9;
+                    p.circle(slotX[station.slot], stationY, radius + (arrive.convoy ? 26 : 16) * k * (age / .7) + 6 * k, arrive.convoy ? 'accent' : station.color, false); c.restore();
+                } else if (arrive) p.circle(slotX[station.slot], stationY, radius + 10 * k, station.color, false);
+                p.circle(slotX[station.slot], stationY, r, station.color);
                 light(p, station.letter, slotX[station.slot], stationY + 2, radius * 1.15, METRO.white, 'center', 400);
             }
             for (const train of s.trains) {

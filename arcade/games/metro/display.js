@@ -50,6 +50,23 @@ export function bursts(s, p, reduced = false) {
 }
 export function pruneBursts(s) { s.bursts = s.bursts.filter(b => s.time - b.at < 1.1); }
 
+/** Decorative effects run on simulation time and never touch rules or RNG. */
+export function addEffect(s, effect) { s.effects.push({ at: s.time, ...effect }); s.effects = s.effects.slice(-16); }
+export function pruneEffects(s) { s.effects = s.effects.filter(effect => s.time - effect.at < 1); }
+/** A flat pop and a square ripple around a tile. Returns the scale to draw the tile with; reduced motion keeps a steady outline. */
+export function ripple(p, x, y, w, h, age, color, reduced = false) {
+    if (age < 0 || age > .6) return 1;
+    if (reduced) { if (age < .35) p.outline(x + 2, y + 2, w - 4, h - 4, color, 4); return 1; }
+    const grow = Math.min(1, age / .5), spread = Math.min(26, Math.max(6, w * .3)) * grow, c = p.c;
+    c.save(); c.globalAlpha = (1 - grow) * .9;
+    p.outline(x - spread, y - spread, w + spread * 2, h + spread * 2, color, 3); c.restore();
+    return age < .25 ? 1 + .16 * Math.sin(age / .25 * Math.PI) : 1;
+}
+/** Draws a tile scaled about its centre, for pops. */
+export function scaledTile(p, x, y, w, h, scale, color, glyph, options) {
+    tile(p, x - (w * scale - w) / 2, y - (h * scale - h) / 2, w * scale, h * scale, color, glyph, options);
+}
+
 export function loseLife(s, env) {
     s.lives = Math.max(0, s.lives - 1); env.sound?.({ kind: 'miss' });
     if (!s.lives) { s.ended = true; env.finish('Game over'); }
