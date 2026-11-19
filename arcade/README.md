@@ -346,13 +346,20 @@ and score rules v2; older boards and friend links stay separate.
   after the show pays 10. Finishing adds 10 per tile, doubled when every tile was
   live. Unrevealed inputs are harmless. A wrong tile costs a heart and replays the
   same order; cadence shrinks from 1.1 s to .55 s with rounds. 24 s score rounds.
-- Tile Merge (`merge`): a seven-cell row. The previewed tile (a shuffled bag of six
-  2s and two 4s) enters the end you slid away from. Each merge scores its value;
-  two merges in a slide double the sum. A slide that moves nothing spawns nothing.
-  A full row without equal neighbours costs a heart and keeps only its biggest
-  tile. Seven cells were chosen by simulation: a greedy preview player outlasts
-  random slides by about 60%, while alternating slides avoid blocks but barely
-  score, so the 20 s score round is what makes stalling expensive.
+  The slot row under the tiles is the sequence: it fills with lettered tiles as
+  they flash, empties for the repeat and marks the current slot, so the number
+  of moves and the moment the order grows are explicit.
+- Tile Drop (`merge`, score rules v3): survival on a 5 by 6 board of bottom-up
+  columns. L/R move the waiting tile one column; both raises within .12 s drop it
+  now; otherwise it drops when its bar runs out, max(1.8, 4.2/pace) seconds. It
+  merges with an equal tile below and equal side neighbours (value times 2 per
+  joined tile), then checks again; each merge scores its value times the chain
+  step. Spawns are the floor and the next 2 to 4 powers of two (variety grows
+  with retirements). When the best tile reaches 128 times the floor, tiles below
+  the doubled floor retire, so the board never saturates. A full column costs a
+  heart and empties. Simulation: random columns lose after about 75 drops, a
+  greedy player after 1,400 to 3,000, so skill decides and time pressure is the
+  ceiling. Values show as 2k, 1M and so on.
 - Metro Line (`rail`): survival. Trains queue by themselves every max(1.5, 3.2/pace)
   seconds on a four-slot platform. L toggles the junction, R dispatches the front
   train, which takes max(1.3, 2.6/pace) seconds and is routed by the junction at
@@ -360,7 +367,7 @@ and score rules v2; older boards and friend links stay separate.
   adds a 10 convoy bonus. A fifth waiting train cancels the oldest for a heart; a
   wrong station costs a heart. Empty or busy platforms make R harmless.
 
-Deterministic tests cover live/repeat scoring, the show-phase clock, merge bags,
-spawn sides, blocked resets, the policy comparison, junction timing, convoys,
+Deterministic tests cover live/repeat scoring, the show-phase clock, drop merges,
+chords, retirements, overflow, the policy comparison, junction timing, convoys,
 overflow, idle loss and reduced-motion equivalence. These are simulated cadence
 checks, not evidence of physical comfort or webcam accuracy.

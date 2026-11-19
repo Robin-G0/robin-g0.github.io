@@ -189,6 +189,8 @@
 [data-theme=metro] .metro-diagram path { stroke-linecap: square; }
 .metro-flash { animation: metro-flash 3.6s linear infinite; animation-delay: var(--delay, 0s); }
 .metro-train { animation: metro-train 3s ease-in-out infinite; }
+.metro-drop { animation: metro-drop 2.6s ease-in infinite; }
+@keyframes metro-drop { 0%, 15% { transform: translateY(0); opacity: 1; } 60%, 85% { transform: translateY(68px); opacity: 1; } 100% { transform: translateY(68px); opacity: 0; } }
 @keyframes metro-flash { 0%, 100% { opacity: .35; } 8%, 20% { opacity: 1; } 28% { opacity: .35; } }
 @keyframes metro-train { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-58px); } }
 @media(prefers-reduced-motion:reduce) { .metro-diagram * { animation: none !important; } }

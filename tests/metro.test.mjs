@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {memory,TILES,tileCadence,revealedSteps} from '../arcade/games/metro/tiles.js';
-import {merge,MERGE,collapse,slide,blocked} from '../arcade/games/metro/merge.js';
+import {merge,DROP,landTile,spawnRange,varietyAfter,retireBelow,label} from '../arcade/games/metro/drop.js';
 import {rail,RAIL,arrivalInterval,travelSeconds} from '../arcade/games/metro/rail.js';
 import {seededRandom} from '../arcade/core/random.js';
 import {GameRunner} from '../arcade/core/runner.js';
@@ -32,7 +32,7 @@ test('Live Tiles answers only revealed steps live, ignores the rest harmlessly a
     g.input({action:'right'});
     assert.equal(s.score,80,'20 + 20 live, then 10 per tile doubled for an all-live finish');
     assert.equal(s.rounds,1);assert.equal(s.sequence.length,3);assert.equal(s.phase,'show');
-    assert.ok(sounds.some(e=>e.kind==='powerup'));
+    assert.ok(sounds.some(e=>e.kind==='powerup'));assert.ok(s.bursts.some(b=>b.text.startsWith('+1 TILE')));
 });
 
 test('Live Tiles repeats after the show for single points; a wrong tile costs a heart and replays the same order',()=>{
@@ -59,49 +59,78 @@ test('an idle Live Tiles run loses through the host round clock, which pauses wh
     assert.ok(runner.elapsed>60&&runner.elapsed<200,`Three shrinking rounds plus show phases, not instant: ${runner.elapsed}`);
 });
 
-test('Tile Merge slides merge each pair once, count merges, and reject moves that change nothing',()=>{
-    assert.deepEqual(collapse([2,2,2,2,0,0,0]),{row:[4,4,0,0,0,0,0],points:8});
-    assert.deepEqual(slide([2,2,4,0,0,0,0],'left'),{row:[4,4,0,0,0,0,0],points:4,merges:1,moved:true});
-    assert.deepEqual(slide([0,0,0,0,4,2,2],'right').row,[0,0,0,0,0,4,4]);
-    assert.equal(slide([4,2,0,0,0,0,0],'left').moved,false);
-    assert.equal(blocked([2,4,2,4,2,4,2]),true);assert.equal(blocked([2,4,4,2,8,2,4]),false);assert.equal(blocked([2,4,2,4,2,4,0]),false);
+test('Tile Drop landings merge below and sideways in chains, overflow full columns, retire small tiles and label big ones',()=>{
+    let columns=[[2],[],[],[],[]];
+    assert.deepEqual(landTile(columns,0,2),{overflow:false,points:4,merges:1,value:4,row:0});assert.deepEqual(columns,[[4],[],[],[],[]]);
+    columns=[[2],[],[2],[],[]];
+    assert.equal(landTile(columns,1,2).value,8,'Two equal side neighbours quadruple');assert.deepEqual(columns,[[],[8],[],[],[]]);
+    columns=[[4],[2],[],[],[]];
+    const chain=landTile(columns,1,2);
+    assert.deepEqual([chain.value,chain.merges,chain.points],[8,2,4+8*2],'Below first, then the freed side neighbour, scored by chain step');
+    assert.deepEqual(columns,[[],[8],[],[],[]]);
+    columns=[[2,4,8,16,32,64],[],[],[],[]];
+    assert.equal(landTile(columns,0,2).overflow,true);assert.equal(columns[0].length,DROP.rows);
+    columns=[[2,4],[8,2],[],[2],[16]];
+    assert.equal(retireBelow(columns,4),3);assert.deepEqual(columns,[[4],[8],[],[],[16]]);
+    assert.deepEqual(spawnRange(2),[2,4,8]);assert.deepEqual(spawnRange(8,5),[8,16,32,64,128]);
+    assert.deepEqual([varietyAfter(0),varietyAfter(3),varietyAfter(10)],[3,4,5]);
+    assert.deepEqual([label(512),label(2048),label(2**20),label(2**31)],['512','2k','1M','2G']);
 });
 
-test('Tile Merge previews a balanced bag, spawns opposite the slide, doubles double merges and resets a blocked row for a heart',()=>{
-    const {g,s,sounds}=setup(merge);
-    assert.equal(s.row.length,MERGE.cells);
-    s.row=[2,2,4,4,0,0,0];s.next=2;s.bag=[4];
-    g.input({action:'left'});
-    assert.deepEqual(s.row,[4,8,0,0,0,0,2]);assert.equal(s.score,24,'(4 + 8) × 2 merges');assert.equal(s.next,4);assert.equal(s.best,8);
-    g.input({action:'left'});
-    assert.deepEqual(s.row,[4,8,2,0,0,0,4]);assert.equal(s.score,24);assert.equal(s.bag.length,MERGE.bag.length-1,'An empty bag refills with a shuffled copy');
-    s.row=[4,8,2,0,0,0,0];const next=s.next;
-    g.input({action:'left'});
-    assert.equal(s.lastMove.moved,false);assert.deepEqual(s.row,[4,8,2,0,0,0,0]);assert.equal(s.next,next,'A slide that moves nothing spawns nothing');
-    s.bag=[];const values=[];
-    for(let i=0;i<MERGE.bag.length;i++){s.row=[2,0,0,0,0,0,0];g.input({action:'right'});values.push(s.next);}
-    assert.equal(values.filter(value=>value===4).length,MERGE.bag.filter(value=>value===4).length,'Every bag holds exactly its share of 4s');
-    s.row=[2,4,2,4,2,4,0];s.next=8;
-    g.input({action:'right'});
-    assert.equal(s.lives,2);assert.deepEqual(s.row,[8,0,0,0,0,0,0]);assert.equal(s.resets,1);assert.ok(sounds.some(e=>e.kind==='miss'));
+test('Tile Drop moves on single raises, drops on a chord, respects edges and deadlines, and empties a full column for a heart',()=>{
+    const {g,s,advance,sounds,results}=setup(merge);
+    assert.equal(s.column,2);
+    g.input({action:'left'});assert.equal(s.column,2,'A single raise waits out the chord window');
+    advance(.15);assert.equal(s.column,1);
+    g.input({action:'left'});g.input({action:'left'});advance(.15);assert.equal(s.column,0,'A duplicate raise is one move');
+    g.input({action:'left'});advance(.15);assert.equal(s.column,0);assert.equal(s.lastMove.moved,false,'The edge is harmless');
+    const value=s.value,next=s.next;
+    g.input({action:'left'});g.input({action:'right'});
+    assert.deepEqual(s.columns[0],[value]);assert.equal(s.drops,1);assert.equal(s.value,next,'Both raises together drop at once and the preview advances');
+    assert.equal(s.pending,null);assert.equal(s.column,0,'A chord does not also move');
+    assert.equal(s.budget,DROP.budget);assert.ok(Math.abs(s.deadline-s.time-DROP.budget)<1e-9);
+    const before=s.drops;advance(DROP.budget+.05);assert.equal(s.drops,before+1,'The deadline drops the tile by itself');
+    s.columns[0]=[2,4,8,16,32,64];s.column=0;
+    g.input({action:'left'});g.input({action:'right'});
+    assert.equal(s.lives,2);assert.deepEqual(s.columns[0],[]);assert.ok(sounds.some(e=>e.kind==='miss'));
+    s.columns=[[128],[],[],[2],[2,8]];s.column=0;s.value=128;s.best=128;
+    g.input({action:'left'});g.input({action:'right'});
+    assert.equal(s.floor,4);assert.equal(s.retirements,1);assert.deepEqual(s.columns,[[256],[],[],[],[8]],'Reaching 128 times the floor retires every 2');
+    assert.ok(s.value>=4&&s.next>=4);
+    assert.deepEqual(results,[]);
 });
 
-test('Tile Merge rewards planning: a greedy preview player outlasts chance, and a stalling player avoids blocks but barely scores',()=>{
-    const after=(row,direction,value)=>{const r=slide(row,direction);if(!r.moved)return null;const next=[...r.row];next[direction==='left'?next.length-1:0]=value;return {row:next,points:r.points*r.merges};};
-    const greedy=s=>['left','right'].map(d=>{const a=after(s.row,d,s.next);return {d,v:a?a.points-(blocked(a.row)?1000:0):-9};}).sort((a,b)=>b.v-a.v)[0].d;
-    const stall=s=>s.moves%2?'left':'right';
-    const play=(policy,seed,limit)=>{
-        const results=[];const g=merge({pace:1,random:seededRandom(seed),message(){},sound(){},finish:t=>results.push(t)});g.start();
-        let moves=0;for(;moves<limit&&!results.length;moves++){g.input({action:policy(g.state)});g.update(.05);}
-        return {moves,best:g.state.best,score:g.state.score,over:results.length>0};
+test('Tile Drop rewards column choice: random drops lose soon, a greedy player lasts hundreds of drops and keeps retiring',()=>{
+    const clone=columns=>columns.map(stack=>[...stack]);
+    const evaluate=(columns,column,value)=>{const c=clone(columns);const r=landTile(c,column,value);if(r.overflow)return -1e6;
+        const heights=c.map(stack=>stack.length);return r.points-Math.max(...heights)**2*3-heights.reduce((a,h)=>a+h,0);};
+    const policies={
+        random:(s,rnd)=>Math.floor(rnd()*DROP.columns),
+        greedy:s=>{let best=-Infinity,choice=0;for(let c=0;c<DROP.columns;c++){const v=evaluate(s.columns,c,s.value);if(v>best){best=v;choice=c;}}return choice;}
     };
-    for(let seed=1;seed<=6;seed++){
-        const smart=play(greedy,seed,600);
-        assert.ok(smart.moves>=30&&smart.best>=16,`seed ${seed}: ${smart.moves} moves, best ${smart.best}`);
+    const play=(name,seed,cap)=>{
+        const rnd=seededRandom(seed+1000),results=[];
+        const g=merge({pace:1,random:seededRandom(seed),message(){},sound(){},finish:t=>results.push(t)});g.start();const s=g.state;
+        let drops=0;
+        while(drops<cap&&!results.length){
+            const target=policies[name](s,rnd);
+            while(s.column!==target&&!results.length){g.input({action:s.column<target?'right':'left'});g.update(.15);}
+            g.input({action:'left'});g.input({action:'right'});g.update(.05);drops++;
+        }
+        return {drops,over:results.length>0,retirements:s.retirements};
+    };
+    for(let seed=1;seed<=4;seed++){
+        const chance=play('random',seed,400),skill=play('greedy',seed,900);
+        assert.ok(chance.over&&chance.drops<200,`seed ${seed}: random lasted ${chance.drops}`);
+        assert.ok(skill.drops>=900&&!skill.over,`seed ${seed}: greedy lasted only ${skill.drops}`);
+        assert.ok(skill.retirements>=3,'The floor keeps rising instead of saturating the board');
     }
-    const stalled=play(stall,1,300),scored=play(greedy,1,300);
-    assert.equal(stalled.over,false,'Alternating slides keep the row open; the round clock is what punishes stalling');
-    assert.ok(stalled.score<scored.score/2);
+});
+
+test('an unattended Tile Drop overflows into Game over and reduced motion changes nothing',()=>{
+    const a=setup(merge),b=setup(merge,{reducedMotion:true});
+    for(let i=0;i<30000&&!a.results.length;i++){a.g.update(.02);b.g.update(.02);}
+    assert.deepEqual(a.results,['Game over']);assert.ok(a.s.time<600);assert.deepEqual(a.s,b.s);
 });
 
 test('Metro Line dispatches the front train, routes it by the junction at the fork, and pays convoys',()=>{
@@ -137,17 +166,17 @@ test('Metro Line cancels the oldest train on a full platform, loses when idle, a
     assert.deepEqual(a.results,['Game over']);assert.ok(a.s.time<60);assert.deepEqual(a.s,b.s);
 });
 
-test('Metro engines use the shared illustrated host policy, declared clocks, and isolated v2 scores',()=>{
-    for(const engine of ['memory','merge','rail']){
+test('Metro engines use the shared illustrated host policy, declared clocks, and isolated versioned scores',()=>{
+    for(const [engine,version] of [['memory',2],['merge',3],['rail',2]]){
         const description=games.find(game=>game.engine===engine),config=gameConfig(description);
         assert.equal(config.profileFile,'wrist-up-only');assert.equal(config.outcomeFeedback,true);assert.equal(config.portraitBoard,true);
-        assert.equal(description.scoreVersion,2);
+        assert.equal(description.scoreVersion,version);
         const old={...description,scoreVersion:1},store=new ScoreStore(null);
         store.record(old,999);assert.equal(store.hasScore(description),false);assert.notEqual(scoreKey(old),scoreKey(description));
         const link=challengeLink('https://example.com/',description,{name:'METRO',score:100});
-        assert.equal(readChallenge(link,games).rules,2);
+        assert.equal(readChallenge(link,games).rules,version);
         assert.equal(readChallenge(challengeLink('https://example.com/',old,{name:'METRO',score:999}),games),null);
     }
-    assert.equal(PRESSURE_RULES.rail.kind,'survival');
-    assert.deepEqual([PRESSURE_RULES.memory.seconds,PRESSURE_RULES.merge.seconds],[24,20]);
+    assert.equal(PRESSURE_RULES.rail.kind,'survival');assert.equal(PRESSURE_RULES.merge.kind,'survival');
+    assert.equal(PRESSURE_RULES.memory.seconds,24);
 });

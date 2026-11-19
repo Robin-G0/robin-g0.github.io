@@ -5,6 +5,8 @@ const BLUE = '#087aa5', PURPLE = '#7434a6', GREEN = '#347c62', ORANGE = '#d86924
 const tile = (x, y, w, h, color, glyph = '', size = 28, css = '', delay = 0) =>
     `<g class="${css}" style="--delay:${delay}s"><rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${color};stroke:none"/>${glyph === '' ? '' : text(glyph, x + w / 2, y + h / 2 + size * .36, size, 300, '#fff')}</g>`;
 const station = (x, y, letter, color) => `<circle cx="${x}" cy="${y}" r="22" style="fill:${color};stroke:none"/>${text(letter, x, y + 9, 26, 400, '#fff')}`;
+const grid = filled => { let out = ''; for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) out += `<rect x="${118 + c * 34}" y="${104 - r * 34}" width="30" height="30" style="fill:none;stroke:currentColor;opacity:.35"/>`;
+    return out + (filled ? tile(118, 104, 30, 30, BLUE, '2', 16) + tile(186, 104, 30, 30, BLUE, '2', 16) + tile(186, 70, 30, 30, PURPLE, '4', 16) + tile(220, 104, 30, 30, GREEN, '8', 16) : tile(152, 104, 30, 30, BLUE, '2', 16) + tile(220, 104, 30, 30, PURPLE, '4', 16)); };
 const junction = active => `<path d="M200 165V95" style="stroke-width:7"/><path d="M200 95L110 45" style="stroke-width:7;stroke:${active === 0 ? BLUE : 'currentColor'};opacity:${active === 0 ? 1 : .35}"/><path d="M200 95L290 45" style="stroke-width:7;stroke:${active === 1 ? PURPLE : 'currentColor'};opacity:${active === 1 ? 1 : .35}"/>`;
 
 export const metroDiagrams = {
@@ -16,14 +18,9 @@ export const metroDiagrams = {
             + `<rect x="150" y="114" width="100" height="36" style="fill:${ORANGE};stroke:none"/>` + text('3 wrong = over', 200, 138, 17, 400, '#fff'))
     ],
     merge: [
-        frame([2, 0, 2, 0, 0, 0, 0].map((value, i) => value ? tile(50 + i * 44, 48, 38, 48, BLUE, value, 22) : `<rect x="${50 + i * 44}" y="48" width="38" height="48" style="fill:none;stroke:currentColor;stroke-dasharray:3 4"/>`).join('')
-            + '<rect x="8" y="57" width="30" height="30" style="fill:none;stroke:currentColor"/>' + text('2', 23, 79, 20) + '<rect x="362" y="57" width="30" height="30" style="fill:none;stroke:currentColor"/>' + text('2', 377, 79, 20)
-            + text('L ←', 100, 122, 30) + text('→ R', 300, 122, 30) + text('next tile enters the other end', 200, 152, 19)),
-        frame(tile(60, 20, 46, 46, BLUE, '2', 22) + tile(112, 20, 46, 46, BLUE, '2', 22) + tile(164, 20, 46, 46, PURPLE, '4', 22) + '<path d="M235 43h55m-12-10 12 10-12 10"/>' + text('L', 262, 28, 18, 400)
-            + tile(300, 20, 46, 46, PURPLE, '4', 22) + tile(352, 20, 46, 46, PURPLE, '4', 22)
-            + text('equal neighbours merge once', 200, 100, 21) + text('2 2 4 → 4 4, not 8', 200, 128, 21) + text('plan around the preview', 200, 153, 19)),
-        frame(text('+ value', 80, 55, 30) + text('merged', 80, 85, 18) + text('×2', 200, 55, 42) + text('two merges', 200, 85, 18) + text('refills time', 320, 55, 26) + text('every merge', 320, 85, 18)
-            + `<rect x="120" y="112" width="160" height="40" style="fill:${ORANGE};stroke:none"/>` + text('blocked row = −1 ■', 200, 138, 18, 400, '#fff'))
+        frame(grid(false) + tile(187, 2, 32, 32, PURPLE, '4', 18, 'metro-drop') + text('L ←', 60, 70, 30) + text('→ R', 340, 70, 30) + text('both ↑ = drop now', 200, 152, 20)),
+        frame(grid(true) + tile(187, 2, 32, 32, BLUE, '2', 18, 'metro-drop') + text('lands on an equal tile', 60, 70, 15) + text('merges with equal', 340, 62, 15) + text('neighbours, again', 340, 80, 15) + text('2 + 2 + 2 → 8 · chains score more', 200, 152, 19)),
+        frame(text('+ value', 75, 50, 30) + text('× chain', 75, 80, 20) + text('best = 128 × min', 215, 50, 24) + text('small tiles retire', 215, 80, 19) + `<rect x="290" y="28" width="100" height="64" style="fill:${ORANGE};stroke:none"/>` + text('full column', 340, 54, 16, 400, '#fff') + text('−1 ■', 340, 80, 20, 400, '#fff') + text('the bar above the tile is its deadline', 200, 140, 19))
     ],
     rail: [
         frame(junction(0) + station(110, 45, 'A', BLUE) + station(290, 45, 'B', PURPLE) + text('L  switch', 70, 125, 24) + tile(180, 106, 40, 50, BLUE, 'A', 22, 'metro-train') + text('R  dispatch', 320, 125, 24)),
@@ -34,7 +31,7 @@ export const metroDiagrams = {
     ]
 };
 export const metroCaptions = {
-    memory: ['Raise L for the blue tile, R for the purple tile.', 'Watch the order. Repeat it, or follow along live for ×2.', 'Each tile 10, live 20. Finishing adds 10 per tile. Three wrongs end the run.'],
-    merge: ['Raise L to slide left, R to slide right. The preview enters the other end.', 'Equal neighbours merge once per slide. Plan around the next tile.', 'Merges score and refill time. Two merges double. A blocked row costs a heart.'],
+    memory: ['Raise L for the blue tile, R for the purple tile.', 'Slots fill as tiles flash. Repeat them in order, or follow along live for ×2.', 'Each tile 10, live 20. Finishing adds 10 per tile. Three wrongs end the run.'],
+    merge: ['Raise L or R to move the waiting tile. Both together drop it now.', 'It falls when its bar runs out and merges with equal neighbours, in chains.', 'Chains score more. Reaching 128 × the smallest tile retires the small ones. A full column costs a heart.'],
     rail: ['Raise L to switch the junction. Raise R to dispatch the front train.', 'Set the junction before the train reaches the fork. Its letter is its station.', 'Arrivals score. Back-to-back same-line arrivals add a convoy bonus. Four waiting or a wrong station costs a heart.']
 };

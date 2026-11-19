@@ -4,7 +4,6 @@ import { games } from '../arcade/catalog.js';
 import { engines } from '../arcade/registry.js';
 import { seededRandom } from '../arcade/core/random.js';
 import { Painter } from '../arcade/core/painter.js';
-import { collapse } from '../arcade/games/metro.js';
 import { traceMirrors, probeRoute } from '../arcade/games/glass.js';
 import { containsPoint } from '../arcade/games/field-notes.js';
 
@@ -54,11 +53,6 @@ for (const description of games) {
         }
     });
 }
-
-test('merge preserves value and never merges a resulting tile twice', () => {
-    assert.deepEqual(collapse([2, 2, 2, 2, 0]), { row: [4, 4, 0, 0, 0], points: 8 });
-    assert.deepEqual(collapse([2, 2, 4, 0, 0]).row, [4, 4, 0, 0, 0]);
-});
 
 test('all rotated optical puzzles have a valid ray route', () => {
     const run = create('prisms'), g = run.game;

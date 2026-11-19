@@ -3,10 +3,10 @@ export function pressureMultiplier(seconds) {
     return 1 + .7 * Math.log1p(Math.max(0, seconds) / 40);
 }
 
-const survival = ['invaders', 'lander', 'snake', 'sort', 'ski', 'juggle', 'parry', 'rail',
+const survival = ['invaders', 'lander', 'snake', 'sort', 'ski', 'juggle', 'parry', 'rail', 'merge',
     'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'balance', 'abyss'];
 const rounds = { stack: 18, golf: 24, orbit: 24, binary: 24, gel: 18,
-    dock: 18, memory: 24, merge: 20, tangram: 20, prisms: 32, clockwork: 24,
+    dock: 18, memory: 24, tangram: 20, prisms: 32, clockwork: 24,
     contour: 36, stars: 24, bubbles: 18 };
 
 export const PRESSURE_RULES = Object.freeze({

@@ -27,7 +27,8 @@ export function header(p, title, detail, lives) {
 /** A live tile: solid colour, white glyph, inverted while lit and outlined while selected. */
 export function tile(p, x, y, w, h, color, glyph = '', { lit = false, selected = false, size = h * .45, label = '' } = {}) {
     p.rect(x, y, w, h, lit ? METRO.white : color);
-    if (lit) p.outline(x + 4, y + 4, w - 8, h - 8, color, 8); // Inverted tiles stay visible on a white page.
+    const edge = Math.max(3, Math.min(8, Math.round(w * .06)));
+    if (lit) p.outline(x + edge / 2, y + edge / 2, w - edge, h - edge, color, edge); // Inverted tiles stay visible on a white page.
     if (glyph !== '') light(p, glyph, x + w / 2, y + h / 2 - (label ? h * .06 : 0), size, lit ? color : METRO.white, 'center');
     if (label) light(p, label, x + 14, y + h - 18, Math.max(14, h * .12), lit ? color : METRO.white, 'left', 400);
     if (selected) p.outline(x + 3, y + 3, w - 6, h - 6, lit ? color : METRO.white, 4);
