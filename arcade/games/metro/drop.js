@@ -4,7 +4,8 @@ import { METRO, light, header, tile, meter, pruneBursts, loseLife } from './disp
 
 // Columns are bottom-up stacks, so gravity is implicit. The board never saturates: when the
 // best tile reaches `retire` times the floor, every tile below the doubled floor leaves the board.
-export const DROP = { columns: 5, rows: 6, budget: 4.2, minBudget: 1.8, chord: .12, retire: 128, variety: [3, 4, 5],
+// One life: a full column ends the run. Each real move refunds `refund` seconds, at most `columns - 1` times per tile.
+export const DROP = { columns: 5, rows: 6, budget: 4.2, minBudget: 1.8, chord: .12, retire: 128, variety: [3, 4, 5], refund: .2,
     colors: [METRO.blue, METRO.purple, METRO.green, METRO.orange, METRO.magenta, METRO.slate] };
 export const tileColor = value => DROP.colors[Math.round(Math.log2(value)) % DROP.colors.length];
 /** Values that may spawn: `variety` consecutive powers of two starting at the floor. Variety grows with retirements. */
@@ -46,24 +47,25 @@ export function retireBelow(columns, floor) {
     return removed;
 }
 
-/** Tile Drop: move the waiting tile with L/R, both together drop it now, otherwise it falls at the deadline. */
+/** Tile Drop: move the waiting tile with L/R (each move buys .2 s), both together drop it now, otherwise it falls at the deadline. */
 export function merge(env) {
-    const s = { columns: Array.from({ length: DROP.columns }, () => []), column: 2, value: 2, next: 2, floor: 2, best: 2,
-        deadline: null, budget: DROP.budget, drops: 0, pending: null, bursts: [], ended: false, lastMove: null, lastLanding: null, retired: 0, retirements: 0 };
+    const s = { columns: Array.from({ length: DROP.columns }, () => []), column: 2, value: 2, next: 2, floor: 2, best: 2, lives: 1,
+        deadline: null, budget: DROP.budget, drops: 0, pending: null, bursts: [], ended: false, lastMove: null, lastLanding: null, retired: 0, retirements: 0, refunds: 0 };
     const draw = () => { const range = spawnRange(s.floor, varietyAfter(s.retirements)); return range[integer(env.random, 0, range.length - 1)]; };
     s.value = draw(); s.next = draw();
     const burst = (text, column, row, good = true) => { s.bursts.push({ text, column, row, good, at: s.time }); s.bursts = s.bursts.slice(-6); };
-    function schedule() { s.budget = Math.max(DROP.minBudget, DROP.budget / env.pace); s.deadline = s.time + s.budget; }
+    function schedule() { s.budget = Math.max(DROP.minBudget, DROP.budget / env.pace); s.deadline = s.time + s.budget; s.refunds = 0; }
     function move(action) {
         const column = s.column + (action === 'left' ? -1 : 1);
         if (column < 0 || column >= DROP.columns) { s.lastMove = { action, at: s.time, moved: false }; return; }
         s.column = column; s.lastMove = { action, at: s.time, moved: true }; env.sound?.({ kind: 'turn', action });
+        if (s.deadline != null && s.refunds < DROP.columns - 1) { s.deadline += DROP.refund; s.refunds++; }
     }
     function drop() {
         const result = landTile(s.columns, s.column, s.value);
         s.drops++;
         if (result.overflow) {
-            burst('COLUMN FULL', s.column, DROP.rows - 1, false); s.columns[s.column].length = 0; loseLife(s, env);
+            burst('COLUMN FULL', s.column, DROP.rows - 1, false); loseLife(s, env);
         } else {
             s.lastLanding = { column: s.column, row: result.row, at: s.time };
             if (result.points) {
@@ -100,7 +102,7 @@ export function merge(env) {
         },
         render(s, p) {
             const compact = p.compact;
-            header(p, 'tile drop', `best ${label(s.best)} · min ${label(s.floor)}`, s.lives);
+            header(p, 'tile drop', `best ${label(s.best)} · min ${label(s.floor)}`, s.lives, 0);
             const cell = compact ? 100 : 43, gap = compact ? 10 : 5, pitch = cell + gap;
             const width = DROP.columns * pitch - gap, height = DROP.rows * pitch - gap, left = 360 - width / 2;
             const top = compact ? 330 : 118, bottom = top + height;
@@ -113,7 +115,7 @@ export function merge(env) {
             }));
             const waitY = top - cell - (compact ? 28 : 14), moved = s.lastMove && s.lastMove.moved && s.time - s.lastMove.at < .3;
             tile(p, colX(s.column), waitY, cell, cell, tileColor(s.value), label(s.value), { size: label(s.value).length > 2 ? cell * .38 : cell * .5, selected: moved });
-            if (s.deadline != null) meter(p, colX(s.column), waitY + cell + (compact ? 6 : 3), cell, (s.deadline - s.time) / s.budget, 'accent', compact ? 6 : 3);
+            if (s.deadline != null) meter(p, colX(s.column), waitY + cell + (compact ? 6 : 3), cell, (s.deadline - s.time) / (s.budget + DROP.refund * (DROP.columns - 1)), 'accent', compact ? 6 : 3);
             const ghost = compact ? 62 : 34, side = 50, infoY = compact ? 118 : waitY;
             const nextX = compact ? left + ghost / 2 : left - side, hintX = compact ? left + width : left + width + side, hintAlign = compact ? 'right' : 'center';
             light(p, 'next', nextX, infoY + (compact ? 0 : 10), compact ? 24 : 15, 'muted', 'center', 400);

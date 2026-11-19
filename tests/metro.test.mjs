@@ -77,27 +77,37 @@ test('Tile Drop landings merge below and sideways in chains, overflow full colum
     assert.deepEqual([label(512),label(2048),label(2**20),label(2**31)],['512','2k','1M','2G']);
 });
 
-test('Tile Drop moves on single raises, drops on a chord, respects edges and deadlines, and empties a full column for a heart',()=>{
-    const {g,s,advance,sounds,results}=setup(merge);
-    assert.equal(s.column,2);
+test('Tile Drop moves on single raises with a capped .2 s refund, drops on a chord, respects edges and deadlines',()=>{
+    const {g,s,advance,results}=setup(merge);
+    assert.equal(s.column,2);assert.equal(s.lives,1,'One life');
+    advance(.01);const deadline=s.deadline;
     g.input({action:'left'});assert.equal(s.column,2,'A single raise waits out the chord window');
-    advance(.15);assert.equal(s.column,1);
+    advance(.15);assert.equal(s.column,1);assert.ok(Math.abs(s.deadline-deadline-DROP.refund)<1e-9,'A real move refunds .2 s');
     g.input({action:'left'});g.input({action:'left'});advance(.15);assert.equal(s.column,0,'A duplicate raise is one move');
     g.input({action:'left'});advance(.15);assert.equal(s.column,0);assert.equal(s.lastMove.moved,false,'The edge is harmless');
+    assert.ok(Math.abs(s.deadline-deadline-2*DROP.refund)<1e-9,'Edges refund nothing');
+    for(let i=0;i<3;i++){g.input({action:'right'});advance(.15);}
+    assert.equal(s.column,3);assert.ok(Math.abs(s.deadline-deadline-(DROP.columns-1)*DROP.refund)<1e-9,'Refunds stop after four moves per tile');
     const value=s.value,next=s.next;
     g.input({action:'left'});g.input({action:'right'});
-    assert.deepEqual(s.columns[0],[value]);assert.equal(s.drops,1);assert.equal(s.value,next,'Both raises together drop at once and the preview advances');
-    assert.equal(s.pending,null);assert.equal(s.column,0,'A chord does not also move');
+    assert.deepEqual(s.columns[3],[value]);assert.equal(s.drops,1);assert.equal(s.value,next,'Both raises together drop at once and the preview advances');
+    assert.equal(s.pending,null);assert.equal(s.column,3,'A chord does not also move');assert.equal(s.refunds,0,'The next tile starts with a fresh refund allowance');
     assert.equal(s.budget,DROP.budget);assert.ok(Math.abs(s.deadline-s.time-DROP.budget)<1e-9);
     const before=s.drops;advance(DROP.budget+.05);assert.equal(s.drops,before+1,'The deadline drops the tile by itself');
-    s.columns[0]=[2,4,8,16,32,64];s.column=0;
-    g.input({action:'left'});g.input({action:'right'});
-    assert.equal(s.lives,2);assert.deepEqual(s.columns[0],[]);assert.ok(sounds.some(e=>e.kind==='miss'));
     s.columns=[[128],[],[],[2],[2,8]];s.column=0;s.value=128;s.best=128;
     g.input({action:'left'});g.input({action:'right'});
     assert.equal(s.floor,4);assert.equal(s.retirements,1);assert.deepEqual(s.columns,[[256],[],[],[],[8]],'Reaching 128 times the floor retires every 2');
     assert.ok(s.value>=4&&s.next>=4);
     assert.deepEqual(results,[]);
+});
+
+test('Tile Drop ends the run on the first full column',()=>{
+    const {g,s,sounds,results}=setup(merge);
+    s.columns[2]=[2,4,8,16,32,64];
+    g.input({action:'left'});g.input({action:'right'});
+    assert.deepEqual(results,['Game over']);assert.equal(s.lives,0);assert.equal(s.ended,true);assert.ok(sounds.some(e=>e.kind==='miss'));
+    const drops=s.drops;g.input({action:'left'});g.input({action:'right'});g.update(10);
+    assert.equal(s.drops,drops,'Nothing moves after the end');
 });
 
 test('Tile Drop rewards column choice: random drops lose soon, a greedy player lasts hundreds of drops and keeps retiring',()=>{

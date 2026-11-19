@@ -12,12 +12,12 @@ export function light(p, text, x, y, size, color = 'ink', align = 'left', weight
 }
 
 /** Start-screen header: a lowercase light title, a right-aligned detail and three square lives. */
-export function header(p, title, detail, lives) {
+export function header(p, title, detail, lives, slots = 3) {
     const compact = p.compact, y = compact ? 44 : 34;
     light(p, title, 28, y, compact ? 46 : 34, 'ink');
     light(p, detail, 692, y, compact ? 30 : 23, 'muted', 'right');
     const size = compact ? 16 : 11, gap = compact ? 10 : 7, top = compact ? 76 : 58;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < slots; i++) {
         const x = 692 - size - i * (size + gap);
         if (i < lives) p.rect(x, top, size, size, 'ink');
         else p.outline(x + 1, top + 1, size - 2, size - 2, 'border', 2);

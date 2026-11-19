@@ -356,10 +356,12 @@ and score rules v2; older boards and friend links stay separate.
   joined tile), then checks again; each merge scores its value times the chain
   step. Spawns are the floor and the next 2 to 4 powers of two (variety grows
   with retirements). When the best tile reaches 128 times the floor, tiles below
-  the doubled floor retire, so the board never saturates. A full column costs a
-  heart and empties. Simulation: random columns lose after about 75 drops, a
-  greedy player after 1,400 to 3,000, so skill decides and time pressure is the
-  ceiling. Values show as 2k, 1M and so on.
+  the doubled floor retire, so the board never saturates. One life: a full column
+  ends the run. Each real move refunds .2 s to the deadline, at most four times
+  per tile, so crossing the board is always affordable but stalling is not.
+  Simulation: random columns lose after about 75 drops, a greedy player after
+  1,400 to 3,000, so skill decides and time pressure is the ceiling. Values show
+  as 2k, 1M and so on.
 - Metro Line (`rail`): survival. Trains queue by themselves every max(1.5, 3.2/pace)
   seconds on a four-slot platform. L toggles the junction, R dispatches the front
   train, which takes max(1.3, 2.6/pace) seconds and is routed by the junction at
