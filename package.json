@@ -9,6 +9,6 @@
     "test:browser": "playwright test",
     "dev": "node scripts/serve.mjs"
   },
-  "dependencies": { "motion-input-grid": "1.1.0" },
+  "dependencies": { "motion-input-grid": "1.2.0" },
   "devDependencies": { "@playwright/test": "1.63.0" }
 }

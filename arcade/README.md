@@ -73,8 +73,8 @@ The host owns those resources and destroys the game on exit or theme change.
 The profile uses close, broad body-relative direction boxes with a small gap,
 native Single Press and 120 ms continuous occupancy. Terminal regions extend
 outward to the schema limits so travelling farther does not create a far-edge miss. Each simultaneous step
-has Required and Trigger constraints in the same rectangle. In npm 1.1.0,
-a trigger-only step does not reset its hold timer on brief exits; the Required
+has Required and Trigger constraints in the same rectangle. Since npm 1.1.0
+(unchanged in 1.2.0), a trigger-only step does not reset its hold timer on brief exits; the Required
 constraint is what makes dwell continuous. No finger inference is required.
 Shoulders and the acting wrist suffice; the other wrist and legs may be absent.
 GestureGate deduplicates native deliveries and drops ambiguous same-wrist
@@ -89,7 +89,8 @@ Packaged-WASM tests cover close reaches for both wrists, 0.75/1.33/1.78 camera
 aspects, narrow/wide shoulder crops, short boundary jitter, holds and loss.
 
 The camera shows the six profile rectangles projected into the mirrored preview.
-The published session does not expose its calibrated grid, so TriggerView matches
+MIGSession does not publicly expose its calibrated grid (1.2.0 adds `grid()` on
+the tracker only), so TriggerView matches
 the shoulder-relative metric and 35 ms grid filter as a live alignment guide.
 Box activation comes from the SDK tracker's native active state, not hit testing
 in the page. The guide and native profile share their region definitions.
@@ -290,11 +291,10 @@ Paused/tutorial boards retain their paint; the maze tree is cached independently
 from its animated icons. Covered theme animations and GIF backgrounds suspend
 while the room is open and restore on close.
 
-The npm dependency still supplies 1.1.0's WASM/models. Pending the next registry
-release, asset preparation uses the exact upstream JavaScript source revision in
-mig/runtime-source.json, verifies SHA-256 hashes and records that provenance in
-vendor/motion-input-grid/package.json. Re-running prepare:assets can reuse those
-verified files offline. No private recognizer is introduced.
+The site depends on the published motion-input-grid 1.2.0 release, which ships
+these session options natively. `prepare:assets` copies the installed package's
+runtime unchanged into vendor/motion-input-grid; no upstream source override or
+private recognizer is involved.
 
 Tests count render/inference work and exercise gesture/navigation behaviour.
 These budgets do not establish a temperature or battery saving on every device.

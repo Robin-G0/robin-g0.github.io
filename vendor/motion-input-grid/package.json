@@ -1,14 +1,6 @@
 {
   "name": "motion-input-grid",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
-  "license": "Apache-2.0",
-  "runtimeSource": {
-    "repository": "Robin-G0/Motion-Input-Grid",
-    "commit": "30d3c95b792ce99067174b261d86d0f6bffd2191",
-    "files": {
-      "session.mjs": "75d7fa6f9b9c96ac5f591f49e62de9262f42233a25a94ad4df6a0f7734f00f41",
-      "models.mjs": "69926f03a48b02a92691b372271f3f0b3a356ba53f090e0c56a48c13ccdcb5b7"
-    }
-  }
+  "license": "Apache-2.0"
 }

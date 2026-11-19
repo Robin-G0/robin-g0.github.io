@@ -7,7 +7,7 @@ function attribute(element, name, value) {
 }
 
 /** Project profile cells for display only; this module never emits game commands.
- * npm 1.1.0 does not expose the calibrated grid. Match its shoulder-relative metric,
+ * MIGSession does not publicly expose the calibrated grid. Match its shoulder-relative metric,
  * axis and 35 ms smoothing; an initial live projection is an alignment guide.
  */
 export class TriggerView {
