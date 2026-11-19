@@ -60,6 +60,8 @@ export class GameRoom {
         this.canvas.getContext('2d').setTransform(2, 0, 0, 2, 0, 0);
         this.canvas.setAttribute('aria-label', `${description.title}. ${description.goal}`);
         this.$('#arcade-game-title').textContent = description.title;
+        const livesCell = this.$('#arcade-lives').parentElement; // Lives, Attempts, or nothing: the engine decides.
+        livesCell.hidden = !config.livesLabel; livesCell.querySelector('dt').textContent = config.livesLabel || 'Lives';
         this.$('#arcade-goal').textContent = description.goal;
         this.buildControls();
         this.runner = new GameRunner(description, engines[description.engine], {

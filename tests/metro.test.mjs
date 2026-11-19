@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {memory,TILES,tileCadence,revealedSteps} from '../arcade/games/metro/tiles.js';
 import {merge,DROP,landTile,spawnRange,varietyAfter,retireBelow,label} from '../arcade/games/metro/drop.js';
-import {rail,RAIL,arrivalInterval,travelSeconds} from '../arcade/games/metro/rail.js';
+import {rail,RAIL,departureInterval,travelSeconds,stageAt,openStations,hasChild,destination} from '../arcade/games/metro/rail.js';
 import {seededRandom} from '../arcade/core/random.js';
 import {GameRunner} from '../arcade/core/runner.js';
 import {engines} from '../arcade/registry.js';
 import {games} from '../arcade/catalog.js';
 import {ScoreStore,scoreKey} from '../arcade/core/scores.js';
 import {readChallenge,challengeLink} from '../arcade/core/challenges.js';
-import {gameConfig} from '../arcade/core/game-config.js';
+import {gameConfig,livesLabel} from '../arcade/core/game-config.js';
 import {PRESSURE_RULES} from '../arcade/core/pressure.js';
 
 function setup(factory,extra={}) {
@@ -143,41 +143,51 @@ test('an unattended Tile Drop overflows into Game over and reduced motion change
     assert.deepEqual(a.results,['Game over']);assert.ok(a.s.time<600);assert.deepEqual(a.s,b.s);
 });
 
-test('Metro Line dispatches the front train, routes it by the junction at the fork, and pays convoys',()=>{
+test('Metro Line departs on its timetable, routes by junction 1 at 40% and junction 2 at 70%, and pays convoys',()=>{
     const {g,s,advance,sounds}=setup(rail);
-    assert.equal(arrivalInterval(1),RAIL.arrival);assert.equal(arrivalInterval(10),RAIL.minArrival);assert.equal(travelSeconds(1),RAIL.travel);
-    g.input({action:'right'});assert.equal(s.trains.length,0,'An empty platform makes the raise harmless');
-    advance(1.05);assert.equal(s.queue.length,1);
-    const line=s.queue[0].line;
-    g.input({action:'right'});assert.equal(s.trains.length,1);assert.equal(s.queue.length,0);
-    if(s.junction===line)g.input({action:'left'});
-    advance(2.7);
-    assert.equal(s.lives,2);assert.equal(s.score,0);assert.equal(s.trains.length,0);assert.ok(sounds.some(e=>e.kind==='miss'));
-    s.queue=[{line:1,id:11}];s.junction=0;s.nextArrival=1e9;
-    g.input({action:'right'});advance(1);
-    g.input({action:'left'});assert.equal(s.junction,1);
-    advance(2);assert.equal(s.score,RAIL.points,'Switching before the fork routes the train');
-    s.queue=[{line:1,id:12},{line:1,id:13}];
-    g.input({action:'right'});g.input({action:'right'});
-    assert.equal(s.trains.length,1,'A train still leaving the platform blocks the next dispatch harmlessly');
-    advance(.6);g.input({action:'right'});assert.equal(s.trains.length,2);
-    advance(3);
-    assert.equal(s.score,RAIL.points*3+RAIL.convoy);assert.equal(s.served,3);assert.equal(s.convoy,1);
+    assert.equal(departureInterval(1),RAIL.interval);assert.equal(departureInterval(10),RAIL.minInterval);assert.equal(travelSeconds(1),RAIL.travel);
+    assert.equal(s.schedule.length,RAIL.ahead);assert.equal(s.schedule[0].at,RAIL.firstDeparture);
+    assert.ok(s.schedule.every(d=>['A','B'].includes(d.letter)),'Only open stations are scheduled');
+    g.input({action:'right'});assert.equal(s.refusedAt,0,'No second junction exists at the start: R is harmless');
+    s.schedule=[{letter:'B',at:1,id:1},{letter:'B',at:1.6,id:2},{letter:'A',at:90,id:3},{letter:'A',at:93,id:4}];
+    advance(1.05);assert.equal(s.trains.length,1,'A train leaves when its time comes');
+    assert.equal(s.root,0);advance(RAIL.travel*RAIL.root);
+    g.input({action:'left'});assert.equal(s.root,1,'Switched after the train read junction 1');
+    advance(RAIL.travel*(1-RAIL.root)+.05);
+    assert.equal(s.lives,2);assert.equal(s.score,0);assert.ok(sounds.some(e=>e.kind==='miss'));
+    assert.equal(s.trains.length,1,'The second train is already on the track');
+    advance(RAIL.travel);
+    assert.equal(s.score,RAIL.points,'Junction 1 set to the right branch delivers B');
+    s.schedule=[{letter:'B',at:s.time+.1,id:5},{letter:'B',at:s.time+.8,id:6},{letter:'A',at:300,id:7},{letter:'A',at:303,id:8}];
+    advance(RAIL.travel+1);
+    assert.equal(s.served,3);assert.equal(s.score,RAIL.points*3+RAIL.convoy);assert.equal(s.convoy,1);
     assert.ok(sounds.some(e=>e.kind==='powerup'));
 });
 
-test('Metro Line cancels the oldest train on a full platform, loses when idle, and reduced motion changes nothing',()=>{
-    const {g,s}=setup(rail);
-    s.queue=[1,0,1,0].map((line,i)=>({line,id:i+1}));s.nextArrival=s.time;
-    g.update(.01);
-    assert.equal(s.queue.length,RAIL.capacity);assert.equal(s.queue[0].id,2);assert.equal(s.lives,2);
+test('Metro Line opens stations behind new junctions at hard-coded times and junction 2 only acts on the open branch',()=>{
+    const {g,s,advance}=setup(rail);
+    assert.deepEqual([stageAt(0),stageAt(39.9),stageAt(40),stageAt(90)],[0,0,1,2]);
+    assert.deepEqual(openStations(1).map(st=>st.letter),['A','B','C']);assert.deepEqual(openStations(2).map(st=>st.letter),['A','B','C','D']);
+    assert.equal(hasChild(1,0),false);assert.equal(hasChild(1,1),true);assert.equal(hasChild(2,0),true);
+    assert.equal(destination(1,1,0).letter,'B');assert.equal(destination(1,1,1).letter,'C');assert.equal(destination(2,0,1).letter,'D');assert.equal(destination(0,0,1).letter,'A');
+    s.schedule=[{letter:'A',at:500,id:1}];
+    advance(40.1);assert.equal(s.stage,1);assert.ok(s.bursts.some(b=>b.text==='NEW STATION C'));
+    s.root=0;g.input({action:'right'});assert.deepEqual(s.children,[0,0],'The left branch has no second junction at stage 1');
+    g.input({action:'left'});g.input({action:'right'});assert.deepEqual(s.children,[0,1],'R toggles the junction on the open branch');
+    s.schedule=[{letter:'C',at:s.time+.1,id:9},{letter:'A',at:500,id:10}];
+    advance(RAIL.travel+.3);assert.equal(s.score,RAIL.points,'Root right and child outer reach C');
+    advance(50);assert.equal(s.stage,2);assert.ok(s.bursts.some(b=>b.text==='NEW STATION D')||s.time>=90);
+    assert.ok(s.schedule.every(d=>['A','B','C','D'].includes(d.letter)));
+});
+
+test('an unattended Metro Line misroutes trains into Game over, and reduced motion changes nothing',()=>{
     const a=setup(rail),b=setup(rail,{reducedMotion:true});
     for(let i=0;i<20000&&!a.results.length;i++){a.g.update(.02);b.g.update(.02);}
-    assert.deepEqual(a.results,['Game over']);assert.ok(a.s.time<60);assert.deepEqual(a.s,b.s);
+    assert.deepEqual(a.results,['Game over']);assert.ok(a.s.time<120);assert.deepEqual(a.s,b.s);
 });
 
 test('Metro engines use the shared illustrated host policy, declared clocks, and isolated versioned scores',()=>{
-    for(const [engine,version] of [['memory',2],['merge',3],['rail',2]]){
+    for(const [engine,version] of [['memory',2],['merge',3],['rail',3]]){
         const description=games.find(game=>game.engine===engine),config=gameConfig(description);
         assert.equal(config.profileFile,'wrist-up-only');assert.equal(config.outcomeFeedback,true);assert.equal(config.portraitBoard,true);
         assert.equal(description.scoreVersion,version);
@@ -189,4 +199,5 @@ test('Metro engines use the shared illustrated host policy, declared clocks, and
     }
     assert.equal(PRESSURE_RULES.rail.kind,'survival');assert.equal(PRESSURE_RULES.merge.kind,'survival');
     assert.equal(PRESSURE_RULES.memory.seconds,24);
+    assert.deepEqual(['memory','merge','rail','binary','snake','popups','maze'].map(livesLabel),['Lives',null,'Lives','Attempts','Lives',null,null],'The HUD names what each game spends');
 });

@@ -1,110 +1,147 @@
 import { game } from '../../core/game.js';
 import { integer } from '../../core/random.js';
-import { METRO, light, header, meter, addBurst, pruneBursts, loseLife } from './display.js';
+import { METRO, light, header, pruneBursts, loseLife } from './display.js';
 
-export const RAIL = { capacity: 4, travel: 2.6, minTravel: 1.3, arrival: 3.2, minArrival: 1.5, fork: .5,
-    headway: .22, convoyWindow: 1.6, points: 20, convoy: 10 };
-const LINES = [{ letter: 'A', color: METRO.blue }, { letter: 'B', color: METRO.purple }];
-export const arrivalInterval = pace => Math.max(RAIL.minArrival, RAIL.arrival / pace);
+// A growing tree: one junction and two stations, then a third station behind a second
+// junction at 40 s, then a fourth behind a third junction at 90 s. Trains leave on a
+// visible timetable; the player only sets junctions. Station slots never move.
+export const RAIL = { stages: [0, 40, 90], interval: 3, minInterval: 1.4, travel: 4.4, minTravel: 2.4,
+    root: .4, child: .7, horizon: 6, ahead: 4, firstDeparture: 1.5, convoyWindow: 1.6, points: 20, convoy: 10 };
+export const STATIONS = Object.freeze([
+    { letter: 'A', color: METRO.blue, side: 0, outer: false, stage: 0, slot: 1 },
+    { letter: 'B', color: METRO.purple, side: 1, outer: false, stage: 0, slot: 2 },
+    { letter: 'C', color: METRO.green, side: 1, outer: true, stage: 1, slot: 3 },
+    { letter: 'D', color: METRO.orange, side: 0, outer: true, stage: 2, slot: 0 }
+]);
+export const departureInterval = pace => Math.max(RAIL.minInterval, RAIL.interval / pace);
 export const travelSeconds = pace => Math.max(RAIL.minTravel, RAIL.travel / pace);
+export const stageAt = time => RAIL.stages.filter(at => time >= at).length - 1;
+export const openStations = stage => STATIONS.filter(station => station.stage <= stage);
+export const hasChild = (stage, side) => openStations(stage).filter(station => station.side === side).length === 2;
+/** The station reached from a root side and, where that side splits, a child choice (0 inner, 1 outer). */
+export function destination(stage, side, choice) {
+    const onSide = openStations(stage).filter(station => station.side === side);
+    return onSide.length === 1 ? onSide[0] : onSide.find(station => station.outer === (choice === 1));
+}
 
-/** Metro Line: trains queue on their own. Set the junction, dispatch, and keep the platform clear. */
 export function rail(env) {
-    const s = { junction: 0, queue: [], trains: [], nextArrival: 1, served: 0, convoy: 0, lastArrival: { line: -1, at: -10 },
-        switchedAt: -10, dispatchedAt: -10, refusedAt: -10, bursts: [], ended: false, ids: 0 };
-    const arrive = () => { s.queue.push({ line: integer(env.random, 0, 1), id: ++s.ids }); };
+    const s = { time: 0, root: 0, children: [0, 0], stage: 0, schedule: [], trains: [], served: 0, convoy: 0, lastArrival: { letter: '', at: -10 },
+        switchedAt: -10, childSwitchedAt: -10, refusedAt: -10, bursts: [], ended: false, ids: 0 };
+    const burst = (text, letter, good = true) => { s.bursts.push({ text, letter, good, at: s.time }); s.bursts = s.bursts.slice(-6); };
+    function fillSchedule() {
+        while (s.schedule.length < RAIL.ahead) {
+            const last = s.schedule.at(-1), at = last ? last.at + departureInterval(env.pace) : s.time + RAIL.firstDeparture;
+            const open = openStations(s.stage);
+            s.schedule.push({ letter: open[integer(env.random, 0, open.length - 1)].letter, at, id: ++s.ids });
+        }
+    }
+    fillSchedule();
     return game(s, {
         feedback: () => ({ hideAll: true }),
         input(s, event) {
             if (s.ended) return;
-            if (event.action === 'left') {
-                s.junction = 1 - s.junction; s.switchedAt = s.time;
-                env.sound?.({ kind: 'turn', action: s.junction ? 'right' : 'left' }); return;
-            }
+            if (event.action === 'left') { s.root = 1 - s.root; s.switchedAt = s.time; env.sound?.({ kind: 'turn', action: s.root ? 'right' : 'left' }); return; }
             if (event.action !== 'right') return;
-            // An empty platform or a train still leaving it makes the raise harmless.
-            if (!s.queue.length || s.trains.some(train => train.progress < RAIL.headway)) { s.refusedAt = s.time; return; }
-            const train = s.queue.shift();
-            s.trains.push({ ...train, progress: 0, route: null, done: false }); s.dispatchedAt = s.time;
-            env.sound?.({ kind: 'input', action: 'right' });
+            if (!hasChild(s.stage, s.root)) { s.refusedAt = s.time; return; } // No second junction on this branch yet: harmless.
+            s.children[s.root] = 1 - s.children[s.root]; s.childSwitchedAt = s.time;
+            env.sound?.({ kind: 'turn', action: s.children[s.root] ? 'right' : 'left' });
         },
         update(s, dt) {
             pruneBursts(s); if (s.ended) return;
-            if (s.time >= s.nextArrival) {
-                arrive(); s.nextArrival = s.time + arrivalInterval(env.pace);
-                if (s.queue.length > RAIL.capacity) {
-                    s.queue.shift(); addBurst(s, 'PLATFORM FULL', 360, 'platform', false); loseLife(s, env);
-                    if (s.ended) return;
-                }
+            const stage = stageAt(s.time);
+            if (stage > s.stage) {
+                s.stage = stage; const opened = STATIONS.find(station => station.stage === stage);
+                burst(`NEW STATION ${opened.letter}`, opened.letter); env.sound?.({ kind: 'powerup' });
             }
+            while (s.schedule.length && s.time >= s.schedule[0].at) {
+                const departure = s.schedule.shift();
+                s.trains.push({ letter: departure.letter, id: departure.id, progress: 0, side: null, choice: null, done: false });
+                env.sound?.({ kind: 'input', action: 'right' });
+            }
+            fillSchedule();
             const speed = 1 / travelSeconds(env.pace);
             for (const train of s.trains) {
                 train.progress += speed * dt;
-                if (train.route == null && train.progress >= RAIL.fork) train.route = s.junction;
+                if (train.side == null && train.progress >= RAIL.root) train.side = s.root;
+                if (train.choice == null && train.progress >= RAIL.child) train.choice = s.children[train.side];
                 if (train.done || train.progress < 1) continue;
                 train.done = true;
-                if (train.route === train.line) {
-                    const convoy = s.lastArrival.line === train.line && s.time - s.lastArrival.at <= RAIL.convoyWindow;
+                const reached = destination(s.stage, train.side, train.choice);
+                if (reached.letter === train.letter) {
+                    const convoy = s.lastArrival.letter === train.letter && s.time - s.lastArrival.at <= RAIL.convoyWindow;
                     const points = RAIL.points + (convoy ? RAIL.convoy : 0);
                     s.score += points; s.served++; s.convoy = convoy ? s.convoy + 1 : 0;
-                    s.lastArrival = { line: train.line, at: s.time };
-                    addBurst(s, convoy ? `CONVOY +${points}` : `+${points}`, train.line ? 570 : 150, 'station');
+                    s.lastArrival = { letter: train.letter, at: s.time };
+                    burst(convoy ? `CONVOY +${points}` : `+${points}`, reached.letter);
                     env.sound?.({ kind: convoy ? 'powerup' : 'clear', count: convoy ? 3 : 1 });
                 } else {
-                    s.convoy = 0; s.lastArrival = { line: -1, at: -10 };
-                    addBurst(s, 'WRONG STATION', train.route ? 570 : 150, 'station', false); loseLife(s, env);
+                    s.convoy = 0; s.lastArrival = { letter: '', at: -10 };
+                    burst(`${train.letter} SENT TO ${reached.letter}`, reached.letter, false); loseLife(s, env);
                     if (s.ended) return;
                 }
             }
             s.trains = s.trains.filter(train => !train.done);
         },
         render(s, p) {
-            const compact = p.compact, h = p.h;
+            const compact = p.compact, h = p.h, k = compact ? 1.6 : 1;
             header(p, 'metro line', `${s.served} arrived · convoy ${s.convoy}`, s.lives);
-            // Vertical budget at 420: stations, fork, platform, then one label row and the arrival meter.
-            const stationY = compact ? 150 : 100, radius = compact ? 50 : 36, forkY = compact ? h * .5 : 205;
-            const slot = compact ? 70 : 44, gap = compact ? 16 : 12, platformY = h - (compact ? 200 : 120);
-            const stationX = [150, 570], track = compact ? 14 : 10, branchEnd = i => [stationX[i], stationY + radius];
-            // Signage: the branch the junction serves carries its line colour and its station wears a ring.
-            p.line([[360, platformY - 8], [360, forkY]], 'border', track);
-            LINES.forEach((line, i) => {
-                const active = s.junction === i;
-                p.line([[360, forkY], branchEnd(i)], active ? line.color : 'border', track);
-                if (active) p.circle(stationX[i], stationY, radius + (compact ? 9 : 6), 'ink', false);
-                p.circle(stationX[i], stationY, radius, line.color);
-                light(p, line.letter, stationX[i], stationY + 2, radius * 1.1, METRO.white, 'center', 400);
-            });
-            const [bladeX, bladeY] = branchEnd(s.junction);
-            p.line([[360, forkY], [360 + (bladeX - 360) * .28, forkY + (bladeY - forkY) * .28]], s.time - s.switchedAt < .3 ? 'ink' : METRO.white, Math.max(3, track - 6));
-            light(p, `L  switch → ${LINES[s.junction].letter}`, 378, forkY + (compact ? 44 : 26), compact ? 32 : 18, 'ink', 'left', 400);
+            const stationY = compact ? 150 : 96, radius = 30 * k, childY = compact ? h * .40 : 196, rootY = compact ? h * .56 : 272;
+            const depotY = compact ? h * .70 : 334, boardY = compact ? h - 150 : 368, track = 10 * k;
+            const slotX = [110, 280, 440, 610], childX = [195, 525], stationPoint = station => [slotX[station.slot], stationY + radius];
+            const selected = destination(s.stage, s.root, s.children[s.root]);
+            // Tracks: the open route carries its destination colour from the depot to the station.
+            p.line([[360, depotY], [360, rootY]], 'border', track);
+            for (const side of [0, 1]) {
+                const open = side === s.root, onSide = openStations(s.stage).filter(station => station.side === side);
+                p.line([[360, rootY], [childX[side], childY]], open ? selected.color : 'border', track);
+                for (const station of onSide) {
+                    const chosen = open && station === selected;
+                    p.line([[childX[side], childY], stationPoint(station)], chosen ? station.color : 'border', track);
+                }
+                if (onSide.length === 2) {
+                    p.circle(childX[side], childY, 9 * k, open ? 'ink' : 'border');
+                    light(p, '2', childX[side] + (side ? 22 : -22) * k, childY, 16 * k, open ? 'ink' : 'muted', 'center', 400);
+                    if (open) light(p, 'R', childX[side] + (side ? 22 : -22) * k, childY + 20 * k, 15 * k, 'ink', 'center', 400);
+                }
+            }
+            p.circle(360, rootY, 10 * k, s.time - s.switchedAt < .3 ? 'accent' : 'ink');
+            light(p, '1 · L', 360 + 28 * k, rootY + 2, 16 * k, 'ink', 'left', 400);
+            for (const station of openStations(s.stage)) {
+                if (station === selected) p.circle(slotX[station.slot], stationY, radius + 6 * k, 'ink', false);
+                p.circle(slotX[station.slot], stationY, radius, station.color);
+                light(p, station.letter, slotX[station.slot], stationY + 2, radius * 1.15, METRO.white, 'center', 400);
+            }
             for (const train of s.trains) {
-                const t = train.progress, [endX, endY] = branchEnd(train.route ?? s.junction), share = (t - RAIL.fork) / (1 - RAIL.fork);
-                const x = t < RAIL.fork ? 360 : 360 + (endX - 360) * share;
-                const y = t < RAIL.fork ? platformY - 8 - (platformY - 8 - forkY) * t / RAIL.fork : forkY + (endY - forkY) * share;
-                const w = compact ? 44 : 32, th = compact ? 56 : 40;
-                p.rect(x - w / 2, y - th / 2, w, th, LINES[train.line].color);
-                light(p, LINES[train.line].letter, x, y + 1, compact ? 30 : 20, METRO.white, 'center', 400);
+                const t = train.progress, side = train.side ?? s.root;
+                const target = destination(s.stage, side, train.choice ?? s.children[side]), [sx, sy] = stationPoint(target);
+                let x, y;
+                if (t < RAIL.root) { const u = t / RAIL.root; x = 360; y = depotY + (rootY - depotY) * u; }
+                else if (t < RAIL.child) { const u = (t - RAIL.root) / (RAIL.child - RAIL.root); x = 360 + (childX[side] - 360) * u; y = rootY + (childY - rootY) * u; }
+                else { const u = (t - RAIL.child) / (1 - RAIL.child); x = childX[side] + (sx - childX[side]) * u; y = childY + (sy - childY) * u; }
+                const line = STATIONS.find(station => station.letter === train.letter), w = 30 * k, th = 38 * k;
+                p.rect(x - w / 2, y - th / 2, w, th, line.color);
+                light(p, train.letter, x, y + 1, 19 * k, METRO.white, 'center', 400);
             }
-            // Platform: four slots. The front train leaves on R; a fifth arrival cancels the oldest.
-            const width = RAIL.capacity * (slot + gap) - gap, left = 360 - width / 2;
-            for (let i = 0; i < RAIL.capacity; i++) {
-                const x = left + i * (slot + gap), train = s.queue[i];
-                if (!train) { p.outline(x + 1, platformY + 1, slot - 2, slot - 2, 'border', 2); continue; }
-                p.rect(x, platformY, slot, slot, LINES[train.line].color);
-                light(p, LINES[train.line].letter, x + slot / 2, platformY + slot / 2 + 1, slot * .55, METRO.white, 'center', 400);
-                if (i === 0) p.outline(x + 3, platformY + 3, slot - 6, slot - 6, s.time - s.dispatchedAt < .3 ? 'ink' : METRO.white, 3);
+            // Departures board: upcoming trains slide toward the "now" line and leave when they reach it.
+            const left = 70, width = 580, nowX = left + 36 * k;
+            light(p, 'departures', left, boardY - 14 * k, 15 * k, 'muted', 'left', 400);
+            p.line([[left, boardY + 16 * k], [left + width, boardY + 16 * k]], 'border', 2);
+            p.line([[nowX, boardY - 2 * k], [nowX, boardY + 34 * k]], 'ink', 3);
+            light(p, 'now', nowX - 8 * k, boardY + 46 * k, 13 * k, 'muted', 'right', 400);
+            for (const departure of s.schedule) {
+                const wait = departure.at - s.time; if (wait > RAIL.horizon) continue;
+                const x = nowX + (wait / RAIL.horizon) * (left + width - nowX), line = STATIONS.find(station => station.letter === departure.letter);
+                p.rect(x - 13 * k, boardY, 26 * k, 32 * k, line.color);
+                light(p, departure.letter, x, boardY + 17 * k, 18 * k, METRO.white, 'center', 400);
+                light(p, `${Math.ceil(wait)}s`, x, boardY + 46 * k, 12 * k, 'muted', 'center', 400);
             }
-            const row = platformY + slot + (compact ? 38 : 20);
-            light(p, 'platform  ·  R  dispatch', left, row, compact ? 27 : 15, 'ink', 'left', 400);
-            // Phones put the arrival label under its meter instead of competing for the row.
-            light(p, 'next train', compact ? left : left + width, compact ? row + 60 : row, compact ? 24 : 15, 'muted', compact ? 'left' : 'right', 400);
-            meter(p, left, row + (compact ? 26 : 13), width, 1 - Math.max(0, s.nextArrival - s.time) / arrivalInterval(env.pace), 'accent', compact ? 8 : 5);
-            if (s.time - s.refusedAt < .5) light(p, s.queue.length ? 'platform busy' : 'no train waiting', left + width, row + (compact ? 60 : 32), compact ? 22 : 15, 'muted', compact ? 'right' : 'center', 400);
-            // Bursts are anchored to a station or the platform; the row is resolved at draw time.
-            for (const burst of s.bursts) {
-                const age = s.time - burst.at; if (age > 1.1) continue;
-                const y = burst.y === 'platform' ? platformY - (compact ? 60 : 38) : stationY + radius + (compact ? 60 : 30);
-                light(p, burst.text, burst.x, y - (env.reducedMotion ? 0 : age * 22), compact ? 36 : 28, burst.good ? 'ink' : METRO.orange, 'center', burst.good ? 300 : 400);
+            const upcoming = RAIL.stages.find(at => at > s.time);
+            if (upcoming) light(p, `new station in ${Math.ceil(upcoming - s.time)}s`, left + width, boardY - 14 * k, 13 * k, 'muted', 'right', 400);
+            if (s.time - s.refusedAt < .6) light(p, 'no second junction on this branch yet', 360, depotY + 22 * k, 14 * k, 'muted', 'center', 400);
+            for (const b of s.bursts) {
+                const age = s.time - b.at; if (age > 1.1) continue;
+                const station = STATIONS.find(item => item.letter === b.letter), x = station ? slotX[station.slot] : 360;
+                light(p, b.text, Math.max(90, Math.min(630, x)), stationY + radius + 28 * k - (env.reducedMotion ? 0 : age * 22), 26 * k, b.good ? 'ink' : METRO.orange, 'center', b.good ? 300 : 400);
             }
         }
     });

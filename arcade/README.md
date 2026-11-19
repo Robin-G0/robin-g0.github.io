@@ -33,7 +33,9 @@ The static site needs no server build.
 - `core/audio.js`: original synthesized cues and a mute control, with no audio downloads.
 - `core/game.js`: the small lifecycle used by every game.
 - `core/runner.js`: simulation time, tutorial, manual pause, restart and end conditions.
-- `core/game-config.js`: shared built-in profile and cooldown selection.
+- `core/game-config.js`: shared built-in profile, cooldown and HUD-label selection
+  (`livesLabel`: Lives for survival games, Attempts for round puzzles, hidden for
+  one-life or lifeless engines such as Tile Drop, Pop-up Panic and Link Maze).
 - `core/results.js`: shared scores, name entry, challenge comparison and share UI.
 - `core/challenges.js`: validated friend links and a separate browser-session target.
 - `core/pressure.js`: explicit survival/round policies for all 33 engines.
@@ -362,12 +364,15 @@ and score rules v2; older boards and friend links stay separate.
   Simulation: random columns lose after about 75 drops, a greedy player after
   1,400 to 3,000, so skill decides and time pressure is the ceiling. Values show
   as 2k, 1M and so on.
-- Metro Line (`rail`): survival. Trains queue by themselves every max(1.5, 3.2/pace)
-  seconds on a four-slot platform. L toggles the junction, R dispatches the front
-  train, which takes max(1.3, 2.6/pace) seconds and is routed by the junction at
-  half way. Arrivals pay 20; a same-line arrival within 1.6 s of the previous one
-  adds a 10 convoy bonus. A fifth waiting train cancels the oldest for a heart; a
-  wrong station costs a heart. Empty or busy platforms make R harmless.
+- Metro Line (`rail`, score rules v3): survival on a growing tree. Trains leave by
+  themselves from a departures board every max(1.4, 3/pace) seconds and travel
+  max(2.4, 4.4/pace) seconds; several are on the track at once. L toggles junction
+  1 (read at 40% of the trip); R toggles junction 2 on the branch junction 1 is
+  open to (read at 70%). Stations A and B exist from the start; C opens behind a
+  second junction at 40 s and D behind a third at 90 s (hard-coded stages); slots
+  never move. Arrivals pay 20, a same-station arrival within 1.6 s adds a 10
+  convoy bonus, a wrong station costs a heart. R is harmless while the open branch
+  has no second junction.
 
 Deterministic tests cover live/repeat scoring, the show-phase clock, drop merges,
 chords, retirements, overflow, the policy comparison, junction timing, convoys,

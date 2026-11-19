@@ -26,6 +26,8 @@ test('Metro games teach their real rules on flat cards and use two native raises
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(1200);
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
+        const livesCell=page.locator('#arcade-lives').locator('..');
+        if(engine==='merge')await expect(livesCell).toBeHidden();else{await expect(livesCell).toBeVisible();await expect(livesCell.locator('dt')).toHaveText('Lives');}
         await page.screenshot({path:`../arcade-review/metro-${engine}-desktop.png`});
         await page.locator('#arcade-pause').click();const time=await page.locator('#arcade-time').textContent();
         await page.clock.runFor(1500);await expect(page.locator('#arcade-time')).toHaveText(time);
@@ -52,16 +54,16 @@ test('Metro boards and cards fit phones and landscape without stretching game ru
     }
 });
 
-test('an unattended Metro Line fills its platform into Game over, versioned scores, sharing and replay',async({page})=>{
+test('an unattended Metro Line misroutes trains into Game over, versioned scores, sharing and replay',async({page})=>{
     await page.locator('[data-game=metro-rail]').click();
-    await page.locator('#arcade-no-camera').click();await page.clock.runFor(40000);
+    await page.locator('#arcade-no-camera').click();await page.clock.runFor(70000);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
     await expect(page.locator('#arcade-result')).toContainText('Game over');
     await page.locator('#arcade-name').fill('METRO');await page.locator('#arcade-save-score').click();
     await page.locator('#arcade-challenge-friend').click();
     const link=await page.locator('#arcade-challenge-link').inputValue();
     const target=JSON.parse(new URLSearchParams(new URL(link).hash.split('?')[1]).get('challenge'));
-    expect(target.game).toBe('metro-rail');expect(target.rules).toBe(2);
+    expect(target.game).toBe('metro-rail');expect(target.rules).toBe(3);
     await page.locator('#arcade-again').click();
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
 });
