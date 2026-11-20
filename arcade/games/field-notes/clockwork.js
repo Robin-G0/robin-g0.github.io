@@ -20,7 +20,7 @@ const visit = (open = false, struck = false) => ({ open, struck, closedAt: -10, 
 
 export function clockwork(env) {
     const s = { phi: 0, amp: CLOCK.start, target: CLOCK.start, heldUntil: CLOCK.hold, visits: { left: visit(), right: visit(true, true) },
-        ticks: 0, streak: 0, best: 0, chimes: 0, lastMark: 'plain', lastInput: null, bursts: [], effects: [], ended: false };
+        ticks: 0, streak: 0, best: 0, chimes: 0, rewound: false, lastMark: 'plain', lastInput: null, bursts: [], effects: [], ended: false };
     /** The next visit's mark is chosen as the previous visit to that side closes: about one full swing of warning. */
     function chooseMark() {
         if (s.ticks < CLOCK.goldAt) return 'plain';
@@ -30,7 +30,7 @@ export function clockwork(env) {
     }
     function rewind() {
         s.phi = 0; s.amp = s.target = CLOCK.start; s.heldUntil = s.time + CLOCK.recovery;
-        s.visits = { left: visit(), right: visit(true, true) }; s.streak = 0;
+        s.visits = { left: visit(), right: visit(true, true) }; s.streak = 0; s.rewound = true;
     }
     function stop() {
         addBurst(s, 'STOPPED', 360, 0, false); addEffect(s, { kind: 'stop' }); loseLife(s, env);
@@ -131,8 +131,7 @@ export function clockwork(env) {
             c.restore();
             // Rod and bob. During a rewind the bob is drawn back to the right pallet.
             let shown = theta;
-            if (held && s.time > CLOCK.hold - .01) shown = CLOCK.start * Math.min(1, 1 - (s.heldUntil - s.time) / CLOCK.recovery);
-            if (held && s.time <= CLOCK.hold) shown = CLOCK.start;
+            if (held) shown = s.rewound ? CLOCK.start * Math.min(1, 1 - (s.heldUntil - s.time) / CLOCK.recovery) : CLOCK.start;
             const [bx, by] = at(shown, L);
             ink(p, [[px, py], [bx, by]], 'ink', 3 * k);
             const stopped = s.effects.find(e => e.kind === 'stop' && s.time - e.at < 1);

@@ -8,19 +8,17 @@
 :root[data-theme=field-notes][data-mode=dark] [data-brief=start] #arcade-controls-status,
 :root[data-theme=field-notes][data-mode=dark] #arcade-begin { color: var(--accent); border-color: var(--accent); }
 
-/* The walkthrough is a notebook page: grid paper, red margin rule, washi tape on the corner. */
+/* The walkthrough is a notebook page: grid paper and the red margin rule. */
 [data-theme=field-notes] .arcade-walkthrough {
     background: linear-gradient(90deg,color-mix(in srgb,var(--border) 60%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,
         linear-gradient(color-mix(in srgb,var(--border) 45%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,var(--bg);
     border-left: 2px solid #b4625366; }
-[data-theme=field-notes] .arcade-walkthrough::after { content: ''; position: absolute; top: 6px; right: 18px; width: 74px; height: 18px;
-    background: color-mix(in srgb,var(--gold) 35%,transparent); transform: rotate(7deg); pointer-events: none; }
 [data-theme=field-notes] .guide-heading h3 { font-family: Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: .04em; }
 [data-theme=field-notes] .guide-title { font-family: 'Caveat', 'Segoe Print', cursive; font-weight: 700; font-size: clamp(28px, 3.4vw, 36px); color: var(--accent); transform: rotate(-1deg); }
 [data-theme=field-notes] .guide-caption { font-family: Georgia, serif; }
+@media (max-width: 480px) { [data-theme=field-notes] .arcade-walkthrough .guide-caption { font-size: 17px; } [data-theme=field-notes] .guide-title { font-size: 26px; } }
 [data-theme=field-notes] .guide-progress span { border-radius: 50%; background: transparent; border: 1.5px solid var(--muted); color: var(--muted); font-family: Georgia, serif; }
 [data-theme=field-notes] .guide-progress [aria-current=step] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-[data-theme=field-notes] .guide-figure { flex: 0 0 auto; }
 [data-theme=field-notes] .guide-nav button { font-family: Georgia, serif; font-style: italic; border-radius: 0; }
 [data-theme=field-notes] .guide-nav .primary { background: transparent; color: var(--accent); border: 0; border-bottom: 3px solid var(--accent); box-shadow: none; }
 [data-theme=field-notes] #arcade-player .arcade-action[data-pulse=true] { background: color-mix(in srgb,var(--accent) 18%,transparent); }

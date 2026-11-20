@@ -47,9 +47,9 @@ export const diagrams = {
 };
 
 export const captions = {
-    clockwork: ['The pendulum swings by itself. Raise L as the bob reaches the left pallet, R at the right one.', 'Any strike in the band keeps it swinging. Wait for the jewel at the turn: double points and twice the push.', 'Twelve strikes in a row chime: +60 and a life back. Later come gold jewels (+50) and grit to let pass. If the swing dies, the clock stops.'],
-    contour: ['The pencil walks by itself. Raise L or R to turn it a quarter at its next step; the dashed line shows where it goes.', 'Meet your own line to close a loop. Every summit inside is surveyed.', 'More summits in one loop score far more. Keep marshes out of the loop and the pencil on the sheet; each costs an attempt.'],
-    stars: ['Sweep a wrist left or right toward the next star. From the third figure, raise a wrist for the star above.', 'Each figure is inked stroke by stroke, then fades. Retrace it from memory, star by star.', 'Each star scores; a finished figure adds a bonus, doubled without mistakes. A wrong star costs an attempt and the figure is shown again.']
+    clockwork: ['Raise L as the bob reaches the left pallet, R at the right one.', 'Any strike keeps it swinging. At the jewel: double points, twice the push.', '12 in a row chime: +60, a life back. A dying swing stops the clock.'],
+    contour: ['Raise L or R: the pencil turns a quarter at its next step.', 'Meet your own line to close a loop around the summits.', 'More summits per loop score far more. Marsh inside or the edge: −1.'],
+    stars: ['Sweep toward the next star. From figure 3, raise for a star above.', 'Watch the figure being inked, then retrace it from memory.', 'Clean figures score double. A wrong star costs −1 and replays it.']
 };
 
 export const lessons = {
