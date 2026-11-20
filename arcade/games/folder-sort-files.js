@@ -1,5 +1,5 @@
-import { integer } from '../core/random.js?v=eras-2';
-import { createFilenameGenerator } from './folder-sort-names.js?v=eras-2';
+import { integer } from '../core/random.js?v=eras-3';
+import { createFilenameGenerator } from './folder-sort-names.js?v=eras-3';
 
 // Every filename is fictional. Classification follows the extension, not the joke.
 export const FILE_TYPES = {
@@ -40,27 +40,20 @@ export const fileStage = sorted => stages.findLastIndex(stage => sorted >= stage
 export const fileType = file => FILE_TYPES[file.split('.').at(-1)];
 export const fileSide = file => fileType(file).category === 'media' ? 'left' : 'right';
 
-function shuffle(values, random) {
-    for (let i = values.length - 1; i > 0; i--) {
-        const j = integer(random, 0, i); [values[i], values[j]] = [values[j], values[i]];
-    }
-    return values;
-}
-
-/** Balanced categories and independent extension bags prevent long one-sided runs. */
+/**
+ * Every file is an independent draw: a fair coin for media or text, then any extension
+ * already unlocked in that category. Runs of one folder happen, as they do by chance.
+ * Extensions of the newest stage count twice, so each unlock is felt right away.
+ */
 export function createFileDeck(random) {
-    let level = -1, categories = [], bags = {};
     const filename = createFilenameGenerator(random);
     return sorted => {
-        const next = fileStage(sorted);
-        if (next !== level) { level = next; categories = []; bags = {}; }
-        if (!categories.length) categories = shuffle(['media', 'text'], random);
-        const category = categories.pop();
-        if (!bags[category]?.length) {
-            const types = stages.slice(0, level + 1).flatMap(stage => stage.types);
-            bags[category] = shuffle(types.filter(type => FILE_TYPES[type].category === category), random);
-        }
-        const extension = bags[category].pop();
+        const level = fileStage(sorted);
+        const category = random() < .5 ? 'media' : 'text';
+        const pool = stages.slice(0, level + 1).flatMap((stage, index) => stage.types
+            .filter(type => FILE_TYPES[type].category === category)
+            .flatMap(type => index === level && level > 0 ? [type, type] : [type]));
+        const extension = pool[integer(random, 0, pool.length - 1)];
         return filename(extension, FILE_TYPES[extension]);
     };
 }

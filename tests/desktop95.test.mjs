@@ -44,15 +44,21 @@ test('desktop95 timed actions do not change state while paused or after dispose'
     }
 });
 
-test('file types unlock progressively and each deck balances media against text',()=>{
+test('file types unlock progressively and each file is an independent fair draw',()=>{
     for(const [sorted,allowed] of [[0,['txt','png']],[5,['txt','png','jpg','gif','bmp','md','rtf']]]){
         const draw=createFileDeck(seededRandom(23)),seen=new Set();
-        for(let i=0;i<100;i+=2){
-            const pair=[draw(sorted),draw(sorted)];
-            assert.notEqual(fileType(pair[0]).category,fileType(pair[1]).category);
-            pair.forEach(file=>{const ext=file.split('.').at(-1);assert.ok(allowed.includes(ext));seen.add(ext);});
-        }
+        for(let i=0;i<100;i++){const ext=draw(sorted).split('.').at(-1);assert.ok(allowed.includes(ext));seen.add(ext);}
         assert.deepEqual([...seen].sort(),allowed.sort());
+    }
+    // No hidden alternation: about half media, about half switches, and long runs do occur.
+    for(const seed of [3,77,901]){
+        const draw=createFileDeck(seededRandom(seed)),sides=Array.from({length:4000},()=>fileType(draw(10)).category);
+        const media=sides.filter(side=>side==='media').length/sides.length;
+        const switches=sides.slice(1).filter((side,i)=>side!==sides[i]).length/(sides.length-1);
+        let run=1,longest=1;for(let i=1;i<sides.length;i++){run=sides[i]===sides[i-1]?run+1:1;longest=Math.max(longest,run);}
+        assert.ok(media>.45&&media<.55,`media share ${media}`);
+        assert.ok(switches>.45&&switches<.55,`switch rate ${switches}`);
+        assert.ok(longest>=7,`longest run ${longest}`);
     }
     const draw=createFileDeck(seededRandom(7));
     for(const [milestone,formats] of [[15,['js','py','wav','mp3']],[25,['mp4','webm','json','css']],[35,['cpp','rs','flac','mkv']],[45,['sh','sql','opus','avif']]]){

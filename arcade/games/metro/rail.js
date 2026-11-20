@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js?v=eras-2';
-import { integer } from '../../core/random.js?v=eras-2';
-import { METRO, light, header, addEffect, pruneEffects, pruneBursts, loseLife, settle } from './display.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
+import { integer } from '../../core/random.js?v=eras-3';
+import { METRO, light, header, addEffect, pruneEffects, pruneBursts, loseLife, settle } from './display.js?v=eras-3';
 
 // A growing tree: one junction and two stations, then a third station behind a second
 // junction at 40 s, then a fourth behind a third junction at 90 s. Trains leave on a

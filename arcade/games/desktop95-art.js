@@ -133,6 +133,8 @@ export function fileIcon(p,x,y,kind,size=1) {
     else if(kind==='audio') {p.text('♫',x,y+35*size,34*size,C.blue,'center');}
     else if(kind==='video') {p.rect(x-19*size,y+15*size,38*size,34*size,C.dark);for(let i=0;i<4;i++){p.rect(x-17*size,y+(17+i*8)*size,3*size,4*size,C.light);p.rect(x+14*size,y+(17+i*8)*size,3*size,4*size,C.light);}p.text('>',x,y+32*size,24*size,C.light,'center');}
     else if(kind==='code') {p.text('{ }',x,y+34*size,23*size,C.blue,'center');}
+    // Unknown until it is sorted: a blank page, so only the extension tells the folder.
+    else if(kind==='unknown') {p.text('?',x,y+36*size,30*size,C.shadow,'center');}
     else for(let i=0;i<4;i++)p.line([[x-w/2+9*size,y+(18+i*9)*size],[x+w/2-9*size,y+(18+i*9)*size]],i===0?C.blue:'#777',2*size);
 }
 export function tree(p,x,y,size=1,sway=0) {

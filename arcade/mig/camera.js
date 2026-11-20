@@ -1,8 +1,8 @@
-import { arcadeProfile } from './profile.js?v=eras-2';
-import { GestureGate } from './gesture-gate.js?v=eras-2';
-import { BindingGate } from './bindings.js?v=eras-2';
-import { PRESETS } from './precision.js?v=eras-2';
-import { precisionModelLoader, isPoseModelReady, POSE_MODELS } from './pose-models.js?v=eras-2';
+import { arcadeProfile } from './profile.js?v=eras-3';
+import { GestureGate } from './gesture-gate.js?v=eras-3';
+import { BindingGate } from './bindings.js?v=eras-3';
+import { PRESETS } from './precision.js?v=eras-3';
+import { precisionModelLoader, isPoseModelReady, POSE_MODELS } from './pose-models.js?v=eras-3';
 
 const RUNTIME = new URL('../../vendor/motion-input-grid/runtime/', import.meta.url).href;
 

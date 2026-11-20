@@ -1,7 +1,7 @@
-import {game} from '../../core/game.js?v=eras-2';
-import {clamp,integer} from '../../core/random.js?v=eras-2';
-import {CRT,terminal,stars,addBurst,bursts,pruneBursts,loseLife,bloom,faded,shards,staticBurst,rollBand,warmUp,glass,bitmap} from './display.js?v=eras-2';
-import {createBunkers,strikeBunker,crushBunker,drawBunkers} from './bunkers.js?v=eras-2';
+import {game} from '../../core/game.js?v=eras-3';
+import {clamp,integer} from '../../core/random.js?v=eras-3';
+import {CRT,terminal,stars,addBurst,bursts,pruneBursts,loseLife,bloom,faded,shards,staticBurst,rollBand,warmUp,glass,bitmap} from './display.js?v=eras-3';
+import {createBunkers,strikeBunker,crushBunker,drawBunkers} from './bunkers.js?v=eras-3';
 
 export const INVADERS={lanes:7,ground:322,shotSeconds:.48,warningSeconds:.95,hitGrace:1.15};
 export const laneX=lane=>72+lane*96;

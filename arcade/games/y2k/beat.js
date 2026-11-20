@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js?v=eras-2';
-import { decodeGesture } from '../../core/commands.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
+import { decodeGesture } from '../../core/commands.js?v=eras-3';
 import { techno, chrome, pill, backdrop, header, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js?v=eras-2';
+    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js?v=eras-3';
 
 // Chrome Beat: two lanes, one per wrist, on a Winamp-style deck. Notes slide down to the pads and are
 // played with the move they show: ↑ raise; from 30 s ← / → scratch (sweep that wrist to the side).

@@ -1,6 +1,6 @@
-import {game} from '../../core/game.js?v=eras-2';
-import {integer} from '../../core/random.js?v=eras-2';
-import {CRT,terminal,meter,addBurst,bursts,pruneBursts,loseLife,bloom,faded,staticBurst,warmUp,glass,mix} from './display.js?v=eras-2';
+import {game} from '../../core/game.js?v=eras-3';
+import {integer} from '../../core/random.js?v=eras-3';
+import {CRT,terminal,meter,addBurst,bursts,pruneBursts,loseLife,bloom,faded,staticBurst,warmUp,glass,mix} from './display.js?v=eras-3';
 
 export const SNAKE={columns:12,rows:9,quickSeconds:6,minStep:.7};
 const directions=[[1,0],[0,1],[-1,0],[0,-1]];

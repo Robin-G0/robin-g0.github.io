@@ -1,7 +1,7 @@
-import { LINK_EFFECTS } from './link-maze-map.js?v=eras-2';
-import { drawLinkEffect } from './link-maze-art.js?v=eras-2';
-import { Painter } from '../core/painter.js?v=eras-2';
-import { starfield, sparkle, sparkleBurst, blinkOn, pageColor } from './construction-fx.js?v=eras-2';
+import { LINK_EFFECTS } from './link-maze-map.js?v=eras-3';
+import { drawLinkEffect } from './link-maze-art.js?v=eras-3';
+import { Painter } from '../core/painter.js?v=eras-3';
+import { starfield, sparkle, sparkleBurst, blinkOn, pageColor } from './construction-fx.js?v=eras-3';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
 const wrist = side => side === 0 ? 'L' : 'R';

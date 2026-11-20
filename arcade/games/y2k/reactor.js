@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
 import { techno, chrome, candy, starburst, flare, backdrop, header, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js?v=eras-2';
+    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js?v=eras-3';
 
 // Reactor Balance: plasma orbs drop into a chute one at a time. Raise L to pour the orb into the left
 // core, R into the right core. A core that reaches exactly 10 FUSES (score, it empties, +1 vent);

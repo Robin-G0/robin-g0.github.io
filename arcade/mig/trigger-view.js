@@ -1,5 +1,5 @@
-import { arcadeProfile } from './profile.js?v=eras-2';
-import { commandLabel } from '../core/commands.js?v=eras-2';
+import { arcadeProfile } from './profile.js?v=eras-3';
+import { commandLabel } from '../core/commands.js?v=eras-3';
 
 function attribute(element, name, value) {
     const text = String(value);

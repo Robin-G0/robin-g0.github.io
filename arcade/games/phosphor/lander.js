@@ -1,6 +1,6 @@
-import {game} from '../../core/game.js?v=eras-2';
-import {clamp} from '../../core/random.js?v=eras-2';
-import {CRT,terminal,stars,meter,addBurst,bursts,pruneBursts,loseLife,bloom,faded,shards,staticBurst,rollBand,warmUp,glass} from './display.js?v=eras-2';
+import {game} from '../../core/game.js?v=eras-3';
+import {clamp} from '../../core/random.js?v=eras-3';
+import {CRT,terminal,stars,meter,addBurst,bursts,pruneBursts,loseLife,bloom,faded,shards,staticBurst,rollBand,warmUp,glass} from './display.js?v=eras-3';
 
 export const LANDER={pad:320,safeSpeed:32,perfectSpeed:8,thrust:18,thrusterFuel:4,
     chordSeconds:.12,step:48,minX:216,maxX:504,padHalfWidth:96,footHalfWidth:42};

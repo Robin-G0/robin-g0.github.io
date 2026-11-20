@@ -1,4 +1,4 @@
-import { WRISTS, DIRECTIONS } from '../core/commands.js?v=eras-2';
+import { WRISTS, DIRECTIONS } from '../core/commands.js?v=eras-3';
 
 // Body cells use unmirrored image X; the preview is mirrored once. A screen-left
 // movement therefore increases grid X. Regions stay relative to the shoulders.

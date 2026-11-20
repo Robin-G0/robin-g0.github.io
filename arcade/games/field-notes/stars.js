@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js?v=eras-2';
-import { decodeGesture } from '../../core/commands.js?v=eras-2';
-import { header, page, write, ink, pencil, star, blot, tag, stamp, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
+import { decodeGesture } from '../../core/commands.js?v=eras-3';
+import { header, page, write, ink, pencil, star, blot, tag, stamp, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-3';
 
 // Constellations: a figure is inked on the star chart stroke by stroke, then fades. Retrace it from
 // memory: at every star, the next candidates are circled and you point toward the right one with a

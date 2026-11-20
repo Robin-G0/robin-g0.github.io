@@ -1,7 +1,7 @@
-import { game, reward } from '../core/game.js?v=eras-2';
-import { clamp, integer } from '../core/random.js?v=eras-2';
-import { C, bevel, window95, folder, fileIcon, tree, hourglass, dialog, dragOutline, zoomRects, label } from './desktop95-art.js?v=eras-2';
-import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=eras-2';
+import { game, reward } from '../core/game.js?v=eras-3';
+import { clamp, integer } from '../core/random.js?v=eras-3';
+import { C, bevel, window95, folder, fileIcon, tree, hourglass, dialog, dragOutline, zoomRects, label } from './desktop95-art.js?v=eras-3';
+import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=eras-3';
 
 // A lost third heart is a game over, not a completed round.
 function loseHeart(state,env,message) {
@@ -34,7 +34,7 @@ export function sort(env) {
         update(s){if(s.time>s.deadline){s.streak=0;env.sound?.({kind:'miss'});loseHeart(s,env,'File expired. Try the next one.');next();}},
         render(s,p){
             const compact=p.compact,reduced=env.reducedMotion;
-            const rank=knowledge(s.streak),type=fileType(s.file);
+            const rank=knowledge(s.streak);
             const area=window95(p,'Exploring - C:\\Inbox',`${s.sorted} object(s) copied`,`Chain ${s.streak}`,s.time,reduced);
             bevel(p,22,area.top,676,area.bottom-area.top,true,C.light);
             const top=area.top,bottom=area.bottom,scale=compact?1.35:1;
@@ -53,7 +53,7 @@ export function sort(env) {
             folder(p,160,folderY,'L / Media',receipt?.side==='left',scale,receipt?.side==='left'&&!reduced?landing:0);
             folder(p,560,folderY,'R / Text',receipt?.side==='right',scale,receipt?.side==='right'&&!reduced?landing:0);
             const iconScale=compact?1.4:1.05;
-            fileIcon(p,360,iconTop,type.icon,iconScale);
+            fileIcon(p,360,iconTop,'unknown',iconScale);
             if(s.time<s.ready)hourglass(p,360+48*iconScale,iconTop+16*iconScale,compact?3:2);
             const nameY=compact?iconTop+130:199;
             p.text(s.file,360,nameY,Math.min(compact?36:20,570/(s.file.length*.62)),C.dark,'center');
@@ -70,12 +70,14 @@ export function sort(env) {
             for(let i=0;i<20;i++)if(i<Math.floor(rank.progress*20))p.rect(254+i*10.6,meterY+4,8,compact?16:6,C.blue);
             if(receipt){
                 const x=receipt.side==='left'?160:560;
+                // The chosen file reveals its icon and travels into the folder under a drag outline.
+                const travel=reduced?1:Math.min(1,age/.36),t=1-Math.pow(1-travel,3),w=54*iconScale,h=64*iconScale;
+                const shrink=1-.45*t,fx=360+(x-360)*t,fy=iconTop+(folderY-iconTop-h/2)*t;
+                if(age<(receipt.ok?.45:.9)){
+                    fileIcon(p,fx,fy,fileType(receipt.file).icon,iconScale*shrink);
+                    if(!reduced&&travel<1)dragOutline(p,fx-w*shrink/2,fy,w*shrink,h*shrink);
+                }
                 if(receipt.ok){
-                    // The shell's dotted drag outline travels from the file to the folder.
-                    if(!reduced&&age<.36){
-                        const t=1-Math.pow(1-age/.36,3),w=54*iconScale,h=64*iconScale;
-                        dragOutline(p,360-w/2+(x-360)*t,iconTop+(folderY-iconTop-h/2)*t,w,h);
-                    }
                     p.text('\u2713 Copied',x,folderY-(compact?70:53),compact?30:19,'#176a49','center');
                 }else dialog(p,x,folderY-(compact?80:60),compact?290:190,compact?96:62,'Error','Wrong folder',{age,reduced});
             }

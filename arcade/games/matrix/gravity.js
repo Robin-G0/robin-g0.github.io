@@ -1,5 +1,5 @@
-import { game } from '../../core/game.js?v=eras-2';
-import { mono, header, rain, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, loseLife } from './display.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
+import { mono, header, rain, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, loseLife } from './display.js?v=eras-3';
 
 // Gravity Switch: a wall run up a shaft of code. Gravity pulls the runner to the left or the right
 // wall: raise L for the left wall, R for the right wall (raising the wall you are on is harmless).

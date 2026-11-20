@@ -1,6 +1,6 @@
-import { InputRouter } from './input.js?v=eras-2';
-import { seededRandom } from './random.js?v=eras-2';
-import { PRESSURE_RULES, RoundPressure, pressureMultiplier } from './pressure.js?v=eras-2';
+import { InputRouter } from './input.js?v=eras-3';
+import { seededRandom } from './random.js?v=eras-3';
+import { PRESSURE_RULES, RoundPressure, pressureMultiplier } from './pressure.js?v=eras-3';
 
 /** Owns simulation time. Games never own timers, animation loops or cameras. */
 export class GameRunner {

@@ -1,9 +1,9 @@
 // The games gallery: every engine of every era, each preview painted in its own era's palette.
-import { games } from './catalog.js?v=eras-2';
-import { engines } from './registry.js?v=eras-2';
-import { seededRandom } from './core/random.js?v=eras-2';
-import { Painter } from './core/painter.js?v=eras-2';
-import { LEVEL_LABELS } from './mig/precision.js?v=eras-2';
+import { games } from './catalog.js?v=eras-3';
+import { engines } from './registry.js?v=eras-3';
+import { seededRandom } from './core/random.js?v=eras-3';
+import { Painter } from './core/painter.js?v=eras-3';
+import { LEVEL_LABELS } from './mig/precision.js?v=eras-3';
 
 // Canvas fonts per era, mirroring the --arcade-font/--arcade-display room variables.
 const FONTS = {

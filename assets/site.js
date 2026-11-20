@@ -1,5 +1,5 @@
-import { Experience } from './experience.js?v=eras-2';
-import { readPrecision, resolvePreset, isMobileDevice } from '../arcade/mig/precision.js?v=eras-2';
+import { Experience } from './experience.js?v=eras-3';
+import { readPrecision, resolvePreset, isMobileDevice } from '../arcade/mig/precision.js?v=eras-3';
 
 const $ = (selector) => document.querySelector(selector);
 const THEME_KEY = 'robin-g0-theme';
@@ -105,7 +105,7 @@ function buildPicker() {
 let glassField = null, glassLoading = null;
 function syncGlassField(id) {
   if (id === 'glass' && !glassField && !glassLoading) {
-    glassLoading = import('./glass-field.js?v=eras-2').then(module => {
+    glassLoading = import('./glass-field.js?v=eras-3').then(module => {
       glassLoading = null;
       if (root.dataset.theme === 'glass' && !glassField) glassField = module.mountGlassField(root);
     }).catch(() => { glassLoading = null; });

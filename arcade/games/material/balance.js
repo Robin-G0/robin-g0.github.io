@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js?v=eras-2';
-import { integer } from '../../core/random.js?v=eras-2';
+import { game } from '../../core/game.js?v=eras-3';
+import { integer } from '../../core/random.js?v=eras-3';
 import { type, header, sheet, elevated, ink, swatch, onSwatch, tint, surface, ease, clamp01,
-    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, loseLife, backdrop } from './display.js?v=eras-2';
+    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, loseLife, backdrop } from './display.js?v=eras-3';
 
 // Paper Balance: a hanging mobile with two trays. Each paper card falls down the middle; raise L to
 // lay it in the left tray, R for the right tray. Unplaced cards land in the lower (heavier) tray.
