@@ -52,8 +52,11 @@
 .start-art { display: block; position: relative; overflow: hidden; height: 120px; border-radius: 12px; margin-bottom: 8px; }
 .start-art-games { background: linear-gradient(115deg, #101709 0 16%, #c0c0c0 16% 32%, #10103b 32% 48%, #9fdcff 48% 64%, #087aa5 64% 80%, #f7f4ed 80%); }
 .start-art-games::after { content: '▲  ◀  ▶'; position: absolute; inset: auto 0 12px; text-align: center; font-size: 20px; color: #fff; text-shadow: 0 1px 4px #0009; }
-.start-art-theme { background: linear-gradient(160deg, #cdefff, #5fb6e3 55%, #2a8bc4); }
-.start-art-theme::after { content: ''; position: absolute; inset: 18px 26px; border-radius: 10px; background: #ffffffb8;
+.start-art-theme { background: url('./previews/desktop95-light.svg') 0 0 / 100% 25% no-repeat,
+  url('./previews/aero-light.svg') 0 33.3% / 100% 25% no-repeat, url('./previews/metro-light.svg') 0 66.6% / 100% 25% no-repeat,
+  url('./previews/field-notes-light.svg') 0 100% / 100% 25% no-repeat, #e9eef6; }
+.start-option:hover .start-art-theme { animation: start-themes 2.4s ease-in-out infinite alternate; }
+@keyframes start-themes { to { background-position: 0 6%, 0 37%, 0 62%, 0 96%; } }
   box-shadow: 0 8px 20px #0b2a4040, inset 0 18px 0 #ffffffd0; }
 
 .experience-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-top: 18px; }
@@ -132,7 +135,7 @@
 .game-tile[data-era=metro] h3 { font-family: 'Segoe UI Light', 'Open Sans', sans-serif; font-weight: 300; text-transform: lowercase; }
 .game-tile[data-era=field-notes] h3 { font-family: 'Caveat', 'Segoe Print', cursive; font-size: 24px; }
 @media (prefers-reduced-motion: reduce) {
-  .experience[open] { animation: none; }
+  .experience[open], .start-option:hover .start-art-theme { animation: none; }
   .precision-option, .start-option, .experience-theme, .game-tile, .game-tile-cta { transition: none; }
 }
 
