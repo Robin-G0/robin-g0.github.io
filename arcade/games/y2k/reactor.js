@@ -102,8 +102,8 @@ export function reactor(env) {
             const compact = p.compact, k = compact ? 1.6 : 1, reduced = env.reducedMotion, c = p.c;
             header(p, `${s.fusions} fusion${s.fusions === 1 ? '' : 's'}`, s.streak ? `streak ×${Math.min(REACTOR.maxStreak, s.streak)}` : '');
             const coreX = [compact ? 150 : 165, compact ? 570 : 555], coreW = compact ? 190 : 118;
-            const coreTop = compact ? p.h * .33 : 112, coreBottom = compact ? p.h - 150 : 382, inner = coreBottom - coreTop - 24;
-            const chuteX = 360, chuteY = compact ? p.h * .2 : 148, orbR = 34 * k;
+            const chuteX = 360, orbR = 30 * k, chuteY = compact ? 150 : 92;
+            const coreTop = chuteY + orbR + (compact ? 50 : 34), coreBottom = p.h - (compact ? 120 : 52), inner = coreBottom - coreTop - 24;
             const colorOf = side => side === 'left' ? 'accent' : 'gold';
             const levelY = level => coreBottom - 12 - inner * Math.min(1.12, level / REACTOR.critical);
             const aimed = s.aim && s.time - s.aim.at < .35 ? s.aim.side : null;
@@ -111,7 +111,7 @@ export function reactor(env) {
             for (const [i, side] of SIDES.entries()) {
                 const from = [chuteX + (i ? 1 : -1) * orbR * .9, chuteY], to = [coreX[i], coreTop - 4];
                 const lit = aimed === side || s.effects.some(e => e.kind === 'pour' && e.side === side && s.time - e.at < .3);
-                p.line([from, [to[0], from[1]], to], 'ink', 16 * k); p.line([from, [to[0], from[1]], to], chrome(p, 0, from[1] - 8, 0, from[1] + 8), 11 * k);
+                p.line([from, [to[0], from[1]], to], 'ink', 15 * k); p.line([from, [to[0], from[1]], to], chrome(p, 0, from[1] - 6 * k, 0, from[1] + 6 * k), 10 * k);
                 if (lit) p.line([from, [to[0], from[1]], to], colorOf(side), 6 * k);
             }
             // Cores: translucent candy capsules with a chrome rim, ten ticks and the fusion line at 10.
@@ -124,17 +124,17 @@ export function reactor(env) {
                 // Liquid: level fill with three lava-lamp blobs (still frames under reduced motion).
                 const surface = levelY(level);
                 if (level > 0) {
-                    c.save(); c.globalAlpha = .75; p.rect(left + 8, surface, coreW - 16, coreBottom - 12 - surface, color, Math.min(coreW / 2 - 8, (coreBottom - 12 - surface) / 2)); c.restore();
+                    c.save(); c.globalAlpha = .75; p.rect(left + 8, surface, coreW - 16, coreBottom - 12 - surface, color, Math.min(14 * k, (coreBottom - 12 - surface) / 2)); c.restore();
                     for (let b = 0; b < 3; b++) {
                         const phase = reduced ? b : s.time * (.6 + b * .17) + b * 2.1, span = Math.max(0, coreBottom - 30 - surface);
                         const by = coreBottom - 26 - span * (.5 + .5 * Math.sin(phase)), bx = x + Math.sin(phase * 1.3 + b) * coreW * .18;
-                        if (span > 12) candy(p, bx, by, Math.min(coreW * .16, 7 + span * .08), color, .55);
+                        if (span > 24 * k) candy(p, bx, by, Math.min(coreW * .12, 6 + span * .06, span / 3), color, .5);
                     }
                 }
                 for (let t = 1; t < REACTOR.critical; t++) p.line([[left + coreW - 18, levelY(t)], [left + coreW - 8, levelY(t)]], 'muted', 1.5);
                 const critical = levelY(REACTOR.critical);
                 p.line([[left + 6, critical], [left + coreW - 6, critical]], 'ink', 3, [8, 5]);
-                starburst(p, left + coreW + 2, critical, 13 * k, 'gold', 8, 0, .5); techno(p, '10', left + coreW + 2, critical + 1, 9 * k, '#ffffff', 'center', 900);
+                starburst(p, left + coreW + 2, critical, 12 * k, 'gold', 8, 0, .5);
                 // Prediction for the current orb, drawn where it would land: exact 10 sparkles, above 10 warns.
                 if (s.orb) {
                     const result = pour(level, s.orb.value), y = levelY(result.reached);
@@ -143,7 +143,7 @@ export function reactor(env) {
                     else p.line([[left + 10, y], [left + coreW - 10, y]], color, 3, [4, 4]);
                 }
                 techno(p, level, x, coreBottom - inner * .3, 40 * k, 'ink', 'center', 900);
-                techno(p, `+${REACTOR.critical - level}`, x, coreBottom + (compact ? 34 : 20), 16 * k, 'muted', 'center', 800);
+                techno(p, `need ${REACTOR.critical - level}`, x, coreBottom + (compact ? 34 : 22), 14 * k, 'muted', 'center', 800);
                 if (fusion) { shatter(p, x, critical, s.time - fusion.at, fusion.spark ? 'gold' : 'accent', reduced, 1.6 * k); if (!reduced) flare(p, x, critical, 34 * k, Math.max(0, 1 - (s.time - fusion.at) * 1.6), color); }
                 if (melt) shatter(p, x, (coreTop + coreBottom) / 2, s.time - melt.at, 'gold', reduced, 1.4 * k);
             }
@@ -158,9 +158,9 @@ export function reactor(env) {
             }
             const spill = s.effects.find(e => e.kind === 'spill'); if (spill) shatter(p, chuteX, chuteY, s.time - spill.at, 'gold', reduced, 1.4 * k);
             // Preview: the next two orbs queue above the chute, smaller.
-            s.queue.forEach((orb, i) => orbArt(p, chuteX + (compact ? 120 : 80) + i * (compact ? 76 : 50), chuteY - (compact ? 56 : 44), 15 * k, orb, 0, k * .5));
+            s.queue.forEach((orb, i) => orbArt(p, chuteX + (compact ? 110 : 76) + i * (compact ? 70 : 46), chuteY - 36 * k, 14 * k, orb, 0, k * .5));
             // Vent charges, the one chord in this game; the L+R label is the only hint buttons cannot give.
-            const ventY = compact ? p.h - 70 : 400, refused = s.effects.find(e => e.kind === 'refused' && s.time - e.at < .4);
+            const ventY = coreBottom - 14 * k, refused = s.effects.find(e => e.kind === 'refused' && s.time - e.at < .4);
             for (let v = 0; v < REACTOR.maxVents; v++) {
                 const vx = 360 + (v - 1) * 30 * k, lit = v < s.vents;
                 p.circle(vx, ventY, 11 * k, lit ? chrome(p, 0, ventY - 11 * k, 0, ventY + 11 * k) : 'border');
@@ -184,5 +184,5 @@ export function orbArt(p, x, y, r, orb, time, k) {
         return;
     }
     candy(p, x, y, r, 'accent', 1);
-    techno(p, orb.value, x, y + 2, r * 1.05, '#ffffff', 'center', 900);
+    techno(p, orb.value, x, y + 2, r * 1.05, 'bg', 'center', 900);
 }

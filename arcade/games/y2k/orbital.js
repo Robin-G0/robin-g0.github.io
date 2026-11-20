@@ -92,7 +92,9 @@ export function orbital(env) {
         render(s, p) {
             backdrop(p);
             const compact = p.compact, k = compact ? 1.7 : 1, cx = 360;
-            const cy = compact ? p.h * .53 : 234, ring = compact ? 205 : 116, outer = compact ? 330 : 180;
+            // The orbit fills whatever height the board has; phones get a taller board, not a different rule.
+            const top = compact ? 84 : 52, room = p.h - top - (compact ? 24 : 14);
+            const outer = Math.min(compact ? 335 : 182, room / 2), ring = outer * .64, cy = top + room / 2;
             header(p, `streak ${s.streak}`, `×${s.level}`);
             const at = (sector, r) => [cx + Math.cos(sectorAngle(sector)) * r, cy + Math.sin(sectorAngle(sector)) * r];
             const c = p.c, reduced = env.reducedMotion;

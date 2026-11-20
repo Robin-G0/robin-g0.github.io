@@ -19,7 +19,7 @@ export const games = Object.freeze([
     entry('matrix', 'parry', 'Construct Parry', 'Block the incoming attacks on the marked side.', 'Left guard', 'Right guard'),
     entry('matrix', 'binary', 'Binary Lock', 'Transform the register into the target code.', 'Rotate bits', 'Flip first bit'),
     entry('matrix', 'gravity', 'Gravity Switch', 'Switch surfaces to pass the moving barriers.', 'Flip gravity', 'Slow time'),
-    entry('y2k', 'orbital', 'Orbital Breaker', 'Turn the shield to break each comet. Grab star shards; dodge solar flares.', 'Turn anticlockwise', 'Turn clockwise', {scoreVersion:2,illustrated:true,precision:'low'}),
+    entry('y2k', 'orbital', 'Orbital Breaker', 'Turn the shield to break each comet. Grab star shards; dodge solar flares.', 'Turn ↺', 'Turn ↻', {scoreVersion:2,illustrated:true,precision:'low'}),
     entry('y2k', 'beat', 'Chrome Beat', 'Play each note with its move as it reaches the pad: raise, scratch, chord.', '', '', {scoreVersion:2,illustrated:true,precision:'full',inputScheme:'wrist-directions',controls:{left_left:'L scratch ←',left_up:'L tap ↑',left_right:'L scratch →',right_left:'R scratch ←',right_up:'R tap ↑',right_right:'R scratch →'}}),
     entry('y2k', 'reactor', 'Reactor Balance', 'Pour each orb into a core. Hit exactly 10 to fuse; above 10 melts down.', 'Left core', 'Right core', {scoreVersion:2,illustrated:true,precision:'low'}),
     entry('aqua', 'marble', 'Marble Gates', 'Roll the marble through each opening.', 'Tilt left', 'Tilt right'),

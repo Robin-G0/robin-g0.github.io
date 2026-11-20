@@ -68,15 +68,15 @@ export function flare(p, x, y, r, alpha = 1, color = 'accent') {
     c.restore();
 }
 
-/** Canvas backdrop: a radial palette wash, faint elliptical orbits and the chrome top strip. */
-export function backdrop(p) {
-    const c = p.c, w = 720, h = p.h;
-    const g = c.createRadialGradient?.(600, 40, 10, 420, h * .45, h * .95);
-    if (g?.addColorStop) { g.addColorStop(0, p.color('soft')); g.addColorStop(1, p.color('bg')); p.rect(0, 0, w, h, g); }
-    c.save(); c.globalAlpha = .4; c.strokeStyle = p.color('border'); c.lineWidth = 1;
-    for (let i = 0; i < 3; i++) { c.beginPath(); c.ellipse?.(600, 30, 180 + i * 130, 50 + i * 38, -.16, 0, Math.PI * 2); c.stroke(); }
+/** Canvas backdrop: a radial palette wash that fades to the page colour at the edges, and faint orbit lines. */
+export function backdrop(p, orbits = true) {
+    const c = p.c, h = p.h;
+    const g = c.createRadialGradient?.(360, h * .42, 20, 360, h * .42, Math.max(360, h * .6));
+    if (g?.addColorStop) { g.addColorStop(0, p.color('soft')); g.addColorStop(1, p.color('bg')); p.rect(0, 0, 720, h, g); }
+    if (!orbits) return;
+    c.save(); c.globalAlpha = .35; c.strokeStyle = p.color('border'); c.lineWidth = 1;
+    for (let i = 0; i < 2; i++) { c.beginPath(); c.ellipse?.(360, h * .42, 250 + i * 90, 70 + i * 34, -.16, 0, Math.PI * 2); c.stroke(); }
     c.restore();
-    p.rect(0, 0, w, 7, chrome(p, 0, 0, 0, 7));
 }
 
 /** Live status only: the room header names the game and the HUD counts lives. */

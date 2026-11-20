@@ -10,7 +10,7 @@ import { techno, chrome, pill, backdrop, header, addBurst, bursts, pruneBursts,
 // move only breaks the streak; a missed note or touched static costs a life.
 export const BEAT = { lead: 2.4, minLead: 1.6, step: 1.6, minStep: 1.05, good: .4, perfect: .15,
     goodPoints: 10, perfectPoints: 25, multEvery: 8, maxMult: 4, restoreEvery: 16,
-    chordFrom: 15, scratchFrom: 30, staticFrom: 50, rest: .12, chord: .2, scratch: .35, static: .15,
+    warmup: 12, chordFrom: 15, scratchFrom: 30, staticFrom: 50, rest: .12, chord: .2, scratch: .35, static: .15,
     opening: [['left', 3], ['right', 4.6], ['left', 6.2], ['right', 7.8]] };
 export const stepFor = pace => Math.max(BEAT.minStep, BEAT.step / pace);
 export const leadFor = pace => Math.max(BEAT.minLead, BEAT.lead / pace);
@@ -80,23 +80,24 @@ export function beat(env) {
                 note.judged = 'miss'; breakStreak();
                 for (const w of note.lane === 'both' ? WRISTS : [note.lane]) if (!note.hits[w]) pad(w, 'miss');
                 addBurst(s, 'MISS', 0, 0, false, { wrist: note.lane === 'both' ? 'both' : note.lane });
-                loseLife(s, env); if (s.ended) return;
+                // The opening warm-up teaches the timing: misses there cost the streak, not a life.
+                if (note.at >= BEAT.warmup) { loseLife(s, env); if (s.ended) return; }
             }
             s.notes = s.notes.filter(note => !note.judged);
         },
         render(s, p) {
-            backdrop(p);
+            backdrop(p, false);
             const compact = p.compact, k = compact ? 1.55 : 1, reduced = env.reducedMotion, c = p.c;
-            header(p, `streak ${s.streak}`, `×${s.mult}`);
+            header(p, `streak ${s.streak}`, s.time < BEAT.warmup ? 'warm-up' : `×${s.mult}`);
             const laneX = { left: compact ? 196 : 238, right: compact ? 524 : 482 }, laneW = compact ? 270 : 190;
-            const top = compact ? 96 : 62, hitY = compact ? p.h - 210 : 330, speed = (hitY - top) / s.lead;
+            const top = compact ? 96 : 62, hitY = p.h - (compact ? 130 : 90), speed = (hitY - top) / s.lead;
             const colorOf = lane => lane === 'left' ? 'accent' : 'gold';
             // Winamp spectrum analyser under the deck: decorative, driven by simulation time and recent hits.
             const energy = Math.min(1, s.effects.filter(e => e.kind === 'hit').reduce((sum, e) => sum + Math.max(0, 1 - (s.time - e.at)), 0));
             const bars = 24, barW = 720 / bars, base = p.h - 4;
             for (let i = 0; i < bars; i++) {
                 const wave = reduced ? .5 : .5 + .5 * Math.sin(s.time * (2.1 + i % 5 * .4) + i * 1.3);
-                const height = (compact ? 70 : 40) * (.25 + .35 * wave + .4 * energy * wave);
+                const height = (compact ? 56 : 34) * (.25 + .35 * wave + .4 * energy * wave);
                 c.save(); c.globalAlpha = .35; p.rect(i * barW + 3, base - height, barW - 6, height, i < bars / 2 ? 'accent' : 'gold', 1);
                 c.globalAlpha = .8; p.rect(i * barW + 3, base - height - 6, barW - 6, 3, chrome(p, 0, base - height - 6, 0, base - height - 3)); c.restore();
             }
@@ -121,8 +122,8 @@ export function beat(env) {
                 if (note.lane === 'both') {
                     const x0 = laneX.left - laneW * .35, x1 = laneX.right + laneW * .35, hh = 32 * k;
                     pill(p, x0, y - hh / 2, x1 - x0, hh, touching ? 'ink' : 'accent');
-                    for (const lane of WRISTS) if (!note.hits[lane]) arrow(p, laneX[lane], y, 'up', 12 * k, '#ffffff'); else p.circle(laneX[lane], y, 8 * k, '#ffffff');
-                    techno(p, 'L+R', 360, y + 1, 15 * k, '#ffffff', 'center', 900);
+                    for (const lane of WRISTS) if (!note.hits[lane]) arrow(p, laneX[lane], y, 'up', 12 * k, 'bg'); else p.circle(laneX[lane], y, 8 * k, 'bg');
+                    techno(p, 'L+R', 360, y + 1, 15 * k, 'bg', 'center', 900);
                     continue;
                 }
                 const x = laneX[note.lane];
@@ -135,13 +136,13 @@ export function beat(env) {
                 } else if (note.move === 'up') {
                     const w = laneW * .62, hh = 34 * k;
                     pill(p, x - w / 2, y - hh / 2, w, hh, touching ? 'ink' : colorOf(note.lane));
-                    arrow(p, x, y, 'up', 12 * k, '#ffffff');
+                    arrow(p, x, y, 'up', 12 * k, 'bg');
                 } else {
                     // Scratch: a chrome vinyl disc with the sweep arrow, a different silhouette from a tap.
                     const r = 24 * k;
                     p.circle(x, y, r + 3, chrome(p, x, y - r, x, y + r)); p.circle(x, y, r, touching ? 'ink' : colorOf(note.lane));
                     c.save(); c.globalAlpha = .5; p.circle(x, y, r * .62, '#ffffff', false); c.restore();
-                    arrow(p, x, y, note.move, 13 * k, '#ffffff');
+                    arrow(p, x, y, note.move, 13 * k, 'bg');
                 }
                 if (touching) { c.save(); c.globalAlpha = .9; p.circle(x, y, 32 * k, '#ffffff', false); c.restore(); }
             }
