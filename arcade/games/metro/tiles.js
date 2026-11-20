@@ -1,5 +1,5 @@
 import { game } from '../../core/game.js';
-import { METRO, light, header, tile, scaledTile, ripple, addEffect, pruneEffects, addBurst, bursts, pruneBursts, loseLife } from './display.js';
+import { METRO, light, header, tile, scaledTile, ripple, addEffect, pruneEffects, addBurst, bursts, pruneBursts, loseLife, poseTile, tilt, settle } from './display.js';
 
 export const TILES = { opening: 2, maxCadence: 1.1, minCadence: .55, stepPoints: 10, livePoints: 20,
     finishPerTile: 10, rest: .9, retry: 1.2, litShare: .62 };
@@ -67,13 +67,24 @@ export function memory(env) {
             const size = compact ? 300 : 220, top = compact ? 150 : 95, gap = compact ? 40 : 60;
             const cue = s.phase === 'show' && s.time >= s.started ? Math.floor((s.time - s.started) / s.cadence) : -1;
             const flashing = cue >= 0 && cue < count && (s.time - s.started) % s.cadence < s.cadence * TILES.litShare;
-            const revealed = revealedSteps(s);
+            const revealed = revealedSteps(s), reduced = env.reducedMotion;
+            // Panorama: after a finished round the board slides in from the right and settles exponentially.
+            const since = s.time - (s.started - TILES.rest), slide = !reduced && s.rounds > 0 && since >= 0 && since < .8 ? 200 * settle(since, 8) : 0;
+            const phaseIn = cue >= 0 ? (s.time - s.started) % s.cadence : -1, litEnd = s.cadence * TILES.litShare, flipTime = Math.min(.16, s.cadence * .2);
             SIDES.forEach((side, i) => {
-                const x = 360 - gap / 2 - size + i * (size + gap);
+                const x = 360 - gap / 2 - size + i * (size + gap) + slide;
                 const lit = flashing && s.sequence[cue] === side;
                 const press = s.effects.find(e => e.kind === 'press' && e.side === side && s.time - e.at < .6);
-                const scale = press ? ripple(p, x, top, size, size, s.time - press.at, press.live ? 'accent' : color(side), env.reducedMotion) : 1;
-                scaledTile(p, x, top, size, size, scale, color(side), letter(side), { lit, selected: !!press && s.time - press.at < .3, size: size * .5 });
+                if (press) ripple(p, x, top, size, size, s.time - press.at, press.live ? 'accent' : color(side), reduced);
+                // Live-tile flip: the cued tile turns over to its lit face and back (reduced motion swaps faces instantly).
+                let face = lit, scaleX = 1;
+                if (!reduced && cue >= 0 && cue < count && s.sequence[cue] === side) {
+                    const turning = phaseIn < flipTime ? phaseIn / flipTime : phaseIn >= litEnd && phaseIn < litEnd + flipTime ? (phaseIn - litEnd) / flipTime : -1;
+                    if (turning >= 0) { scaleX = Math.max(.04, Math.abs(Math.cos(turning * Math.PI))); face = phaseIn < flipTime ? turning >= .5 : turning < .5; }
+                }
+                const pose = press ? tilt(s.time - press.at, i ? 1 : -1, reduced) : {};
+                // The press tilts the tile (Windows 8 pointer tilt) while the square ripple spreads.
+                poseTile(p, x, top, size, size, { ...pose, scaleX: (pose.scaleX ?? 1) * scaleX }, color(side), letter(side), { lit: face, selected: !!press && s.time - press.at < .3, size: size * .5 });
                 if (lit) light(p, `${cue + 1} / ${count}`, x + size / 2, top - (compact ? 26 : 16), compact ? 30 : 22, 'ink', 'center', 400);
             });
             // The slot row is the sequence itself: it fills while tiles flash and empties for the repeat.
@@ -91,7 +102,7 @@ export function memory(env) {
             const status = s.phase === 'repeat' ? `your turn · ${s.index + 1} of ${count}` : s.time < s.started ? `get ready · ${count} tiles` : `watch · ${count} tiles · follow live for ×2`;
             light(p, status, 360, rowY + cell + (compact ? 44 : 30), compact ? 32 : 24, 'ink', 'center');
             if (s.lastInput?.ignored && s.time - s.lastInput.at < .6)
-                light(p, 'not shown yet', tileX(s.lastInput.action), top + size + (compact ? 24 : 16), compact ? 22 : 16, 'muted', 'center', 400);
+                light(p, 'not shown yet', tileX(s.lastInput.action), top + size + (compact ? 24 : 16), compact ? 28 : 16, 'muted', 'center', 400);
             bursts(s, p, env.reducedMotion);
         }
     });

@@ -66,3 +66,21 @@ export function loseLife(s, env) {
     s.lives = Math.max(0, s.lives - 1); env.sound?.({ kind: 'miss' });
     if (!s.lives) { s.ended = true; env.finish('Game over'); }
 }
+
+/** Exponential ease-out, Metro's flat motion curve: fast start, long settle. */
+export const settle = (age, rate = 12) => Math.max(0, Math.exp(-Math.max(0, age) * rate));
+
+/** Draws a tile through a 2D transform about its centre: scaleX for flips, skewY plus a slight shrink for the press tilt. */
+export function poseTile(p, x, y, w, h, { scaleX = 1, scaleY = 1, skewY = 0, dx = 0, dy = 0 } = {}, color, glyph = '', options = {}) {
+    const c = p.c;
+    if (scaleX === 1 && scaleY === 1 && !skewY) { tile(p, x + dx, y + dy, w, h, color, glyph, options); return; }
+    c.save(); c.translate(x + w / 2 + dx, y + h / 2 + dy); c.transform(scaleX, skewY, 0, scaleY, 0, 0);
+    tile(p, -w / 2, -h / 2, w, h, color, glyph, options); c.restore();
+}
+
+/** Windows 8 press tilt: the pressed side dips and the tile shrinks a little, returning exponentially. */
+export function tilt(age, side = 0, reduced = false) {
+    if (reduced || age < 0 || age > .45) return {};
+    const e = settle(age, 9);
+    return { scaleX: 1 - .05 * e, scaleY: 1 - .07 * e, skewY: side * .06 * e };
+}

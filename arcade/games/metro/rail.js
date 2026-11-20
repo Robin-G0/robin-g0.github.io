@@ -1,6 +1,6 @@
 import { game } from '../../core/game.js';
 import { integer } from '../../core/random.js';
-import { METRO, light, header, addEffect, pruneEffects, pruneBursts, loseLife } from './display.js';
+import { METRO, light, header, addEffect, pruneEffects, pruneBursts, loseLife, settle } from './display.js';
 
 // A growing tree: one junction and two stations, then a third station behind a second
 // junction at 40 s, then a fourth behind a third junction at 90 s. Trains leave on a
@@ -84,7 +84,9 @@ export function rail(env) {
             s.trains = s.trains.filter(train => !train.done);
         },
         render(s, p) {
-            const compact = p.compact, h = p.h, k = compact ? 1.6 : 1;
+            const compact = p.compact, h = p.h, k = compact ? 1.6 : 1, reduced = env.reducedMotion;
+            // Phone labels never drop below a legible logical size (about 14 CSS px on a 370 px stage).
+            const ts = size => compact ? Math.max(28, size * k) : size;
             header(p, `${s.served} arrived`, s.convoy ? `convoy ${s.convoy}` : '');
             const stationY = compact ? 150 : 96, radius = 30 * k, childY = compact ? h * .40 : 196, rootY = compact ? h * .56 : 272;
             const depotY = compact ? h * .70 : 334, boardY = compact ? h - 150 : 368, track = 10 * k;
@@ -94,19 +96,22 @@ export function rail(env) {
             p.line([[360, depotY], [360, rootY]], 'border', track);
             for (const side of [0, 1]) {
                 const open = side === s.root, onSide = openStations(s.stage).filter(station => station.side === side);
-                p.line([[360, rootY], [childX[side], childY]], open ? selected.color : 'border', track);
+                // A freshly switched junction paints its route outward with an exponential ease.
+                const sinceSwitch = s.time - s.switchedAt, fill = open && !reduced && sinceSwitch < .5 ? 1 - settle(sinceSwitch, 9) : 1;
+                p.line([[360, rootY], [childX[side], childY]], 'border', track);
+                if (open) p.line([[360, rootY], [360 + (childX[side] - 360) * fill, rootY + (childY - rootY) * fill]], selected.color, track);
                 for (const station of onSide) {
                     const chosen = open && station === selected;
                     p.line([[childX[side], childY], stationPoint(station)], chosen ? station.color : 'border', track);
                 }
                 if (onSide.length === 2) {
                     p.circle(childX[side], childY, 9 * k, open ? 'ink' : 'border');
-                    light(p, '2', childX[side] + (side ? 22 : -22) * k, childY, 16 * k, open ? 'ink' : 'muted', 'center', 400);
-                    if (open) light(p, 'R', childX[side] + (side ? 22 : -22) * k, childY + 20 * k, 15 * k, 'ink', 'center', 400);
+                    light(p, '2', childX[side] + (side ? 26 : -26) * k, childY, ts(16), open ? 'ink' : 'muted', 'center', 400);
+                    if (open) light(p, 'R', childX[side] + (side ? 26 : -26) * k, childY + 22 * k, ts(15), 'ink', 'center', 400);
                 }
             }
             p.circle(360, rootY, 10 * k, s.time - s.switchedAt < .3 ? 'accent' : 'ink');
-            light(p, '1 · L', 360 + 28 * k, rootY + 2, 16 * k, 'ink', 'left', 400);
+            light(p, '1 · L', 360 + 28 * k, rootY + 2, ts(16), 'ink', 'left', 400);
             for (const station of openStations(s.stage)) {
                 if (station === selected) p.circle(slotX[station.slot], stationY, radius + 6 * k, 'ink', false);
                 // An arrival pops the station and sends a flat ring outward; reduced motion keeps a steady highlight.
@@ -133,20 +138,20 @@ export function rail(env) {
             }
             // Departures board: upcoming trains slide toward the "now" line and leave when they reach it.
             const left = 70, width = 580, nowX = left + 36 * k;
-            light(p, 'departures', left, boardY - 14 * k, 15 * k, 'muted', 'left', 400);
+            light(p, 'departures', left, boardY - 16 * k, ts(15), 'muted', 'left', 400);
             p.line([[left, boardY + 16 * k], [left + width, boardY + 16 * k]], 'border', 2);
             p.line([[nowX, boardY - 2 * k], [nowX, boardY + 34 * k]], 'ink', 3);
-            light(p, 'now', nowX - 8 * k, boardY + 46 * k, 13 * k, 'muted', 'right', 400);
+            light(p, 'now', nowX - 8 * k, boardY + 48 * k, ts(13), 'muted', 'right', 400);
             for (const departure of s.schedule) {
                 const wait = departure.at - s.time; if (wait > RAIL.horizon) continue;
                 const x = nowX + (wait / RAIL.horizon) * (left + width - nowX), line = STATIONS.find(station => station.letter === departure.letter);
                 p.rect(x - 13 * k, boardY, 26 * k, 32 * k, line.color);
                 light(p, departure.letter, x, boardY + 17 * k, 18 * k, METRO.white, 'center', 400);
-                light(p, `${Math.ceil(wait)}s`, x, boardY + 46 * k, 12 * k, 'muted', 'center', 400);
+                light(p, `${Math.ceil(wait)}s`, x, boardY + 48 * k, ts(12), 'muted', 'center', 400);
             }
             const upcoming = RAIL.stages.find(at => at > s.time);
-            if (upcoming) light(p, `new station in ${Math.ceil(upcoming - s.time)}s`, left + width, boardY - 14 * k, 13 * k, 'muted', 'right', 400);
-            if (s.time - s.refusedAt < .6) light(p, 'no second junction on this branch yet', 360, depotY + 22 * k, 14 * k, 'muted', 'center', 400);
+            if (upcoming) light(p, `new station in ${Math.ceil(upcoming - s.time)}s`, left + width, boardY - 16 * k, ts(13), 'muted', 'right', 400);
+            if (s.time - s.refusedAt < .6) light(p, 'no second junction on this branch yet', 360, depotY + 24 * k, ts(14), 'muted', 'center', 400);
             for (const b of s.bursts) {
                 const age = s.time - b.at; if (age > 1.1) continue;
                 const station = STATIONS.find(item => item.letter === b.letter), x = station ? slotX[station.slot] : 360;
