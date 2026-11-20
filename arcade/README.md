@@ -391,3 +391,46 @@ Deterministic tests cover live/repeat scoring, the show-phase clock, drop merges
 chords, retirements, overflow, the policy comparison, junction timing, convoys,
 overflow, idle loss and reduced-motion equivalence. These are simulated cadence
 checks, not evidence of physical comfort or webcam accuracy.
+
+## Matrix, Y2K, Aqua, Aero, Material, Glass and Field Notes engines
+
+Each of these eras keeps its engines in `games/<theme>/` (`display.js`, one module
+per game, `tutorials.js` for the three cards, captions and Controls lessons) and
+re-exports them from `games/<theme>.js`. Their rules, constants, stage timings,
+precision reasoning and phone notes live next to the code:
+
+| Era | Games | Notes |
+|---|---|---|
+| Matrix | Construct Parry (six commands), Binary Lock, Gravity Switch | [games/matrix/NOTES.md](games/matrix/NOTES.md) |
+| Y2K | Orbital Breaker, Chrome Beat (six commands), Reactor Balance | [games/y2k/NOTES.md](games/y2k/NOTES.md) |
+| Aqua | Marble Gates, Gel Factory, Dock Bounce (six commands) | [games/aqua/NOTES.md](games/aqua/NOTES.md) |
+| Aero | School Rescue (six commands), Bubble Cascade, Living Garden | [games/aero/NOTES.md](games/aero/NOTES.md) |
+| Material | Paper Tangram (six commands), Ripple Golf, Paper Balance | [games/material/NOTES.md](games/material/NOTES.md) |
+| Glass | Prisms, Abyss Drift (six commands), Orbital Assist | [games/glass/NOTES.md](games/glass/NOTES.md) |
+| Field Notes | Clockwork, Contour Survey, Constellations (six commands) | [games/field-notes/NOTES.md](games/field-notes/NOTES.md) |
+
+All of them use score rules v2, engine-owned feedback and sound, seeded rule
+randomness and staged depth (new mechanics arrive by time or progress rather than
+by speed alone). Six-command games set `inputScheme:'wrist-directions'` and
+recommend Full precision; two-raise games recommend Low.
+
+## Tracking precision
+
+`mig/precision.js` defines the presets the welcome dialog offers: Low (Lite on the
+processor), Medium (Full), Medium fast (Full on the graphics card), Full (Heavy)
+and Full fast (Heavy on the graphics card); phones get Low, Medium and Full. Each
+catalog line declares `precision` (`low`, `medium` or `full`); the room shows when
+the current preset is below it and offers Change. `mig/pose-models.js` downloads
+Full and Heavy once from Google's model storage, checks size and SHA-256, keeps
+them in Cache Storage and falls back from GPU to CPU when WebGL inference fails.
+
+## Phone player
+
+`phone.css` (loaded after every theme) turns the player into a full-screen app on
+screens up to 640 px wide and on landscape phones: header, scores, the board in
+all remaining height, a one-line camera strip, the toolbar and the touch controls
+in the thumb zone. Nothing scrolls. Camera opens the setup sheet over the board;
+tutorials, results and bindings take the whole play area. In landscape the left
+and right controls sit on either side of the board. Theme room stylesheets only
+skin these elements; layout stays in `phone.css`. `tests/browser/phone.spec.mjs`
+and `mobile-games.spec.mjs` hold the contract.
