@@ -43,27 +43,37 @@
 :root[data-theme=desktop95] ::-webkit-scrollbar-button:single-button:active { box-shadow: var(--pressed); }
 
 /* ---------- Taskbar: Start button, the running task, and a tray of links ---------- */
-:root[data-theme=desktop95] .site-header { position: sticky; top: 0; z-index: 20; width: 100%; margin: 0; min-height: 40px; gap: 6px; padding: 4px 4px 3px;
+:root[data-theme=desktop95] .site-header {
   background: var(--face); color: var(--ink); border: 0; box-shadow: inset 0 1px var(--lt), inset 0 2px var(--hi), inset 0 -1px var(--dk), inset 0 -2px var(--sh); }
-:root[data-theme=desktop95] .theme-trigger { order: -1; min-height: 30px; padding: 3px 10px 3px 6px; gap: 6px; border: 0; border-radius: 0; background: var(--face); color: var(--ink);
-  font: 700 13px var(--font); box-shadow: var(--raised); }
+:root[data-theme=desktop95] .theme-trigger { border: 0; border-radius: 0; background: var(--face); color: var(--ink);
+  font-family: var(--font); font-weight: 700; box-shadow: var(--raised); }
 :root[data-theme=desktop95] .theme-trigger > span:first-child { width: 20px; height: 20px; font-size: 0; background: url('../favicon.svg') center / 18px 18px no-repeat; }
 :root[data-theme=desktop95] .theme-trigger:hover { outline: 0; background: var(--face); }
-:root[data-theme=desktop95] .theme-trigger:active, :root[data-theme=desktop95] .theme-trigger[aria-expanded=true] { box-shadow: var(--pressed); padding: 4px 9px 2px 7px;
+:root[data-theme=desktop95] .theme-trigger:active, :root[data-theme=desktop95] .theme-trigger[aria-expanded=true] { box-shadow: var(--pressed);
   background: repeating-conic-gradient(var(--face) 0 25%, var(--hi) 0 50%) 0 0 / 2px 2px; }
 :root[data-theme=desktop95] .theme-trigger:focus-visible { outline: 1px dotted var(--ink); outline-offset: -5px; }
 /* The wordmark is the active task: a pressed taskbar button with a dithered face. */
-:root[data-theme=desktop95] .wordmark { min-height: 30px; min-width: min(170px, 40vw); padding: 3px 12px 3px 6px; gap: 6px; font: 700 13px var(--font); color: var(--ink);
+:root[data-theme=desktop95] .wordmark { font-family: var(--font); font-weight: 700; color: var(--ink);
   box-shadow: var(--pressed); background: repeating-conic-gradient(var(--face) 0 25%, var(--hi) 0 50%) 0 0 / 2px 2px; }
 :root[data-theme=desktop95][data-mode=dark] .wordmark { background: repeating-conic-gradient(var(--face) 0 25%, #3b3b3b 0 50%) 0 0 / 2px 2px; }
 :root[data-theme=desktop95] .wordmark img { width: 20px; height: 20px; border-radius: 0; }
 /* Links sit in the sunken notification tray, flat until pointed at. */
-:root[data-theme=desktop95] .site-header nav { gap: 2px; padding: 3px 4px; min-height: 30px; font-size: 12px; box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
-:root[data-theme=desktop95] .site-header nav a { padding: 4px 8px; color: var(--ink); text-decoration: none; }
+:root[data-theme=desktop95] .site-header nav { box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
+:root[data-theme=desktop95] .site-header nav a { color: var(--ink); text-decoration: none; }
 :root[data-theme=desktop95] .site-header nav a:hover { text-decoration: none; box-shadow: inset 1px 1px var(--hi), inset -1px -1px var(--sh); }
 :root[data-theme=desktop95] .site-header nav a:active, :root[data-theme=desktop95] .site-header nav a[aria-current] { box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
 :root[data-theme=desktop95] .site-header nav a:active { cursor: progress; }
 :root[data-theme=desktop95] .site-header nav a:focus-visible { outline: 1px dotted var(--ink); outline-offset: -2px; }
+
+/* Taskbar geometry only above phone width; phones keep the shared header and tab bar layout. */
+@media (min-width: 641px) {
+  :root[data-theme=desktop95] .site-header { position: sticky; top: 0; z-index: 20; width: 100%; margin: 0; min-height: 40px; gap: 6px; padding: 4px 4px 3px; }
+  :root[data-theme=desktop95] .theme-trigger { order: -1; min-height: 30px; padding: 3px 10px 3px 6px; gap: 6px; font-size: 13px; }
+  :root[data-theme=desktop95] :is(.theme-trigger:active, .theme-trigger[aria-expanded=true]) { padding: 4px 9px 2px 7px; }
+  :root[data-theme=desktop95] .wordmark { min-height: 30px; min-width: 170px; padding: 3px 12px 3px 6px; gap: 6px; font-size: 13px; }
+  :root[data-theme=desktop95] .site-header nav { gap: 2px; padding: 3px 4px; min-height: 30px; font-size: 12px; }
+  :root[data-theme=desktop95] .site-header nav a { padding: 4px 8px; }
+}
 
 /* ---------- Desktop labels ---------- */
 :root[data-theme=desktop95] .identity-strip { color: #fff; }
@@ -205,10 +215,8 @@
 
 /* ---------- Phone ---------- */
 @media (max-width: 640px) {
-  :root[data-theme=desktop95] .site-header { width: 100%; margin: 0; padding: 4px; row-gap: 4px; }
-  :root[data-theme=desktop95] .site-header nav { order: 3; width: 100%; padding: 3px; border-top: 0; justify-content: space-between; }
-  :root[data-theme=desktop95] .theme-trigger { margin-left: 0; }
-  :root[data-theme=desktop95] .wordmark { flex: 1; }
+  :root[data-theme=desktop95] .site-header nav { border-top: 0; }
+  :root[data-theme=desktop95] .site-header nav a { display: inline-flex; align-items: center; justify-content: center; }
   :root[data-theme=desktop95] .window-chrome { font-size: 11px; }
   :root[data-theme=desktop95] .hero { padding-top: calc(var(--section-padding) + 30px); padding-bottom: calc(var(--section-padding) + 44px); }
   :root[data-theme=desktop95] h1 { font-size: clamp(50px, 15vw, 76px); }
