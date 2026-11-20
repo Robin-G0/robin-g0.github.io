@@ -112,7 +112,7 @@ export function gravity(env) {
                 p.line([[360 + off * k - dir * 8 * k, y - 14 * k], [360 + off * k + dir * 8 * k, y], [360 + off * k - dir * 8 * k, y + 14 * k]], 'muted', 3);
             c.restore();
             for (const row of s.rows) {
-                const y = yOf(row.d), near = row.d < GRAVITY.horizon * .45, rh = 26 * k;
+                const y = yOf(row.d), near = row.d < GRAVITY.horizon * .45, rh = 32 * k;
                 if (row.ledge) {
                     const from = row.ledge === 'left' ? wallL : wallR, to = row.ledge === 'left' ? xOf(GRAVITY.ledgeReach) : xOf(1 - GRAVITY.ledgeReach);
                     const x0 = Math.min(from, to), w = Math.abs(to - from);
@@ -127,7 +127,7 @@ export function gravity(env) {
                     p.rect(x0 - 8 * k, y - 10 * k, 12 * k, 20 * k, 'gold'); p.rect(x1 - 4 * k, y - 10 * k, 12 * k, 20 * k, 'gold');
                 }
                 if (row.pickup != null && row.d > -.05) {
-                    const x = xOf(row.pickup), size = 30 * k;
+                    const x = xOf(row.pickup), size = 36 * k;
                     p.rect(x - size / 2, y - size / 2, size, size, 'bg'); p.outline(x - size / 2, y - size / 2, size, size, 'accent', 2);
                     mono(p, '1', x, y + 1, size * .75, 'ink', 'center');
                 }

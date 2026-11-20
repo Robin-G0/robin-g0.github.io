@@ -79,5 +79,16 @@ otherwise), local pulse feedback without the generic playfield label, canvas hyg
 title), phone/landscape fit and 44 px buttons, unattended Game over with v2 links and replay,
 bundled font in both appearances; `MATRIX_SHOTS=<dir>` saves review captures.
 
+Two isMobile/touch captures (390x844 portrait, 844x390 landscape) step through the three cards,
+play with taps and wait for the result screen for every game, and assert that every opaque canvas
+text is at least 14 CSS px (scale = canvas CSS width / 720). Layout is host-owned: `themes/matrix.css`
+only skins (colours, borders, fonts, shadows) and sets no size or position on the player, stage,
+inputs, toolbar, camera dock or overlays. Boards place everything in proportion to the logical
+height, so a ~370x380 CSS px stage (logical ~720x740, compact) keeps key objects at 24+ CSS px
+(strikes ~33, register cells ~45, pickups ~27, ledges ~24 high).
+
+Precision: Parry `full` (six commands with sideways reaches gain most from the heavier model);
+Binary and Gravity `low` (two plain raises, no placement within a box).
+
 Shared test change: `tests/challenges.test.mjs` asserted that only `popups` is directional; it
 now checks `inputScheme === 'wrist-directions'`, which Parry also declares.

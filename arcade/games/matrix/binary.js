@@ -120,7 +120,7 @@ export function binary(env) {
             c.arc(lockX, lockY - lift, 12 * k, Math.PI, 0); c.lineTo(lockX + 12 * k, lockY + 6 * k - (s.solved ? lift : 0)); c.moveTo(lockX - 12 * k, lockY - lift); c.lineTo(lockX - 12 * k, lockY + 6 * k); c.stroke(); c.restore();
             p.rect(lockX - 19 * k, lockY + 4 * k, 38 * k, 26 * k, s.solved ? 'gold' : 'accent');
             p.rect(lockX - 3 * k, lockY + 12 * k, 6 * k, 10 * k, 'bg');
-            mono(p, 'KEY', left - 14, keyY, 20 * k, 'muted', 'right');
+            mono(p, 'KEY', left - 14, keyY, 22 * k, 'muted', 'right');
             for (let i = 0; i < n; i++) {
                 const x = xOf(i), on = s.target[i] === 1, kh = cw * .7;
                 if (on) p.rect(x, keyY - kh / 2, cw, kh, 'soft'); p.outline(x, keyY - kh / 2, cw, kh, on ? 'ink' : 'muted', 2);
@@ -149,12 +149,12 @@ export function binary(env) {
             }
             // The head: a blinking block cursor under the first cell. A refused flip flashes the seal.
             p.outline(xOf(0), regY + ch + 10 * k, cw, 10 * k, 'accent', 2); cursor(p, xOf(0), regY + ch + 10 * k, cw, 10 * k, s.time, reduced);
-            if (s.time - s.refusedAt < .5) { p.outline(xOf(0) - 6, regY - 6, cw + 12, ch + 12, 'gold', 3); mono(p, 'SEALED', xOf(0) + cw / 2, regY + ch + 40 * k, 20 * k, 'gold', 'center'); }
+            if (s.time - s.refusedAt < .5) { p.outline(xOf(0) - 6, regY - 6, cw + 12, ch + 12, 'gold', 3); mono(p, 'SEALED', xOf(0) + cw / 2, regY + ch + 40 * k, 22 * k, 'gold', 'center'); }
             const flip = s.effects.find(e => e.kind === 'flip' && s.time - e.at < .5);
             if (flip) ripple(p, xOf(0) + cw / 2, regY + ch / 2, s.time - flip.at, cw * .8, 'accent', reduced, .5);
             if (s.solved) ripple(p, lockX, lockY + 16 * k, s.time - s.solvedAt, 60 * k, 'gold', reduced, .8);
             const meterY = h * .84;
-            mono(p, 'clean run', 360 - 70 * k, meterY + 8 * k, 20 * k, 'muted', 'right');
+            mono(p, 'clean run', 360 - 70 * k, meterY + 8 * k, 22 * k, 'muted', 'right');
             cells(p, 360 - 56 * k, meterY, BINARY.cleanRun, s.cleanRun % BINARY.cleanRun, 16 * k, 6 * k);
             bursts(s, p, reduced);
         }

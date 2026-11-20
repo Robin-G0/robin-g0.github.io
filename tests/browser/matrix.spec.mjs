@@ -69,11 +69,11 @@ test('Matrix canvases draw outcomes beside the objects: a parried strike, a flip
 
 test('Matrix boards and cards fit phones and landscape without stretching game rules',async({page})=>{
     for(const [engine] of engines){
-        await page.setViewportSize({width:320,height:640});
+        await page.setViewportSize({width:390,height:844});
         await page.locator(`[data-game=matrix-${engine}]`).click();
         await page.locator('#arcade-guide').click();
         await page.locator('[data-guide-skip]').click();await page.locator('#arcade-no-camera').click();
-        for(const size of [{width:320,height:640},{width:390,height:844},{width:740,height:360}]){
+        for(const size of [{width:390,height:844},{width:844,height:390},{width:740,height:360}]){
             await page.setViewportSize(size);await page.clock.runFor(64);
             expect(await page.locator('#arcade-player').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
             if(size.width<400)expect(await page.locator('#arcade-canvas').evaluate(c=>c.height)).toBeGreaterThan(840);
@@ -132,3 +132,42 @@ test('the Matrix room uses the bundled terminal face and palette in both appeara
         }
     }
 });
+
+// Phone-first review: a real mobile context (isMobile, touch) in portrait and landscape, with the
+// tutorial, play and result phases of every game. The canvas text sizes are also checked in CSS px.
+for(const viewport of [{width:390,height:844},{width:844,height:390}]){
+    const tag=viewport.width<500?'mobile-portrait':'mobile-landscape';
+    test(`Matrix games read on a phone (${tag}) in tutorial, play and result phases`,async({browser})=>{
+        test.setTimeout(600000);
+        const context=await browser.newContext({viewport,isMobile:true,hasTouch:true,deviceScaleFactor:2});
+        const page=await context.newPage();
+        await page.clock.install();await page.clock.pauseAt(new Date(Date.now()+1000));
+        await page.route('https://raw.githubusercontent.com/**',r=>r.abort());
+        await page.route('**/vendor/motion-input-grid/src/index.mjs',r=>r.abort());
+        await page.goto('/?theme=matrix#arcade');
+        for(const [engine,,,button] of engines){
+            await page.locator(`[data-game=matrix-${engine}]`).click();
+            await page.locator('#arcade-guide').click();
+            for(let step=1;step<=3;step++){
+                await expect(page.locator('.matrix-diagram')).toBeVisible();
+                await shoot(page,`${engine}-${tag}-card${step}`);await page.locator('[data-guide-next]').click();
+            }
+            await page.locator('#arcade-no-camera').click();
+            await page.locator('#arcade-canvas').evaluate(canvas=>{
+                const context=canvas.getContext('2d'),text=context.fillText.bind(context);window.fontSizes=[];
+                context.fillText=(value,...args)=>{const px=Number(/(\d+(\.\d+)?)px/.exec(context.font)?.[1]||0);
+                    const scale=canvas.getBoundingClientRect().width/720;if(context.globalAlpha>.5)window.fontSizes.push(px*scale);return text(value,...args);};
+            });
+            await page.clock.runFor(2500);
+            for(let i=0;i<3;i++){await page.locator(button).tap();await page.clock.runFor(700);}
+            await shoot(page,`${engine}-${tag}-play`);
+            const sizes=await page.evaluate(()=>window.fontSizes);
+            expect(Math.min(...sizes),`${engine} ${tag}: smallest canvas text in CSS px`).toBeGreaterThanOrEqual(14);
+            await page.clock.runFor(engine==='binary'?200000:90000);
+            await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
+            await shoot(page,`${engine}-${tag}-result`);
+            await page.locator('#arcade-close').click();
+        }
+        await context.close();
+    });
+}

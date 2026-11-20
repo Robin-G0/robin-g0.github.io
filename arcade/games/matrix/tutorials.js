@@ -25,32 +25,32 @@ export const diagrams = {
             + text('L', 130, 150, 26) + text('R', 270, 150, 26)),
         frame(agent(200, 22) + `<path class="mx-dim" d="M188 60L120 110" style="stroke-dasharray:3 6"/><path d="M120 110L92 130" style="stroke-width:9"/>`
             + `<circle cx="88" cy="134" r="12"/>` + block(150, 88, 'up', 'matrix-strike')
-            + `<path class="mx-dim" d="M212 60L290 120" style="stroke-dasharray:3 6"/>` + block(254, 92, 'right', 'matrix-blink') + text('guard zone', 52, 104, 16) + text('blinks: about to fly', 320, 140, 16)),
-        frame(text('+10 → +30', 70, 40, 22) + text('in the zone', 70, 62, 16) + text('PARRY +50', 200, 40, 24, 'mx-gold-text') + text('at contact', 200, 62, 16)
-            + `<g class="mx-gold">${block(330, 34, 'up', '', 34)}</g>` + text('both ↑ ×2', 330, 72, 16)
+            + `<path class="mx-dim" d="M212 60L290 120" style="stroke-dasharray:3 6"/>` + block(254, 92, 'right', 'matrix-blink') + text('guard zone', 52, 104, 17) + text('blink: next strike', 300, 146, 17)),
+        frame(text('+10 → +30', 70, 40, 22) + text('in the zone', 70, 62, 17) + text('PARRY +50', 200, 40, 24, 'mx-gold-text') + text('at contact', 200, 62, 17)
+            + `<g class="mx-gold">${block(330, 34, 'up', '', 34)}</g>` + text('both ↑ ×2', 330, 72, 17)
             + [0, 1, 2, 3, 4, 5].map(i => `<rect x="${34 + i * 18}" y="96" width="14" height="14" class="mx-fill${i === 5 ? ' matrix-blink' : ''}"/>`).join('')
-            + text('6 in a row:', 86, 130, 16) + text('bullet time', 86, 148, 16) + text('sweeps 20 s · heavy 60 s', 290, 104, 15) + text('landed strike: −1 life', 290, 136, 16, 'mx-gold-text'))
+            + text('6 in a row:', 86, 130, 17) + text('bullet time', 86, 148, 17) + text('sweeps 20s · heavy 60s', 290, 104, 17) + text('landed strike: −1 life', 290, 136, 17, 'mx-gold-text'))
     ],
     binary: [
         frame(text('L', 36, 48, 26) + row(66, 22, [1, 0, 1, 1]) + `<path d="M81 64q0 12 14 12h108q14 0 14-12" class="matrix-wrap" style="fill:none"/><path d="M211 68l6-6 6 6"/>` + text('rotate', 300, 48, 20)
             + text('R', 36, 132, 26) + bit(66, 104, 0, 'matrix-flip') + `<rect x="66" y="146" width="30" height="6" class="mx-fill matrix-blink"/>` + row(104, 104, [1, 1, 0]) + text('flip the head', 300, 132, 20)),
-        frame(text('KEY', 40, 38, 16) + row(66, 14, [0, 1, 1, 0]) + text('x', 81, 70, 18, 'mx-gold-text') + text('|', 119, 70, 18) + text('x', 157, 70, 18, 'mx-gold-text') + text('|', 195, 70, 18)
+        frame(text('KEY', 40, 38, 17) + row(66, 14, [0, 1, 1, 0]) + text('x', 81, 70, 18, 'mx-gold-text') + text('|', 119, 70, 18) + text('x', 157, 70, 18, 'mx-gold-text') + text('|', 195, 70, 18)
             + `<g class="mx-gold">${bit(66, 80, 1)}</g>` + bit(104, 80, 1) + `<g class="mx-gold">${bit(142, 80, 0)}</g>` + bit(180, 80, 0)
-            + `<rect x="66" y="124" width="30" height="6" class="mx-fill matrix-blink"/>` + text('par 3', 300, 60, 26) + text('shortest solution', 300, 86, 16) + text('x = still different', 300, 130, 16)),
-        frame(text('20 × par', 70, 44, 24) + text('per lock', 70, 66, 16) + text('in par ×2', 200, 44, 24, 'mx-gold-text') + text('3 in a row: +1 try', 200, 66, 16)
-            + `<rect x="316" y="20" width="30" height="38"/><path class="mx-dim" d="M316 34l14-14M316 50l30-30M330 58l16-16"/>` + text('sealed: no flip', 331, 78, 16)
-            + text('the clock refills on each unlock', 200, 116, 16) + text('a lock left open costs an attempt', 200, 140, 16, 'mx-gold-text'))
+            + `<rect x="66" y="124" width="30" height="6" class="mx-fill matrix-blink"/>` + text('par 3', 300, 60, 26) + text('shortest solution', 300, 86, 17) + text('x = still different', 300, 130, 17)),
+        frame(text('20 × par', 70, 44, 24) + text('per lock', 70, 66, 17) + text('in par ×2', 200, 44, 24, 'mx-gold-text') + text('3 in a row: +1 try', 200, 66, 17)
+            + `<rect x="316" y="20" width="30" height="38"/><path class="mx-dim" d="M316 34l14-14M316 50l30-30M330 58l16-16"/>` + text('sealed:', 331, 76, 17) + text('no flip', 331, 94, 17)
+            + text('the clock refills on each unlock', 200, 116, 17) + text('a lock left open costs an attempt', 200, 140, 17, 'mx-gold-text'))
     ],
     gravity: [
-        frame(shaft() + runner(136, 112, 'matrix-cross') + text('L', 56, 70, 30) + text('left wall', 56, 98, 16) + text('R', 344, 70, 30) + text('right wall', 344, 98, 16)
+        frame(shaft() + runner(136, 112, 'matrix-cross') + text('L', 56, 70, 30) + text('left wall', 56, 98, 17) + text('R', 344, 70, 30) + text('right wall', 344, 98, 17)
             + `<path class="mx-dim" d="M190 80l-8 8 8 8M210 80l8 8-8 8"/>`),
         frame(shaft(40, 200) + `<rect x="40" y="34" width="96" height="16" class="mx-soft"/><path class="mx-dim" d="M50 50l14-16M70 50l14-16M90 50l14-16M110 50l14-16"/>`
             + `<path class="mx-gold" d="M70 86H170" style="stroke-dasharray:8 5;stroke-width:4"/>` + runner(182, 128)
-            + text('ledge:', 300, 38, 16) + text('be on the other wall', 300, 56, 16) + text('beam:', 300, 92, 16, 'mx-gold-text') + text('never switch through', 300, 110, 16)),
-        frame(`<rect x="34" y="26" width="26" height="26"/>` + text('1', 47, 46, 20) + text('+10 ×chain', 130, 44, 20) + text('up to ×5', 130, 64, 16)
+            + text('ledge:', 300, 38, 17) + text('be on the other wall', 300, 56, 17) + text('beam:', 300, 92, 17, 'mx-gold-text') + text('never switch through', 300, 110, 17)),
+        frame(`<rect x="34" y="26" width="26" height="26"/>` + text('1', 47, 46, 20) + text('+10 ×chain', 130, 44, 20) + text('up to ×5', 130, 64, 17)
             + [0, 1, 2, 3, 4, 5, 6, 7].map(i => `<rect x="${236 + i * 18}" y="30" width="14" height="14" class="mx-fill${i === 7 ? ' matrix-blink' : ''}"/>`).join('')
-            + text('8 pickups: hardline', 300, 66, 16) + text('+100 and a life', 300, 84, 16)
-            + text('a missed pickup resets the chain', 200, 118, 16) + text('a ledge or beam hit: −1 life', 200, 142, 16, 'mx-gold-text'))
+            + text('8 pickups: hardline', 300, 66, 17) + text('+100 and a life', 300, 84, 17)
+            + text('a missed pickup resets the chain', 200, 118, 17) + text('a ledge or beam hit: −1 life', 200, 142, 17, 'mx-gold-text'))
     ]
 };
 

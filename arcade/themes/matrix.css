@@ -8,7 +8,7 @@
 [data-theme=matrix] .arcade-room-header .eyebrow { color: var(--accent); letter-spacing: .14em; text-transform: uppercase; }
 [data-theme=matrix] .arcade-hud dt { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
 [data-theme=matrix] .arcade-hud dd { color: var(--ink); font-variant-numeric: tabular-nums; }
-[data-theme=matrix] .arcade-stage { border-radius: 0; }
+
 [data-theme=matrix] #arcade-player .arcade-action { background: var(--soft); color: var(--ink); border: 1px solid var(--border); border-radius: 0; box-shadow: none; }
 [data-theme=matrix] #arcade-player .arcade-action .action-key { color: var(--accent); }
 [data-theme=matrix] #arcade-player .arcade-action:hover { border-color: var(--accent); }
@@ -62,20 +62,4 @@
 @media (prefers-reduced-motion: reduce) {
     .matrix-diagram * { animation: none !important; }
     [data-theme=matrix] .guide-title::after, [data-theme=matrix] [data-brief=start] #arcade-controls-status::after { animation: none !important; }
-}
-
-/* Construct Parry uses the six-command wrist groups: keep both groups inside a phone's width. */
-@media (max-width: 640px) {
-    [data-theme=matrix] [data-engine=parry] .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
-    [data-theme=matrix] [data-engine=parry] .wrist-controls { flex-direction: column; gap: 2px; }
-    [data-theme=matrix] [data-engine=parry] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
-    [data-theme=matrix] [data-engine=parry] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
-    [data-theme=matrix] [data-engine=parry] .wrist-buttons { width: 100%; gap: 2px; }
-    [data-theme=matrix] [data-engine=parry] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; }
-    [data-theme=matrix] [data-engine=parry] .wrist-buttons kbd { display: none; }
-}
-@media (max-width: 480px) { [data-theme=matrix] [data-engine=parry] .arcade-inputs { grid-template-columns: 1fr; } }
-/* Phones: give the portrait board most of the height and keep the touch inputs directly below it. */
-@media (max-width: 640px) {
-    [data-theme=matrix] :is([data-engine=parry], [data-engine=binary], [data-engine=gravity]) .arcade-stage { height: clamp(300px, calc(100dvh - 400px), 460px); min-height: 300px; max-height: none; aspect-ratio: auto; }
 }
