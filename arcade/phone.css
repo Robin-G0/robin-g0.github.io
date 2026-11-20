@@ -1,0 +1,152 @@
+/* Phone layout for the game player. Loaded after every theme so layout wins; themes only skin.
+   The play screen is a fixed full-height app: nothing scrolls, the board takes the space left,
+   touch controls sit in the thumb zone and camera setup opens as a sheet over the board. */
+.camera-more { display: none; }
+
+@media (max-width: 640px), (max-height: 500px) and (orientation: landscape) and (pointer: coarse), (max-height: 500px) and (orientation: landscape) and (max-width: 950px) {
+    #arcade-player[open] {
+        display: grid; width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh;
+        margin: 0; inset: 0; overflow: hidden; border-width: 0; border-radius: 0;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto auto auto;
+        grid-template-areas: "head" "friend" "hud" "stage" "dock" "tool" "inputs";
+    }
+    #arcade-player .arcade-room-header { grid-area: head; align-items: center; gap: 8px; min-height: 52px; padding: 4px 6px 4px 14px; }
+    #arcade-player .arcade-room-header .eyebrow { display: none; }
+    #arcade-player .arcade-room-header h2 { font-size: 21px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #arcade-player .arcade-controls-trigger { min-height: 44px; padding: 6px 12px; font-size: 15px; }
+    #arcade-player .arcade-room-close { width: 44px; height: 44px; font-size: 24px; }
+    #arcade-player .friend-target { grid-area: friend; padding: 6px 14px; font-size: 15px; }
+
+    #arcade-player .arcade-hud { grid-area: hud; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-columns: none; gap: 8px; padding: 5px 14px; }
+    #arcade-player .arcade-hud > div { flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; }
+    #arcade-player .arcade-hud > div[hidden] { display: none; }
+    #arcade-player .arcade-hud dt { font-size: 11px; line-height: 1.2; white-space: nowrap; }
+    #arcade-player[data-engine] .arcade-hud dd { font-size: 19px; white-space: nowrap; }
+
+    /* The board owns every pixel left; overlays scroll inside it instead of being clipped. */
+    #arcade-player[data-engine] .arcade-stage { grid-area: stage; width: 100%; height: auto; min-height: 0; max-height: none; aspect-ratio: auto; margin: 0; }
+    #arcade-player .arcade-overlay { padding: 14px 16px; gap: 8px; overflow-y: auto; overscroll-behavior: contain; justify-content: safe center; }
+    #arcade-player .arcade-overlay h3 { font-size: 22px; }
+    #arcade-player .arcade-walkthrough { justify-content: flex-start; padding: 10px 16px 0; gap: 6px; }
+    #arcade-player .guide-heading { width: 100%; }
+    #arcade-player .guide-heading h3 { font-size: 18px; }
+    #arcade-player .guide-figure { flex: 1 1 auto; min-height: 96px; width: 100%; }
+    #arcade-player .guide-art { max-height: min(150px, 28dvh); }
+    #arcade-player .guide-figure canvas { max-height: min(150px, 28dvh); }
+    #arcade-player .guide-title { font-size: 21px; }
+    #arcade-player .arcade-walkthrough .guide-caption { font-size: 17px; line-height: 1.3; }
+    #arcade-player .guide-nav { position: sticky; bottom: 0; width: 100%; margin-top: auto; padding: 8px 0 12px; background: inherit; }
+    #arcade-player .guide-nav button { flex: 1; min-height: 48px; }
+    #arcade-player .guide-nav button:disabled { display: none; }
+    #arcade-player[data-brief=start] #arcade-controls-status { font-size: clamp(22px, 7vw, 32px); }
+    #arcade-player .arcade-controls .gesture-lesson { gap: 10px; }
+    #arcade-player .arcade-controls > p, #arcade-player .arcade-controls details, #arcade-player .camera-alternative { font-size: 16px; }
+    #arcade-player #arcade-begin, #arcade-player #arcade-resume, #arcade-player #arcade-again { min-height: 52px; font-size: 20px; }
+    #arcade-player #arcade-final-score { font-size: 40px; }
+    #arcade-player #arcade-scoreboard { font-size: 16px; }
+    #arcade-player .arcade-result-actions { bottom: -14px; }
+    #arcade-player .binding-actions { bottom: -14px; }
+    #arcade-player #arcade-binding-rows label { grid-template-columns: 1fr; gap: 4px; font-size: 16px; }
+    #arcade-player .arcade-playfield-input { top: 8px; right: 8px; font-size: 16px; padding: 6px 10px; }
+    #arcade-player .arcade-playfield-message { bottom: 8px; font-size: 15px; }
+
+    /* Camera: a one-line strip during play, a full sheet over the board while setting up. */
+    #arcade-player .arcade-camera-dock, #arcade-player .arcade-camera-dock.compact {
+        grid-area: dock; display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; grid-template-rows: auto;
+        align-items: center; gap: 2px 10px; padding: 6px 8px 6px 14px; border-block: 1px solid var(--border); border-bottom: 0;
+    }
+    #arcade-player .arcade-camera-dock .camera-details { display: contents; }
+    #arcade-player .arcade-camera-dock .camera-view { grid-column: 1; grid-row: 1; width: 58px; }
+    #arcade-player .arcade-camera-dock .camera-placeholder { padding: 0; font-size: 0; }
+    #arcade-player .arcade-camera-dock .camera-wrist { width: 14px; min-width: 14px; height: 14px; border-width: 2px; font-size: 0; }
+    #arcade-player .arcade-camera-dock .camera-heading { grid-column: 3; grid-row: 1; margin: 0; gap: 6px; flex-wrap: nowrap; }
+    #arcade-player .arcade-camera-dock .camera-heading strong { display: none; }
+    #arcade-player .arcade-camera-dock .camera-heading .button { min-height: 44px; padding: 6px 12px; font-size: 15px; }
+    #arcade-player:not([data-camera=off]):not([data-camera=unavailable]):not([data-camera-sheet]) #arcade-camera { display: none; }
+    #arcade-player .arcade-camera-dock .camera-more { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 10px; font-size: 15px; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); background: var(--soft); color: var(--ink); }
+    #arcade-player .arcade-camera-dock #arcade-camera-status { grid-column: 2; grid-row: 1; margin: 0; font-size: 15px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    #arcade-player .arcade-camera-dock #arcade-countdown { grid-column: 2; grid-row: 1; margin: 0; min-height: 0; font-size: 20px; }
+    #arcade-player .arcade-camera-dock #arcade-countdown:empty { display: none; }
+    #arcade-player .arcade-camera-dock:has(#arcade-countdown:not(:empty)) #arcade-camera-status { visibility: hidden; }
+    #arcade-player .arcade-camera-dock :is(.camera-placement, .camera-positioning, .camera-precision, #arcade-recognition, #arcade-recalibrate, #arcade-cancel-countdown) { display: none; }
+    #arcade-player .arcade-camera-dock #arcade-cancel-countdown:not([hidden]) { display: block; grid-column: 1 / -1; grid-row: 2; justify-self: start; }
+
+    #arcade-player[data-camera-sheet] .arcade-camera-dock {
+        grid-row: stage-start / dock-end; grid-column: 1 / -1; z-index: 8; align-self: stretch;
+        grid-template-columns: minmax(0, 1fr); grid-template-rows: none; align-content: start; gap: 10px;
+        padding: 14px 16px; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); border-bottom: 1px solid var(--border);
+    }
+    #arcade-player[data-camera-sheet] #arcade-camera-dock :is(.camera-view, .camera-heading, #arcade-camera-status, #arcade-countdown, .camera-placement, .camera-positioning, .camera-precision, #arcade-recognition, #arcade-recalibrate, #arcade-cancel-countdown, .camera-phone-tip) { grid-column: 1; grid-row: auto; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-view { --cam: max(160px, min(300px, calc(100vw - 32px), calc((100dvh - 360px) * 4 / 3))); width: var(--cam); height: calc(var(--cam) * .75); aspect-ratio: auto; justify-self: center; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-placeholder { padding-top: 70px; font-size: 13px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-wrist { width: 40px; min-width: 40px; height: 26px; border-width: 3px; font-size: 13px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-heading { order: -1; justify-content: space-between; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-heading strong { display: block; font-size: 18px; margin-right: auto; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock #arcade-camera-status { display: block; font-size: 17px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock :is(.camera-placement, .camera-positioning, .camera-precision, #arcade-recognition, #arcade-recalibrate) { display: revert; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-placement { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-placement li { font-size: 16px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-placement span { font-size: 15px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock :is(.camera-positioning, .camera-precision) { font-size: 15px; margin: 0; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock #arcade-recognition { font-size: 20px; min-height: 0; margin: 0; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock #arcade-recognition:empty { display: none; }
+    #arcade-player[data-camera-sheet] .camera-phone-tip { display: block; }
+
+    #arcade-player .arcade-toolbar { grid-area: tool; flex-wrap: nowrap; gap: 4px; padding: 0 8px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--border); }
+    #arcade-player .arcade-toolbar::-webkit-scrollbar { display: none; }
+    #arcade-player .arcade-toolbar button { flex: 0 0 auto; min-height: 44px; min-width: 44px; padding: 4px 10px; font-size: 16px; white-space: nowrap; }
+    #arcade-player #arcade-sound { font-size: 24px; }
+    #arcade-player #arcade-feedback { display: none; }
+
+    /* Thumb zone: the controls are the last thing on screen, above the home indicator. */
+    #arcade-player .arcade-inputs { grid-area: inputs; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; padding: 6px 8px 10px; }
+    #arcade-player .arcade-inputs .arcade-action { min-height: 68px; padding: 8px 10px; gap: 10px; justify-content: center; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    #arcade-player .arcade-inputs .arcade-action .action-key { font-size: 28px; }
+    #arcade-player .arcade-inputs .arcade-action .action-name { font-size: 17px; line-height: 1.15; }
+    #arcade-player .arcade-inputs .wrist-controls { flex-direction: column; align-items: stretch; gap: 3px; }
+    #arcade-player .arcade-inputs .wrist-title { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; }
+    #arcade-player .arcade-inputs .wrist-title::after { width: 7px; height: 7px; margin: 0; }
+    #arcade-player .arcade-inputs .wrist-buttons { width: 100%; gap: 4px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #arcade-player .arcade-inputs .wrist-buttons .arcade-action { min-width: 0; min-height: 60px; padding: 4px; }
+    #arcade-player .arcade-inputs .wrist-buttons kbd { display: none; }
+}
+
+.camera-phone-tip { display: none; font-size: 15px; margin: 0; color: var(--muted); }
+
+/* Landscape phones: the board in the middle, one hand's controls on each side. */
+@media (max-height: 500px) and (orientation: landscape) and (pointer: coarse), (max-height: 500px) and (orientation: landscape) and (max-width: 950px) {
+    #arcade-player[open] {
+        grid-template-columns: minmax(118px, 21%) minmax(0, 1fr) minmax(118px, 21%);
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        grid-template-areas: "head head hud" "friend friend friend" "left stage right" "dock tool tool";
+    }
+    #arcade-player .arcade-room-header { min-height: 44px; padding-block: 0; }
+    #arcade-player .arcade-room-header h2 { font-size: 18px; }
+    #arcade-player .arcade-hud { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 2px 10px; gap: 0 8px; align-self: center; }
+    #arcade-player .arcade-hud > div { flex-direction: column; gap: 0; }
+    #arcade-player .arcade-hud dt { font-size: 10px; }
+    #arcade-player[data-engine] .arcade-hud dd { font-size: 16px; }
+    #arcade-player .arcade-inputs { display: contents; }
+    #arcade-player .arcade-inputs > :first-child { grid-area: left; margin: 6px 0 6px 8px; }
+    #arcade-player .arcade-inputs > :last-child { grid-area: right; margin: 6px 8px 6px 0; }
+    #arcade-player .arcade-inputs > .arcade-action { flex-direction: column; min-height: 0; }
+    #arcade-player .arcade-inputs .wrist-controls { justify-content: center; }
+    #arcade-player .arcade-inputs .wrist-buttons { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 1fr 1fr; }
+    #arcade-player .arcade-inputs .wrist-buttons .arcade-action { min-height: 0; }
+    #arcade-player .arcade-inputs .wrist-buttons .arcade-action:nth-child(2) { grid-column: 1 / -1; grid-row: 1; }
+    #arcade-player .arcade-camera-dock, #arcade-player .arcade-camera-dock.compact { grid-template-columns: 40px minmax(0, 1fr) auto; padding: 4px 6px 4px 10px; border-right: 1px solid var(--border); }
+    #arcade-player .arcade-camera-dock .camera-view { width: 40px; }
+    #arcade-player:not([data-camera-sheet]) .arcade-camera-dock #arcade-camera-status { display: none; }
+    #arcade-player .arcade-camera-dock .camera-heading { grid-column: 2 / -1; justify-content: flex-end; }
+    #arcade-player .arcade-camera-dock .camera-heading #arcade-camera { display: none; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock { grid-row: left-start / dock-end; grid-template-columns: minmax(160px, 38%) minmax(0, 1fr); column-gap: 18px; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-heading #arcade-camera { display: inline-flex; }
+    #arcade-player[data-camera-sheet] #arcade-camera-dock .camera-view { --cam: min(100%, calc((100dvh - 90px) * 4 / 3)); width: var(--cam); height: auto; aspect-ratio: 4 / 3; }
+    #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-view { grid-column: 1; grid-row: 1 / span 6; width: 100%; align-self: start; }
+    #arcade-player[data-camera-sheet] #arcade-camera-dock :is(.camera-heading, #arcade-camera-status, #arcade-countdown, .camera-placement, .camera-positioning, .camera-precision, #arcade-recognition, #arcade-recalibrate, #arcade-cancel-countdown, .camera-phone-tip) { grid-column: 2; }
+    #arcade-player[data-camera-sheet] #arcade-camera-dock .camera-view { grid-column: 1; grid-row: 1 / span 6; }
+    #arcade-player .guide-art, #arcade-player .guide-figure canvas { max-height: 30dvh; }
+    #arcade-player .guide-figure { min-height: 70px; }
+}

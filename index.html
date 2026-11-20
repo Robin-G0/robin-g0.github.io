@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="./arcade/themes/material.css">
   <link rel="stylesheet" href="./arcade/themes/glass.css">
   <link rel="stylesheet" href="./arcade/themes/field-notes.css">
+  <link rel="stylesheet" href="./arcade/phone.css">
   <script type="importmap">{"imports":{"motion-input-grid":"./vendor/motion-input-grid/src/index.mjs"}}</script>
   <script type="module" src="./assets/site.js?v=desktop95-6"></script>
   <script type="module" src="./arcade/app.js?v=desktop95-6"></script>
@@ -185,7 +186,8 @@
         <i class="camera-wrist" data-wrist="left" hidden>L</i><i class="camera-wrist" data-wrist="right" hidden>R</i>
       </div>
       <div class="camera-details">
-        <div class="camera-heading"><strong>Motion controls</strong><button id="arcade-camera" class="button primary" type="button">Use camera</button></div>
+        <div class="camera-heading"><strong>Motion controls</strong><button id="arcade-camera" class="button primary" type="button">Use camera</button><button id="arcade-camera-more" class="camera-more" type="button" aria-controls="arcade-camera-dock" aria-expanded="false">Camera</button></div>
+        <p class="camera-phone-tip">Prop the phone up about two metres away, front camera facing you, so your shoulders and both wrists stay in view. Touch controls work any time.</p>
         <p id="arcade-camera-status" role="status">Starting camera…</p>
         <ul class="camera-placement" aria-label="Positioning feedback">
           <li data-tracking="shoulders">Shoulders <span>Not in view</span></li>

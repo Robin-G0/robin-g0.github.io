@@ -96,7 +96,7 @@ export class GameRoom {
         this.cancelCountdown();
         this.showPlacement({ shoulders: false, left: null, right: null });
         this.dialog.dataset.camera = 'off';
-        this.$('#arcade-feedback').textContent = description.engine==='lander'?'Lift L or R. Both together fire the center engine.':this.sixDirections ? 'One wrist per stack.' : 'Lower and lift one wrist.';
+        this.$('#arcade-feedback').textContent = description.engine==='lander'?'Lift L or R. Both together fire the center engine.':this.sixDirections ? 'Each wrist has three moves: left, up and right.' : 'Lower and lift one wrist.';
         this.$('#arcade-sound').setAttribute('aria-pressed', 'true');
         this.fillControls();
         this.results = new ArcadeResults(dialog,description,this.scores,challenge,{
@@ -123,6 +123,7 @@ export class GameRoom {
         const on = (selector, handler) => this.$(selector).addEventListener('click', handler, { signal });
         bindAlternativeControls(this.dialog, { dispatch: (action, details) => this.input(action, details) }, signal, this.description.inputScheme);
         on('#arcade-close', () => this.dialog.close());
+        on('#arcade-camera-more', () => this.cameraSheet(!('cameraSheet' in this.dialog.dataset)));
         on('#arcade-begin', () => this.play());
         on('#arcade-resume', () => this.play());
         on('#arcade-no-camera', () => {
@@ -421,6 +422,7 @@ export class GameRoom {
         if (this.dialog.dataset.phase !== state.phase) this.needsPaint = true;
         const active = state.phase === 'playing' && !(this.description.engine === 'maze' && this.runner.game.state.stage === 'preview');
         this.camera?.setInferenceFps(active ? 20 : 10);
+        if (state.phase === 'playing' && this.dialog.dataset.phase !== 'playing') this.cameraSheet(false);
         this.dialog.dataset.phase = state.phase;
         this.text('#arcade-score', state.score);
         this.text('#arcade-time', `${state.remaining == null ? state.elapsed : state.remaining}s`);
@@ -685,9 +687,18 @@ export class GameRoom {
         this.request = requestAnimationFrame(time => this.frame(time));
     }
 
+    /** Phones show camera setup as a sheet over the board; desktop never shows the toggle. */
+    cameraSheet(open) {
+        const button = this.$('#arcade-camera-more');
+        if (open) this.dialog.dataset.cameraSheet = ''; else delete this.dialog.dataset.cameraSheet;
+        button.setAttribute('aria-expanded', String(open));
+        button.textContent = open ? 'Done' : 'Camera';
+    }
+
     dispose() {
         if (this.closed) return;
         this.closed = true;
+        this.cameraSheet(false);
         delete document.documentElement.dataset.arcadeOpen;
         cancelAnimationFrame(this.request); this.abort.abort();
         this.resizeObserver?.disconnect();
