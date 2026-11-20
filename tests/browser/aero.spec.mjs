@@ -25,7 +25,7 @@ test('Aero games teach their real rules on glass cards and use their native prof
         expect((await page.evaluate(()=>window.motionTest.profile.inputs.map(i=>i.action))).sort()).toEqual([...RAISES[engine]].sort());
         const first=engine==='school'?'left_left':'left_up';
         await page.evaluate(action=>action.endsWith('_up')?window.motionTest.raw(action):window.motionTest.batch([action]),first);await page.clock.runFor(64);
-        await expect(page.locator(engine==='school'?'[data-arcade-input=left_left]':'[data-arcade-input=left]')).toHaveAttribute('data-pulse','true');
+        await expect(page.locator('#arcade-recognition')).toContainText(engine==='school'?'L ←':'L ↑');
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await expect(page.locator('#arcade-playfield-message')).not.toBeVisible();
         await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(1200);
@@ -44,8 +44,12 @@ test('Aero boards and cards fit phones and landscape without stretching game rul
         await page.setViewportSize({width:390,height:844});
         await page.locator(`[data-game=aero-${engine}]`).click();
         await page.locator('#arcade-guide').click();
+        // The card scrolls inside its overlay on short stages; Next must stay reachable without horizontal overflow.
+        await page.locator('[data-guide-next]').scrollIntoViewIfNeeded();
         const box=await page.locator('#arcade-walkthrough').boundingBox(),next=await page.locator('[data-guide-next]').boundingBox();
         expect(next.y+next.height).toBeLessThanOrEqual(box.y+box.height+1);
+        expect(await page.locator('#arcade-walkthrough').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+        expect((await page.locator('.aero-diagram').boundingBox()).width).toBeLessThanOrEqual(box.width);
         await page.locator('[data-guide-skip]').click();await page.locator('#arcade-no-camera').click();
         for(const size of [{width:390,height:844},{width:844,height:390},{width:740,height:360}]){
             await page.setViewportSize(size);await page.clock.runFor(64);

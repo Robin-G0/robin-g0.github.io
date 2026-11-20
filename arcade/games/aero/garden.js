@@ -104,7 +104,7 @@ export function garden(env) {
             grass(p, t, soil + 4, { blades: 40, height: 26 * k, dark });
             // Weather sources: the rain cloud on the left, the sun on the right, each counting its waiting plants.
             const waiting = type => s.beds.filter(b => b.need && (b.need.type === type || (b.need.type === 'rainbow' && !b.need[type]))).length;
-            const cloudX = 120, sunX = 600, skyY = compact ? 150 : 98;
+            const cloudX = compact ? 150 : 120, sunX = compact ? 530 : 600, skyY = compact ? 150 : 98;
             cloud(p, cloudX, skyY + (env.reducedMotion ? 0 : Math.sin(t * .8) * 3), 1.1 * k);
             orb(p, sunX, skyY, 30 * k, AERO.sun); glyph(p, 'sun', sunX, skyY, 22 * k, '#fff8d8');
             for (const [x, type, color] of [[cloudX + 44 * k, 'water', AERO.aqua], [sunX + 40 * k, 'sun', AERO.sun]]) {
@@ -157,7 +157,7 @@ export function garden(env) {
             const pending = [[40, 'new bed'], [GARDEN.rainbowAt, 'rainbow plants'], [90, 'new bed']].find(([at]) => at > s.time && at - s.time <= 8);
             header(p, `${s.blooms} bloom${s.blooms === 1 ? '' : 's'}`, pending ? `${pending[1]} in ${Math.ceil(pending[0] - s.time)}s` : s.bestBatch > 1 ? `best batch ×${s.bestBatch}` : '');
             // Bursts store a bed index; -1 places them at the soil line, -2 by the need bubbles, -3 mid-sky.
-            bursts(p, { time: s.time, bursts: s.bursts.map(b => (b.y < 0 ? { ...b, x: 40 + span * (b.x + .5) / n, y: b.y === -1 ? soil - 60 * k : b.y === -2 ? soil - 200 * k : horizon * .6 } : b)) }, env.reducedMotion);
+            bursts(p, { time: s.time, bursts: s.bursts.map(b => (b.y < 0 ? { ...b, x: 40 + span * (b.x + .5) / n, y: b.y === -1 ? soil - 60 * k : b.y === -2 ? soil - (compact ? 280 : 150) - 60 * k : horizon * .6 } : b)) }, env.reducedMotion);
         }
     });
 }

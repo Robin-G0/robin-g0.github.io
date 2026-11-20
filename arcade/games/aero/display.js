@@ -259,7 +259,7 @@ export function bursts(p, s, reduced = false) {
         const age = s.time - b.at; if (age < 0 || age > 1.2) continue;
         const size = (p.compact ? 38 : 26) * (b.big ? 1.25 : 1), c = p.c;
         c.save(); c.globalAlpha = Math.min(1, (1.2 - age) * 3);
-        text(p, b.text, Math.max(80, Math.min(640, b.x)), b.y - (reduced ? 0 : age * 26), size, b.good ? (isDark(p) ? '#d1f58e' : '#2c7a12') : AERO.coral, 'center', 600);
+        text(p, b.text, Math.max(80, Math.min(640, b.x)), b.y - (reduced ? 0 : age * 26), size, b.good ? (isDark(p) ? '#d1f58e' : '#175c06') : (isDark(p) ? '#ff9a8a' : '#c0281a'), 'center', 600);
         c.restore();
     }
 }

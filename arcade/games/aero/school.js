@@ -144,7 +144,7 @@ export function school(env) {
                             orb(p, x - 74 * k, y, 13 * k, AERO.lime); orb(p, x + 74 * k, y, 13 * k, AERO.lime);
                             c.save(); c.globalAlpha *= .9; c.beginPath(); c.ellipse(x, y, 62 * k, 22 * k, 0, 0, Math.PI * 2);
                             c.lineWidth = 5 * k; c.strokeStyle = AERO.lime; c.shadowColor = '#d8ff8a'; c.shadowBlur = 18; c.stroke(); c.restore();
-                            text(p, '↑', x, y, 30 * k, dark ? '#e9ffd0' : '#2c7a12', 'center', 600);
+                            text(p, '↑', x, y, 30 * k, dark ? '#e9ffd0' : '#175c06', 'center', 600);
                         } else {
                             glass(p, x - 86, y - 20 * k, 172, 40 * k, 12, { tint: AERO.coral, strength: 1.1 });
                             c.save(); c.strokeStyle = 'rgba(255,255,255,.6)'; c.lineWidth = 3;
