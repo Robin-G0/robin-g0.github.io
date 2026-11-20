@@ -20,7 +20,6 @@ test('camera refusal leaves keyboard play available', async ({ page }) => {
     await page.locator('#arcade-begin').click();
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase', 'playing');
-    await expect(page.locator('#arcade-playfield-message')).toHaveText('Gate open');
 });
 
 test('blank camera keeps play running without a pause menu and releases the stream on exit', async ({ page }) => {

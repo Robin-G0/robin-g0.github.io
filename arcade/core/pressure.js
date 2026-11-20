@@ -4,10 +4,10 @@ export function pressureMultiplier(seconds) {
 }
 
 const survival = ['invaders', 'lander', 'snake', 'sort', 'ski', 'juggle', 'parry', 'rail', 'merge', 'clockwork',
-    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'balance', 'abyss'];
+    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'bubbles', 'balance', 'abyss'];
 const rounds = { stack: 18, golf: 24, orbit: 24, binary: 24, gel: 18,
     dock: 18, memory: 24, tangram: 20, prisms: 32,
-    contour: 36, stars: 24, bubbles: 18 };
+    contour: 36, stars: 24 };
 
 export const PRESSURE_RULES = Object.freeze({
     ...Object.fromEntries(survival.map(engine => [engine, Object.freeze({ kind: 'survival', pace: true })])),
