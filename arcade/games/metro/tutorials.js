@@ -25,7 +25,8 @@ export const metroDiagrams = {
         frame(cells() + tile(118, 104, 30, 30, GREEN, '8', 16) + tile(186, 104, 30, 30, BLUE, '2', 16, 'metro-base') + tile(220, 104, 30, 30, PURPLE, '4', 16, 'metro-side')
             + tile(186, 2, 30, 30, BLUE, '2', 16, 'metro-fall') + tile(186, 104, 30, 30, PURPLE, '4', 16, 'metro-result-a', 0, 'opacity:0') + tile(186, 104, 30, 30, GREEN, '8', 16, 'metro-result-b', 0, 'opacity:0')
             + text('2 on 2 → 4 · touches 4 → 8 · chain ×2', 200, 152, 16)),
-        frame(text('+ value', 65, 52, 28) + text('× chain step', 65, 82, 16) + text('128 × min', 200, 52, 26) + text('small tiles retire', 200, 82, 16) + `<rect x="292" y="28" width="96" height="64" style="fill:${ORANGE};stroke:none"/>` + text('full column', 340, 54, 15, 400, '#fff') + text('= over', 340, 80, 18, 400, '#fff') + text('the bar is the deadline · each move adds .2 s', 200, 140, 18))
+        frame(text('10 × power', 65, 52, 24) + text('4 → 20 · 8 → 30', 65, 76, 13) + text('× chain step', 65, 96, 15) + text('128 × min', 200, 52, 26) + text('small tiles clear', 200, 82, 16) + `<rect x="292" y="28" width="96" height="64" style="fill:${ORANGE};stroke:none"/>` + text('full column', 340, 54, 15, 400, '#fff') + text('= over', 340, 80, 18, 400, '#fff')
+            + text('2 tiles ×2 · 3 tiles ×4 · 4 tiles ×8', 200, 118, 15) + text('the bar is the deadline · each move adds .2 s', 200, 143, 16))
     ],
     rail: [
         frame(network() + text('L  junction 1', 70, 150, 19) + text('R  junction 2', 330, 150, 19) + text('(open branch)', 330, 165, 12)),
@@ -36,6 +37,6 @@ export const metroDiagrams = {
 };
 export const metroCaptions = {
     memory: ['Raise L for the blue tile, R for the purple tile.', 'Slots fill as tiles flash. Repeat them in order, or follow along live for ×2.', 'Each tile 10, live 20. Finishing adds 10 per tile. Three wrongs end the run.'],
-    merge: ['Raise L or R to move the waiting tile; each move buys .2 s. Both together drop it now.', 'It falls when its bar runs out and merges with equal neighbours; anything that then touches keeps merging.', 'Chains score more. Reaching 128 × the smallest tile retires the small ones. One life: a full column ends the run.'],
+    merge: ['Raise L or R to move the waiting tile; each move buys .2 s. Both together drop it now.', 'It falls when its bar runs out and joins every equal tile it touches, ×2 per tile. Anything that then touches keeps merging as a chain.', 'A merge scores 10 per power of two, times its chain step. At 128 × the smallest tile, the small ones clear. One life: a full column ends the run.'],
     rail: ['Raise L to switch junction 1. Raise R to switch junction 2 on the open branch.', 'Trains leave on time from the board. Set the junctions before each train reaches them.', 'Arrivals score; convoys add more. New stations open at 40 s and 90 s. A wrong station costs a heart.']
 };

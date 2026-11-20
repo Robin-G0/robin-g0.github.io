@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {memory,TILES,tileCadence,revealedSteps} from '../arcade/games/metro/tiles.js';
-import {merge,DROP,landTile,spawnRange,varietyAfter,retireBelow,label} from '../arcade/games/metro/drop.js';
+import {merge,DROP,landTile,settle,mergePoints,mergeText,spawnRange,varietyAfter,retireBelow,label} from '../arcade/games/metro/drop.js';
 import {rail,RAIL,departureInterval,travelSeconds,stageAt,openStations,hasChild,destination} from '../arcade/games/metro/rail.js';
 import {seededRandom} from '../arcade/core/random.js';
 import {GameRunner} from '../arcade/core/runner.js';
@@ -59,28 +59,46 @@ test('an idle Live Tiles run loses through the host round clock, which pauses wh
     assert.ok(runner.elapsed>60&&runner.elapsed<200,`Three shrinking rounds plus show phases, not instant: ${runner.elapsed}`);
 });
 
-test('Tile Drop landings merge below and sideways in chains, overflow full columns, retire small tiles and label big ones',()=>{
+test('Tile Drop landings join every equal neighbour, chain across the board, overflow full columns, retire small tiles and label big ones',()=>{
     let columns=[[2],[],[],[],[]];
     const first=landTile(columns,0,2);
-    assert.deepEqual([first.overflow,first.points,first.merges,first.value,first.row],[false,4,1,4,0]);assert.deepEqual(columns,[[4],[],[],[],[]]);
-    assert.deepEqual(first.events,[{column:0,row:0,value:4,step:1,joined:1}]);
+    assert.deepEqual([first.overflow,first.points,first.merges,first.value,first.row],[false,20,1,4,0]);assert.deepEqual(columns,[[4],[],[],[],[]]);
+    assert.deepEqual(first.events[0],{kind:'land',column:0,row:1,board:[[2,2],[],[],[],[]]},'The landing frame shows the tile before it merges');
+    assert.deepEqual(first.events[1],{kind:'merge',column:0,row:0,value:4,step:1,joined:1,points:20,board:[[4],[],[],[],[]]},'Every frame carries the board it leaves, for the replay');
+    assert.deepEqual([mergePoints(4,1),mergePoints(8,1),mergePoints(2**10,1),mergePoints(16,3)],[20,30,100,120],'Ten points per power of two, times the chain step');
     columns=[[2],[],[2],[],[]];
-    assert.equal(landTile(columns,1,2).value,8,'Two equal side neighbours quadruple');assert.deepEqual(columns,[[],[8],[],[],[]]);
+    const triple=landTile(columns,1,2);
+    assert.deepEqual([triple.value,triple.merges,triple.points,triple.events[1].joined],[8,1,30,2],'Three tiles make x4 in one announced merge');assert.deepEqual(columns,[[],[8],[],[],[]]);
+    assert.equal(mergeText(triple.events[1]),'TRIPLE ×4 +30');
+    columns=[[4,2],[2],[4,2],[],[]]; // Landing on the 2 at row 1 touches both side 2s at that height.
+    const quad=landTile(columns,1,2);
+    assert.equal(quad.value,16,'Four tiles make x8');assert.deepEqual(columns,[[4],[16],[4],[],[]]);assert.equal(mergeText(quad.events[1]),'QUAD ×8 +40');
     columns=[[4],[2],[],[],[]];
     const chain=landTile(columns,1,2);
-    assert.deepEqual([chain.value,chain.merges,chain.points],[8,2,4+8*2],'Below first, then the freed side neighbour, scored by chain step');
+    assert.deepEqual([chain.value,chain.merges,chain.points],[8,2,20+30*2],'Below first, then the freed side neighbour, scored by chain step');
+    assert.deepEqual(chain.events.map(mergeText),['','+20','CHAIN ×2 +60']);
     assert.deepEqual(columns,[[],[8],[],[],[]]);
     columns=[[2,4,8,16,32,64],[],[],[],[]];
     assert.equal(landTile(columns,0,2).overflow,true);assert.equal(columns[0].length,DROP.rows);
     // Cascade: absorbing the left neighbour drops its 8 next to another 8, which merges as a second chain step.
     columns=[[8],[2,8],[],[],[]];
     const cascade=landTile(columns,2,2);
-    assert.deepEqual(columns,[[16],[],[4],[],[]]);assert.equal(cascade.merges,2);assert.equal(cascade.points,4*1+16*2);
-    assert.deepEqual(cascade.events.map(e=>[e.column,e.row,e.value,e.step]),[[2,0,4,1],[0,0,16,2]]);
-    // Equal tiles left touching by a retirement merge on the next landing, lowest and leftmost first.
-    columns=[[4],[4],[],[],[2]];
-    const sweep=landTile(columns,4,8);
-    assert.deepEqual(columns,[[8],[],[],[],[2,8]]);assert.equal(sweep.merges,1);assert.equal(sweep.events[0].column,0);
+    assert.deepEqual(columns,[[16],[],[4],[],[]]);assert.equal(cascade.merges,2);assert.equal(cascade.points,20+40*2);
+    assert.deepEqual(cascade.events.filter(e=>e.kind==='merge').map(e=>[e.column,e.row,e.value,e.step]),[[2,0,4,1],[0,0,16,2]]);
+    // Value only grows by the stated rule, x2 per joined neighbour, and a landing never touches tiles that were stable.
+    columns=[[2],[],[4],[],[4]];
+    assert.deepEqual(landTile(columns,0,2).events.map(e=>e.kind),['land','merge']);
+    assert.deepEqual(columns,[[4],[],[4],[],[4]],'Tiles the landing never touches stay as they are');
+    // A retirement that leaves equal tiles touching settles them at once, as later chain steps, instead of handing a free chain to the next landing.
+    columns=[[2,4],[4],[],[],[128]]; // Stable now; retiring the 2 lands the 4 beside the other 4.
+    const retire=landTile(columns,4,128,2);
+    assert.deepEqual([retire.floor,retire.retirements,retire.retired],[4,1,1]);assert.deepEqual(columns,[[8],[],[],[],[256]]);
+    assert.deepEqual(retire.events.map(e=>e.kind),['land','merge','retire','merge']);
+    const cleared=retire.events[2];
+    assert.deepEqual([cleared.floor,cleared.removed,cleared.before,cleared.board],[4,[{column:0,row:0,value:2}],[[2,4],[4],[],[],[256]],[[4],[4],[],[],[256]]],'The clear-out frame knows what vanishes and the boards before and after');
+    assert.deepEqual(retire.events.filter(e=>e.kind==='merge').map(e=>[e.column,e.row,e.value,e.step,e.points]),[[4,0,256,1,80],[0,0,8,2,60]]);
+    assert.deepEqual(settle([[4],[4],[],[],[2]]).map(e=>[e.column,e.row,e.value,e.step,e.points]),[[0,0,8,1,30]],'settle merges lowest and leftmost first');
+    assert.equal(landTile([[],[],[],[],[]],0,2,2).retirements,0,'A floor without a big enough tile retires nothing');
     columns=[[2,4],[8,2],[],[2],[16]];
     assert.equal(retireBelow(columns,4),3);assert.deepEqual(columns,[[4],[8],[],[],[16]]);
     assert.deepEqual(spawnRange(2),[2,4,8]);assert.deepEqual(spawnRange(8,5),[8,16,32,64,128]);
@@ -105,11 +123,14 @@ test('Tile Drop moves on single raises with a capped .2 s refund, drops on a cho
     const sounds=[];
     const chain=merge({pace:1,random:seededRandom(5),message(){},sound:e=>sounds.push(e),finish(){}});chain.start();
     Object.assign(chain.state,{columns:[[8],[2,8],[],[],[]],column:2,value:2});chain.input({action:'left'});chain.input({action:'right'});
-    assert.equal(chain.state.score,36);assert.equal(chain.state.longestChain,2);
-    assert.deepEqual(chain.state.effects.map(e=>[e.column,e.row,e.step,+(e.at-chain.state.time).toFixed(2)]),[[2,0,1,0],[0,0,2,.12]],'Merges replay .12 s apart');
+    assert.equal(chain.state.score,100,'20 for the 4, then 40 × 2 for the chained 16');assert.equal(chain.state.longestChain,2);
+    assert.deepEqual(chain.state.replay.frames.map(f=>[f.kind,f.column,f.row,f.step,+(f.at-chain.state.time).toFixed(2)]),[['land',2,0,undefined,0],['merge',2,0,1,.14],['merge',0,0,2,.28]],'The landing shows first, then one merge frame every .14 s');
+    assert.deepEqual(chain.state.notes,[{text:'chain ×2 · +100',at:chain.state.time+.28}],'The chain total is announced with its last step');
     assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,0,'Cascade cues wait for their frame');
-    chain.update(.13);assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,2);
-    assert.ok(chain.state.bursts.some(b=>b.text.startsWith('CHAIN ×2')));
+    chain.update(.15);assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,1);
+    chain.update(.15);assert.equal(sounds.filter(e=>['clear','bounce'].includes(e.kind)).length,2);
+    assert.ok(chain.state.bursts.some(b=>b.text==='CHAIN ×2 +80'));
+    chain.update(2);assert.equal(chain.state.replay,null,'A finished replay is dropped');assert.deepEqual(chain.state.notes,[]);
     assert.equal(s.pending,null);assert.equal(s.column,3,'A chord does not also move');assert.equal(s.refunds,0,'The next tile starts with a fresh refund allowance');
     assert.equal(s.budget,DROP.budget);assert.ok(Math.abs(s.deadline-s.time-DROP.budget)<1e-9);
     const before=s.drops;advance(DROP.budget+.05);assert.equal(s.drops,before+1,'The deadline drops the tile by itself');
@@ -146,13 +167,15 @@ test('Tile Drop rewards column choice: random drops lose soon, a greedy player l
             while(s.column!==target&&!results.length){g.input({action:s.column<target?'right':'left'});g.update(.15);}
             g.input({action:'left'});g.input({action:'right'});g.update(.05);drops++;
         }
-        return {drops,over:results.length>0,retirements:s.retirements};
+        return {drops,over:results.length>0,retirements:s.retirements,score:s.score};
     };
     for(let seed=1;seed<=4;seed++){
         const chance=play('random',seed,400),skill=play('greedy',seed,900);
         assert.ok(chance.over&&chance.drops<200,`seed ${seed}: random lasted ${chance.drops}`);
         assert.ok(skill.drops>=900&&!skill.over,`seed ${seed}: greedy lasted only ${skill.drops}`);
         assert.ok(skill.retirements>=3,'The floor keeps rising instead of saturating the board');
+        assert.ok(Number.isSafeInteger(skill.score)&&skill.score<1e6,`seed ${seed}: a long run scores ${skill.score}, which the score store must still accept`);
+        assert.ok(new ScoreStore(null).record(games.find(game=>game.engine==='merge'),skill.score),'A long run can still be saved');
     }
 });
 
@@ -206,7 +229,7 @@ test('an unattended Metro Line misroutes trains into Game over, and reduced moti
 });
 
 test('Metro engines use the shared illustrated host policy, declared clocks, and isolated versioned scores',()=>{
-    for(const [engine,version] of [['memory',2],['merge',3],['rail',3]]){
+    for(const [engine,version] of [['memory',2],['merge',4],['rail',3]]){
         const description=games.find(game=>game.engine===engine),config=gameConfig(description);
         assert.equal(config.profileFile,'wrist-up-only');assert.equal(config.outcomeFeedback,true);assert.equal(config.portraitBoard,true);
         assert.equal(description.scoreVersion,version);

@@ -351,17 +351,27 @@ and score rules v2; older boards and friend links stay separate.
   The slot row under the tiles is the sequence: it fills with lettered tiles as
   they flash, empties for the repeat and marks the current slot, so the number
   of moves and the moment the order grows are explicit.
-- Tile Drop (`merge`, score rules v3): survival on a 5 by 6 board of bottom-up
+- Tile Drop (`merge`, score rules v4): survival on a 5 by 6 board of bottom-up
   columns. L/R move the waiting tile one column; both raises within .12 s drop it
   now; otherwise it drops when its bar runs out, max(1.8, 4.2/pace) seconds. It
-  merges with an equal tile below and equal side neighbours (value times 2 per
-  joined tile); then the whole board keeps merging while equal tiles touch,
-  including tiles that just fell, lowest and leftmost first. Each merge scores
-  its value times its chain step; the cascade is replayed one merge per .12 s
-  with a flat pop, a square ripple and a rising cue (`display.js` effects run on
-  simulation time and never touch rules or RNG). Spawns are the floor and the next 2 to 4 powers of two (variety grows
+  joins every equal tile it touches (below, left, right) and doubles once per
+  tile: two make x2, three x4, four x8, announced as TRIPLE / QUAD; then the
+  whole board keeps merging while equal tiles touch, including tiles that just
+  fell, lowest and leftmost first. A merge scores 10 per power of two of the tile
+  it makes (4 is 20, 8 is 30, 1k is 100) times its chain step, so the score tracks
+  the exponent and stays a safe integer however far the run goes (v3 scored raw
+  values, which overflowed `Number.isSafeInteger` after a few hundred drops and
+  could not be saved). Retirements settle the board at once as further chain
+  steps, so no pair is left touching for the next landing to "earn". `landTile`
+  returns the story as frames (`land`, `merge`, `retire`), each with the board it
+  leaves; the engine replays them (`s.replay`) so the canvas shows the landing,
+  then one merge per .14 s with a flat pop, a square ripple, a named burst
+  (`+20`, `CHAIN ×2 +60`, `TRIPLE ×4 +30`) and a rising cue, and a .45 s
+  clear-out in which retired tiles shrink flat into their colour outline before
+  the columns settle; a chain's total replaces the header detail for 1.6 s.
+  The replay never touches rules or RNG. Spawns are the floor and the next 2 to 4 powers of two (variety grows
   with retirements). When the best tile reaches 128 times the floor, tiles below
-  the doubled floor retire, so the board never saturates. One life: a full column
+  the doubled floor clear, so the board never saturates. One life: a full column
   ends the run. Each real move refunds .2 s to the deadline, at most four times
   per tile, so crossing the board is always affordable but stalling is not.
   Simulation: random columns lose after about 75 drops, a greedy player after

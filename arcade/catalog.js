@@ -29,7 +29,7 @@ export const games = Object.freeze([
     entry('aero', 'bubbles', 'Bubble Cascade', 'Choose an arc and burst clusters of bubbles.', 'Change arc', 'Launch bubble'),
     entry('aero', 'garden', 'Living Garden', 'Keep the growing plants watered and lit.', 'Water plant', 'Give sunlight'),
     entry('metro', 'memory', 'Live Tiles', 'Watch the tiles. Repeat them, or follow along live for x2.', 'Blue tile', 'Purple tile', {scoreVersion:2}),
-    entry('metro', 'merge', 'Tile Drop', 'Place each tile. Merge equal neighbours. Chain them before the drop.', 'Move left', 'Move right', {scoreVersion:3}),
+    entry('metro', 'merge', 'Tile Drop', 'Place each tile. Merge equal neighbours. Chain them before the drop.', 'Move left', 'Move right', {scoreVersion:4}),
     entry('metro', 'rail', 'Metro Line', 'Trains leave on time. Set the junctions so each reaches its station. The network grows.', 'Switch junction 1', 'Switch junction 2', {scoreVersion:3}),
     entry('material', 'tangram', 'Paper Tangram', 'Rotate and stamp each shape into its matching outline.', 'Rotate shape', 'Stamp shape'),
     entry('material', 'golf', 'Ripple Golf', 'Send the paper ball into the cup using a measured stroke.', 'Change power', 'Take stroke'),
