@@ -15,7 +15,7 @@ const FONTS = {
     aqua: ["'Lucida Grande', Tahoma, sans-serif"],
     aero: ["'Segoe UI', 'Open Sans', Tahoma, sans-serif"],
     metro: ["'Segoe UI', 'Open Sans', Arial, sans-serif"],
-    material: ["'Segoe UI', 'Open Sans', Arial, sans-serif"],
+    material: ["'Roboto', 'Open Sans', Arial, sans-serif"],
     glass: ["'Segoe UI', 'Open Sans', Arial, sans-serif"],
     'field-notes': ["Georgia, 'Times New Roman', serif", "'Caveat', 'Segoe Print', cursive"]
 };

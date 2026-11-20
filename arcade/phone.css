@@ -6,7 +6,7 @@
 @media (max-width: 640px), (max-height: 500px) and (orientation: landscape) and (pointer: coarse), (max-height: 500px) and (orientation: landscape) and (max-width: 950px) {
     #arcade-player[open] {
         display: grid; width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh;
-        margin: 0; inset: 0; overflow: hidden; border-width: 0; border-radius: 0;
+        margin: 0; inset: 0; overflow: hidden; border-width: 0; border-radius: 0; background-color: var(--bg);
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto auto auto minmax(0, 1fr) auto auto auto;
@@ -94,6 +94,10 @@
     #arcade-player[data-camera-sheet] .arcade-camera-dock #arcade-recognition:empty { display: none; }
     #arcade-player[data-camera-sheet] .camera-phone-tip { display: block; }
 
+    /* Tutorials, results and settings need no game buttons: give them the whole play area. */
+    #arcade-player:has(:is(#arcade-walkthrough, #arcade-result, #arcade-binding-panel):not([hidden]))[data-engine] .arcade-stage { grid-row: stage-start / inputs-end; grid-column: 1 / -1; z-index: 7; }
+    #arcade-player:has(:is(#arcade-walkthrough, #arcade-result, #arcade-binding-panel):not([hidden])) :is(.arcade-inputs, .arcade-toolbar, .arcade-camera-dock) { visibility: hidden; }
+
     #arcade-player .arcade-toolbar { grid-area: tool; flex-wrap: nowrap; gap: 4px; padding: 0 8px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--border); }
     #arcade-player .arcade-toolbar::-webkit-scrollbar { display: none; }
     #arcade-player .arcade-toolbar button { flex: 0 0 auto; min-height: 44px; min-width: 44px; padding: 4px 10px; font-size: 16px; white-space: nowrap; }
@@ -147,6 +151,7 @@
     #arcade-player[data-camera-sheet] .arcade-camera-dock .camera-view { grid-column: 1; grid-row: 1 / span 6; width: 100%; align-self: start; }
     #arcade-player[data-camera-sheet] #arcade-camera-dock :is(.camera-heading, #arcade-camera-status, #arcade-countdown, .camera-placement, .camera-positioning, .camera-precision, #arcade-recognition, #arcade-recalibrate, #arcade-cancel-countdown, .camera-phone-tip) { grid-column: 2; }
     #arcade-player[data-camera-sheet] #arcade-camera-dock .camera-view { grid-column: 1; grid-row: 1 / span 6; }
-    #arcade-player .guide-art, #arcade-player .guide-figure canvas { max-height: 30dvh; }
+    #arcade-player:has(:is(#arcade-walkthrough, #arcade-result, #arcade-binding-panel):not([hidden]))[data-engine] .arcade-stage { grid-row: left-start / dock-end; }
+    #arcade-player .guide-art, #arcade-player .guide-figure canvas { max-height: 34dvh; }
     #arcade-player .guide-figure { min-height: 70px; }
 }
