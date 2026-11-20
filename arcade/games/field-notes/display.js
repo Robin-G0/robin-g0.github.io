@@ -25,12 +25,10 @@ export function header(p, status, detail = '') {
     p.line([[compact ? 60 : 50, rule], [704, rule]], 'border', 1);
 }
 
-/** The notebook page: the painter has laid the square grid; add the red margin rule and a strip of washi tape. */
+/** The notebook page: the painter has laid the square grid; add the red margin rule of the room's page. */
 export function page(p) {
     const c = p.c, x = p.compact ? 48 : 40;
     c.save(); c.globalAlpha = .5; p.line([[x, 0], [x, p.h]], MARGIN, 1.5); c.restore();
-    c.save(); c.globalAlpha = .3; c.translate(p.compact ? 18 : 14, p.h - 40); c.rotate(-1.2);
-    p.rect(-34, -9, 68, 18, 'gold'); c.restore();
 }
 
 /** Fountain-pen ink: a faint bleed under a crisp stroke. `progress` draws the polyline stroke by stroke. */

@@ -2,7 +2,6 @@
    A naturalist's notebook in the site palette: paper (--bg), pen ink (--accent), pencil (--muted), grid (--border),
    brass (--gold); Caveat for handwritten notes and headings, Georgia for print. */
 [data-theme=field-notes] #arcade-player { border-radius: 2px; }
-[data-theme=field-notes] [data-mode=dark] [data-brief=start] #arcade-tutorial,
 :root[data-theme=field-notes][data-mode=dark] [data-brief=start] #arcade-tutorial {
     background: linear-gradient(90deg,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,
         linear-gradient(color-mix(in srgb,var(--border) 55%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,var(--bg); color: var(--ink); }
@@ -62,7 +61,7 @@
 @keyframes fn-swing { from { transform: rotate(40deg); } to { transform: rotate(-40deg); } }
 @keyframes fn-draw { 0% { stroke-dashoffset: 520; } 55%, 100% { stroke-dashoffset: 0; } }
 @keyframes fn-show { 0%, 70% { opacity: 1; } 85%, 100% { opacity: .15; } }
-@keyframes fn-stamp { 0%, 30% { opacity: 0; transform: scale(1.4) rotate(-6deg); } 36% { opacity: 1; transform: scale(1) rotate(-6deg); } 100% { opacity: 1; transform: scale(1) rotate(-6deg); } }
+@keyframes fn-stamp { 0%, 12% { opacity: 0; transform: scale(1.4) rotate(-6deg); } 18% { opacity: 1; transform: scale(1) rotate(-6deg); } 100% { opacity: 1; transform: scale(1) rotate(-6deg); } }
 @media (prefers-reduced-motion: reduce) {
     .field-notes-diagram * { animation: none !important; }
     .fn-draw { stroke-dashoffset: 0; } .fn-stamp { opacity: 1; transform: rotate(-6deg); }

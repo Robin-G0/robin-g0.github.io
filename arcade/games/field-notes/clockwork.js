@@ -92,7 +92,7 @@ export function clockwork(env) {
             page(p);
             const detail = s.ticks < CLOCK.goldAt ? `gold jewels after ${CLOCK.goldAt} ticks` : s.ticks < CLOCK.gritAt ? `grit after ${CLOCK.gritAt} ticks` : `best run ${s.best}`;
             header(p, `${s.chimes} chime${s.chimes === 1 ? '' : 's'}`, detail);
-            const px = 360, py = compact ? 250 : 92, L = compact ? Math.min(380, p.h - 470) : 238, band = 30 * k;
+            const R = 40 * k, px = 360, py = compact ? 90 + R + 20 : 92, band = 30 * k, L = compact ? Math.max(150, Math.min(330, p.h - py - 130 - band)) : 238;
             const at = (deg, r) => [px + Math.sin(deg * Math.PI / 180) * r, py + Math.cos(deg * Math.PI / 180) * r];
             const arc = (from, to, r) => { const out = []; for (let d = from; d <= to + .01; d += 1) out.push(at(d, r)); return out; };
             // The swing scale: pencil path with a tick every 5 degrees.
@@ -126,7 +126,8 @@ export function clockwork(env) {
             // Escape wheel and anchor rocking with the pendulum, behind the dial.
             const wheelAngle = s.ticks * Math.PI / 15, wx = px, wy = py;
             const c = p.c; c.save(); c.translate(wx, wy); c.rotate(wheelAngle);
-            for (let i = 0; i < 15; i++) { const a = i * Math.PI * 2 / 15; p.line([[Math.cos(a) * 46 * k, Math.sin(a) * 46 * k], [Math.cos(a + .2) * 56 * k, Math.sin(a + .2) * 56 * k]], 'gold', 3 * k); }
+            p.circle(0, 0, 47 * k, 'gold', false);
+            for (let i = 0; i < 15; i++) { const a = i * Math.PI * 2 / 15; p.line([[Math.cos(a) * 47 * k, Math.sin(a) * 47 * k], [Math.cos(a + .12) * 54 * k, Math.sin(a + .12) * 54 * k], [Math.cos(a + .3) * 47 * k, Math.sin(a + .3) * 47 * k]], 'gold', 2.5 * k); }
             c.restore();
             // Rod and bob. During a rewind the bob is drawn back to the right pallet.
             let shown = theta;
@@ -144,7 +145,6 @@ export function clockwork(env) {
             }
             if (stopped) write(p, 'the clock stopped', 360, by + 50 * k, 26 * k, 'gold', 'center');
             // The dial: Roman hours, hour hand on chimes, minute hand on the run toward the next chime.
-            const R = 40 * k;
             p.circle(px, py, R, 'bg'); p.circle(px, py, R, 'ink', false); p.circle(px, py, R - 5 * k, 'border', false);
             for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; p.line([[px + Math.sin(a) * (R - 5 * k), py - Math.cos(a) * (R - 5 * k)], [px + Math.sin(a) * (R - 11 * k), py - Math.cos(a) * (R - 11 * k)]], 'ink', i % 3 ? 1 : 2.5); }
             const minute = (s.streak % CLOCK.hour) / CLOCK.hour * Math.PI * 2, hour = (s.chimes % 12) / 12 * Math.PI * 2;

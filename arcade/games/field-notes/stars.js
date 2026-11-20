@@ -7,7 +7,7 @@ import { header, page, write, ink, pencil, star, blot, tag, stamp, addBurst, bur
 // sideways sweep (either wrist, toward the star) or, from the third figure, a raise for the star above.
 // A wrong star blots the chart, costs an attempt and the figure is shown again from the start.
 // Coordinates are normalised to the chart, u right and v down, both in [0, 1].
-export const STARS = { opening: 4, max: 9, showStep: .55, hold: .9, retry: 1, admire: 1.4, link: 10, finishPerLink: 10,
+export const STARS = { opening: 4, max: 8, showStep: .55, hold: .9, retry: 1, admire: 1.4, link: 10, finishPerLink: 10,
     upAt: 2, margin: .06, spacing: .15, clearance: .06 };
 export const NAMES = ['The Heron', 'The Fern', 'The Lantern', 'The Hare', 'The Compass', 'The Kite', 'The Beetle', 'The Owl', 'The Acorn', 'The Lighthouse', 'The Moth', 'The Anchor'];
 /** Direction types a step may take; three-way choices unlock with the third figure. */
@@ -32,14 +32,16 @@ export function typeOf(a, b) {
 /** A figure of n stars, each step a left/right (or up) move, with a decoy for every other offered direction. */
 export function makeFigure(random, n, figures) {
     const types = choicesFor(figures), three = types.length === 3;
-    for (let attempt = 0; attempt < 60; attempt++) {
+    // Figure stars keep room around them for every offered decoy: sideways on both sides, and above when three-way.
+    const roomy = q => q.u >= .2 && q.u <= .8 && q.v <= 1 - STARS.margin && q.v >= (three ? .3 : STARS.margin);
+    for (let attempt = 0; attempt < 200; attempt++) {
         const stars = [{ u: .25 + random() * .5, v: three ? .55 + random() * .3 : .3 + random() * .4 }], answers = [];
         let ok = true;
         for (let i = 1; i < n && ok; i++) {
             ok = false;
             for (let t = 0; t < 30 && !ok; t++) {
                 const from = stars[i - 1], type = types[Math.floor(random() * types.length)], q = offset(random, from, type, three);
-                if (!inside(q) || typeOf(from, q) !== type || stars.some(o => dist(o, q) < STARS.spacing)) continue;
+                if (!roomy(q) || typeOf(from, q) !== type || stars.some(o => dist(o, q) < STARS.spacing)) continue;
                 if (stars.slice(0, -1).some(o => segmentGap(o, from, q) < STARS.clearance)) continue;
                 stars.push(q); answers.push(type); ok = true;
             }
@@ -53,7 +55,7 @@ export function makeFigure(random, n, figures) {
                 let placed = null;
                 for (let t = 0; t < 30 && !placed; t++) {
                     const q = offset(random, from, type, three);
-                    if (!inside(q) || typeOf(from, q) !== type || stars.some(o => dist(o, q) < STARS.spacing)
+                    if (!inside(q) || typeOf(from, q) !== type || stars.slice(0, i + 2).some(o => dist(o, q) < STARS.spacing) // Only the drawn stars and the true next one are on the chart at this step.
                         || Object.values(step).some(o => dist(o, q) < STARS.spacing) || dist(q, stars[i + 1]) < .2) continue;
                     placed = q;
                 }
@@ -116,7 +118,7 @@ export function constellations(env) {
             page(p);
             const fig = s.figure, n = fig.stars.length;
             header(p, `${s.figures} charted`, `${n} stars · ${fig.types.length === 3 ? 'three ways' : 'left or right'}${s.cleanRun > 1 ? ` · ${s.cleanRun} clean` : ''}`);
-            const left = compact ? 70 : 80, right = compact ? 660 : 640, top = compact ? 150 : 82, bottom = compact ? p.h - 150 : 380;
+            const left = compact ? 110 : 90, right = compact ? 640 : 630, top = compact ? 150 : 84, bottom = compact ? p.h - 110 : 362;
             const P = q => [left + q.u * (right - left), top + q.v * (bottom - top)];
             // The chart: a planisphere rim, faint declination arcs and fixed background stars (not gameplay RNG).
             const c = p.c, cx = (left + right) / 2, cy = (top + bottom) / 2;
@@ -140,23 +142,23 @@ export function constellations(env) {
                 ink(p, pts, 'accent', 3 * k, reduced ? Math.ceil(drawn) / (n - 1) : drawn / (n - 1));
                 pts.forEach(([x, y], i) => { if (i <= Math.ceil(drawn)) star(p, x, y, (i === 0 ? 12 : 9) * k, 'ink'); });
                 c.restore();
-                write(p, 'watch the figure', cx, bottom + (compact ? 70 : 26), compact ? 34 : 22, 'muted', 'center', { serifFace: true, italic: true });
+                write(p, 'watch the figure', cx, bottom + (compact ? 60 : 30), compact ? 34 : 22, 'muted', 'center', { serifFace: true, italic: true });
             } else if (s.phase === 'trace') {
                 const pts = fig.stars.slice(0, s.index + 1).map(P);
                 ink(p, pts, 'accent', 3 * k);
                 pts.forEach(([x, y]) => star(p, x, y, 9 * k, 'ink'));
                 const from = fig.stars[s.index], [fx, fy] = P(from);
-                p.circle(fx, fy, 18 * k, 'accent', false);
+                p.circle(fx, fy, 19 * k, 'soft'); star(p, fx, fy, 10 * k, 'ink'); p.circle(fx, fy, 19 * k, 'accent', false); p.circle(fx, fy, 24 * k, 'accent', false);
                 const offered = { [fig.answers[s.index]]: fig.stars[s.index + 1], ...fig.decoys[s.index] };
                 for (const type of fig.types) {
                     const q = offered[type]; if (!q) continue;
                     const [x, y] = P(q);
                     pencil(p, [[fx, fy], [x, y]], 1.5 * k, [3, 6], .7);
-                    star(p, x, y, 9 * k, 'ink'); p.circle(x, y, 17 * k, 'muted', false);
-                    const tx = x + (type === 'left' ? -30 : type === 'right' ? 30 : 0) * k, ty = y + (type === 'up' ? -30 : -2) * k;
+                    star(p, x, y, 9 * k, 'ink'); pencil(p, Array.from({ length: 25 }, (_, i) => [x + Math.cos(i / 24 * Math.PI * 2) * 17 * k, y + Math.sin(i / 24 * Math.PI * 2) * 17 * k]), 1.5, [3, 4], .9);
+                    const tx = x + (type === 'left' ? -36 : type === 'right' ? 36 : 0) * k, ty = y + (type === 'up' ? -36 : 0) * k;
                     tag(p, type === 'left' ? '←' : type === 'right' ? '→' : '↑', tx, ty, 14 * k, 'accent', true);
                 }
-                write(p, `star ${s.index + 2} of ${n}`, cx, bottom + (compact ? 70 : 26), compact ? 34 : 22, 'ink', 'center', { serifFace: true, italic: true });
+                write(p, `star ${s.index + 2} of ${n}`, cx, bottom + (compact ? 60 : 30), compact ? 34 : 22, 'ink', 'center', { serifFace: true, italic: true });
                 const link = s.effects.findLast(e => e.kind === 'link' && s.time - e.at < .4);
                 if (link && !reduced) { const [x, y] = P(fig.stars[link.index]); c.save(); c.globalAlpha = 1 - (s.time - link.at) / .4; p.circle(x, y, (14 + (s.time - link.at) * 40) * k, 'accent', false); c.restore(); }
             } else if (!charted && s.mistakes) write(p, 'again, from the first star', cx, cy, compact ? 40 : 28, 'muted', 'center', { serifFace: true, italic: true });

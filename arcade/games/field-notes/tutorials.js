@@ -10,39 +10,39 @@ const jewel = (x, y, r = 7, cls = 'fn-jewel') => `<path class="${cls}" d="M${x} 
 const summit = (x, y, r = 10) => `<path class="fn-summit" d="M${x} ${y - r}L${x + r} ${y + r * .75}L${x - r} ${y + r * .75}Z"/>`;
 const marsh = (x, y) => `<g class="fn-marsh"><rect x="${x - 14}" y="${y - 14}" width="28" height="28"/><path d="M${x - 8} ${y + 9}l-3-14M${x - 8} ${y + 9}l3-10M${x} ${y + 9}l-3-14M${x} ${y + 9}l3-10M${x + 8} ${y + 9}l-3-14M${x + 8} ${y + 9}l3-10M${x - 11} ${y + 9}h22"/></g>`;
 const dots = (x0, y0, cols, rows, gap) => { let out = ''; for (let i = 0; i <= cols; i++) for (let j = 0; j <= rows; j++) out += `<circle cx="${x0 + i * gap}" cy="${y0 + j * gap}" r="1.6" class="fn-dot"/>`; return out; };
-// The pendulum: pivot, rod and bob (swinging unless reduced motion), brass pallet arcs on each side.
-const pendulum = (swing = true) => `<path class="fn-arc" d="M86 112A120 120 0 0 0 314 112"/>`
-    + `<path class="fn-pallet" d="M76 88A132 132 0 0 0 112 128"/><path class="fn-pallet" d="M324 88A132 132 0 0 1 288 128"/>`
-    + `<g class="${swing ? 'fn-swing' : 'fn-still'}"><path class="fn-rod" d="M200 14V122"/><circle cx="200" cy="130" r="12" class="fn-bob"/></g><circle cx="200" cy="14" r="5" class="fn-bob"/>`;
+// The pendulum: pivot (200,14), rod 116 long swinging +-40 degrees; brass pallets 24-48 degrees out at radius 132.
+const pendulum = (swing = true) => `<path class="fn-arc" d="M125 103A116 116 0 0 0 275 103"/>`
+    + `<path class="fn-pallet" d="M102 102A132 132 0 0 0 146 135"/><path class="fn-pallet" d="M298 102A132 132 0 0 1 254 135"/>`
+    + `<g class="${swing ? 'fn-swing' : 'fn-still'}"><path class="fn-rod" d="M200 14V118"/><circle cx="200" cy="130" r="12" class="fn-bob"/></g><circle cx="200" cy="14" r="5" class="fn-bob"/>`;
 
 export const diagrams = {
     clockwork: [
-        frame(pendulum() + tag(52, 72, 'L') + tag(348, 72, 'R') + note('raise L ↑ here', 64, 152, 19) + note('raise R ↑ here', 336, 152, 19)),
-        frame(pendulum(false) + jewel(312, 112, 9) + note('jewel at the turn', 318, 60, 19) + `<path class="fn-pencil" d="M318 68l-4 28"/>`
-            + note('in the band +10', 96, 40, 20) + note('at the jewel +20', 96, 64, 20) + note('and twice the push', 96, 86, 17, 'fn-muted')),
-        frame(note('12 in a row', 70, 30, 21) + note('chime +60, a life back', 70, 50, 15, 'fn-muted') + `<g class="fn-stamp"><rect x="22" y="62" width="96" height="32" class="fn-stamp-box"/>${note('CHIME', 70, 85, 18, 'fn-serif')}</g>`
-            + jewel(200, 38, 10, 'fn-jewel fn-gold') + note('gold +50', 200, 72, 20) + note('after 12 ticks', 200, 92, 15, 'fn-muted')
-            + `<path class="fn-pallet fn-grit" d="M302 34h56"/>` + note('× × ×', 330, 40, 17) + note('grit: let it pass', 330, 72, 19) + note('after 36 ticks', 330, 92, 15, 'fn-muted')
-            + note('a swing too short for the pallets stops the clock: −1 life', 200, 140, 17))
+        frame(pendulum() + tag(78, 100, 'L') + tag(322, 100, 'R') + note('raise L ↑', 56, 150, 26) + note('raise R ↑', 344, 150, 26)),
+        frame(pendulum(false) + jewel(285, 115, 10) + `<path class="fn-pencil" d="M318 62l-24 42"/>` + note('the turn', 340, 52, 26)
+            + note('band +10', 66, 40, 26) + note('jewel +20', 66, 72, 26) + note('×2 push', 66, 102, 22, 'fn-muted')),
+        frame(`<g class="fn-stamp"><rect x="14" y="18" width="112" height="40" class="fn-stamp-box"/>${note('CHIME', 70, 46, 22, 'fn-serif')}</g>` + note('12 in a row', 70, 86, 24) + note('+60, +1 life', 70, 110, 20, 'fn-muted')
+            + jewel(200, 36, 12, 'fn-jewel fn-gold') + note('gold +50', 200, 86, 24) + note('from 12 ticks', 200, 110, 20, 'fn-muted')
+            + `<path class="fn-pallet fn-grit" d="M300 36h60"/>` + note('×  ×  ×', 330, 43, 20) + note('grit: let it pass', 330, 86, 24) + note('from 36 ticks', 330, 110, 20, 'fn-muted')
+            + note('swing too short: the clock stops, −1', 200, 148, 21))
     ],
     contour: [
         frame(dots(120, 26, 6, 3, 30) + ink('M210 116V60', 'fn-pencil-line') + `<path class="fn-pencil-tip" d="M210 50l-6 12h12z"/>` + `<path class="fn-pencil" d="M210 50V26" stroke-dasharray="4 5"/>`
-            + note('↶ L', 158, 66, 28) + note('R ↷', 262, 66, 28) + note('raise L or R: the pencil turns at its next step', 200, 152, 17)),
+            + note('↶ L', 156, 70, 34) + note('R ↷', 264, 70, 34) + note('turns at the next step', 200, 152, 24)),
         frame(dots(170, 20, 4, 4, 30) + summit(245, 65) + `<path class="fn-hatch" d="M230 50h30v30h-30z"/>` + ink('M200 140V50H260V80H230V50', 'fn-draw')
-            + note('meet your own line:', 92, 50, 18) + note('the loop closes', 92, 72, 18) + note('summits inside', 92, 104, 17, 'fn-muted') + note('are surveyed', 92, 124, 17, 'fn-muted')),
-        frame(summit(30, 34) + note('25', 70, 41, 20) + summit(30, 70) + summit(52, 70) + note('100', 86, 77, 20) + summit(24, 106) + summit(44, 106) + summit(64, 106) + note('225', 98, 113, 20)
-            + jewel(175, 38, 10, 'fn-jewel fn-gold') + note('trig counts two', 175, 74, 17) + marsh(268, 38) + note('inside: −1', 268, 76, 18)
-            + `<path class="fn-pencil" d="M352 18v40"/><path class="fn-pencil-tip" d="M346 58l6 10 6-10z"/>` + note('edge: −1', 352, 86, 18) + note('the line fades after 26 segments: close loops soon', 200, 140, 16))
+            + note('meet your', 86, 54, 26) + note('own line:', 86, 82, 26) + note('loop closed', 86, 116, 24, 'fn-muted')),
+        frame(summit(28, 34) + note('25', 66, 42, 26) + summit(24, 76) + summit(46, 76) + note('100', 86, 84, 26) + summit(20, 118) + summit(40, 118) + summit(60, 118) + note('225', 98, 126, 26)
+            + jewel(180, 36, 12, 'fn-jewel fn-gold') + note('trig = 2', 180, 80, 24) + marsh(272, 36) + note('marsh', 272, 80, 24) + note('inside: −1', 272, 104, 20, 'fn-muted')
+            + `<path class="fn-pencil" d="M356 18v34"/><path class="fn-pencil-tip" d="M350 52l6 10 6-10z"/>` + note('edge −1', 356, 86, 22) + note('close loops soon: the line fades', 230, 148, 21))
     ],
     stars: [
-        frame(starShape(200, 110, 9) + `<circle cx="200" cy="110" r="15" class="fn-ring"/>` + starShape(110, 120, 7) + starShape(290, 92, 7) + starShape(206, 44, 7)
-            + `<path class="fn-pencil" d="M200 110L110 120M200 110L290 92M200 110L206 44" stroke-dasharray="3 6"/>`
-            + tag(80, 120, '←') + tag(320, 92, '→') + tag(206, 20, '↑') + note('sweep toward it', 80, 152, 17) + note('either wrist', 320, 124, 16, 'fn-muted') + note('raise: star above', 300, 30, 16) + note('(from figure 3)', 300, 46, 14, 'fn-muted')),
-        frame(`<g class="fn-show">${ink('M70 120L130 80L200 100L260 50L330 70', 'fn-draw')}</g>` + [[70, 120], [130, 80], [200, 100], [260, 50], [330, 70]].map(([x, y]) => starShape(x, y, 7)).join('')
-            + note('watch it inked, then retrace from memory', 200, 150, 19)),
-        frame(note('+10', 60, 40, 26) + note('each star', 60, 62, 16, 'fn-muted') + note('+10 × links', 175, 40, 24) + note('finish, clean ×2', 175, 62, 16, 'fn-muted')
-            + `<g class="fn-stamp"><rect x="268" y="18" width="116" height="38" class="fn-stamp-box"/>${note('CHARTED', 326, 44, 18, 'fn-serif')}</g>`
-            + `<circle cx="70" cy="110" r="12" class="fn-blot"/><circle cx="80" cy="104" r="6" class="fn-blot"/>` + note('wrong star: −1, shown again', 225, 108, 19) + note('every figure adds one star', 200, 146, 17, 'fn-muted'))
+        frame(starShape(200, 104, 10) + `<circle cx="200" cy="104" r="17" class="fn-ring"/>` + starShape(104, 118, 8) + starShape(296, 92, 8) + starShape(204, 34, 8)
+            + `<path class="fn-pencil" d="M200 104L104 118M200 104L296 92M200 104L204 34" stroke-dasharray="3 6"/>`
+            + tag(72, 118, '←') + tag(328, 92, '→') + tag(236, 30, '↑') + note('sweep ←', 72, 152, 26) + note('sweep →', 328, 132, 26) + note('raise ↑', 300, 30, 24) + note('either wrist', 66, 30, 22, 'fn-muted')),
+        frame(`<g class="fn-show">${ink('M70 120L130 80L200 100L260 50L330 70', 'fn-draw')}</g>` + [[70, 120], [130, 80], [200, 100], [260, 50], [330, 70]].map(([x, y]) => starShape(x, y, 8)).join('')
+            + note('watch, then retrace', 200, 152, 26)),
+        frame(note('+10', 56, 42, 32) + note('per star', 56, 70, 22, 'fn-muted') + note('clean ×2', 180, 42, 30) + note('finish bonus', 180, 70, 22, 'fn-muted')
+            + `<g class="fn-stamp"><rect x="262" y="18" width="126" height="42" class="fn-stamp-box"/>${note('CHARTED', 325, 46, 20, 'fn-serif')}</g>`
+            + `<circle cx="56" cy="114" r="13" class="fn-blot"/><circle cx="68" cy="106" r="6" class="fn-blot"/><circle cx="46" cy="124" r="5" class="fn-blot"/>` + note('wrong: −1, shown again', 228, 120, 26))
     ]
 };
 

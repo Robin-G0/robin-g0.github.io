@@ -107,8 +107,8 @@ export function contour(env) {
             const compact = p.compact, reduced = env.reducedMotion, k = compact ? 1.5 : 1;
             page(p);
             header(p, `${s.surveys} surveyed`, s.surveys < CONTOUR.marshAfter ? 'ring the summits ▲' : s.surveys < CONTOUR.trigAfter ? 'keep the marsh out' : 'trig pillar ◆ counts twice');
-            const cell = compact ? Math.min(52, (p.h - 330) / CONTOUR.rows) : 40, w = cell * CONTOUR.cols, h = cell * CONTOUR.rows;
-            const left = 360 - w / 2, top = compact ? Math.max(130, (p.h - h) / 2 - 20) : 68;
+            const cell = compact ? Math.min(53, (p.h - 230) / CONTOUR.rows) : 40, w = cell * CONTOUR.cols, h = cell * CONTOUR.rows;
+            const left = 360 - w / 2 + (compact ? 14 : 0), top = compact ? 110 : 68;
             const X = x => left + x * cell, Y = y => top + y * cell, V = v => [X(v.x), Y(v.y)];
             // The sheet: a soft wash, faint contour lines (fixed, decorative) and the dot grid.
             p.rect(left, top, w, h, 'soft'); p.outline(left, top, w, h, 'ink', 1.5);
@@ -165,13 +165,12 @@ export function contour(env) {
             const crash = s.effects.find(e => e.kind === 'crash' && s.time - e.at < 1.2);
             if (crash) blot(p, X(crash.x), Y(crash.y), 13 * k, 'ink', .7 * (1 - (s.time - crash.at) / 1.2));
             // Compass rose in the margin; its needle settles on north.
-            const rx = compact ? 610 : 680, ry = compact ? top + h + 90 : top + h - 26, rr = compact ? 44 : 22;
+            const rx = compact ? 640 : 680, ry = compact ? top + h + 60 : top + h - 26, rr = compact ? 30 : 22;
             p.circle(rx, ry, rr, 'border', false);
             const settle = reduced ? 0 : Math.sin(s.time * 3) * Math.exp(-((s.time - (s.lastTurn?.at ?? -9)) * 2)) * .5;
             c.save(); c.translate(rx, ry); c.rotate(settle); c.beginPath(); c.moveTo(0, -rr * .9); c.lineTo(rr * .2, 0); c.lineTo(0, rr * .9); c.lineTo(-rr * .2, 0); c.closePath(); c.fillStyle = p.color('gold'); c.fill(); c.restore();
             write(p, 'N', rx, ry - rr - 10 * k, 16 * k, 'ink', 'center', { serifFace: true, weight: 700 });
-            const ink25 = s.trail.length - 1;
-            write(p, `pencil ${CONTOUR.trail - ink25} segments before it fades`, compact ? 70 : left, compact ? top + h + 40 : top + h + 18, compact ? 24 : 15, 'muted', 'left', { serifFace: true, italic: true });
+            write(p, `line ${s.trail.length - 1} of ${CONTOUR.trail}`, left, top + h + (compact ? 34 : 18), compact ? 28 : 16, 'muted', 'left', { serifFace: true, italic: true });
             bursts(s, p, reduced, b => [X(b.x), Y(b.y) - cell * .8]);
         }
     });

@@ -11,7 +11,7 @@ test('every catalog game has shared host configuration, a trusted factory and pr
     for (const game of games) {
         assert.equal(typeof engines[game.engine],'function');assert.ok(PRESSURE_RULES[game.engine]);
         const config=gameConfig(game);assert.ok(config.profile.inputs.length);
-        assert.equal(config.directional,game.engine==='popups');
+        assert.equal(config.directional,game.inputScheme==='wrist-directions'); // Pop-up Panic and any game that opts into the six-command scheme.
         const link=challengeLink('https://example.com/profile/?unrelated=1#main',game,{name:'ALICE',score:123});
         assert.equal(readChallenge(link,games).game,game.id);
         assert.equal(new URL(link).searchParams.get('theme'),game.theme);
