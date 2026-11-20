@@ -108,9 +108,12 @@ function buildPicker() {
 }
 
 const picker = $('#theme-picker');
-$('#open-themes').addEventListener('click',() => { picker.showModal(); $('#open-themes').setAttribute('aria-expanded','true'); });
+let themeOpener = $('#open-themes');
+function openThemes(opener) { themeOpener = opener; picker.showModal(); opener.setAttribute('aria-expanded','true'); }
+$('#open-themes').addEventListener('click',event => openThemes(event.currentTarget));
+document.querySelectorAll('[data-open-themes]').forEach(button => button.addEventListener('click',() => openThemes(button)));
 $('#close-themes').addEventListener('click',() => picker.close());
-picker.addEventListener('close',() => { $('#open-themes').setAttribute('aria-expanded','false'); $('#open-themes').focus({preventScroll:true}); });
+picker.addEventListener('close',() => { themeOpener.setAttribute('aria-expanded','false'); themeOpener.focus({preventScroll:true}); });
 picker.addEventListener('click',event => { if (event.target === picker) { const r=picker.getBoundingClientRect(); if (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) picker.close(); } });
 function selectDefault() { applyTheme(defaultTheme,false); picker.close(); }
 $('#choose-daily').addEventListener('click',selectDefault);
