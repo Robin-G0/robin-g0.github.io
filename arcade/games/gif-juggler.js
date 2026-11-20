@@ -1,7 +1,7 @@
-import { game } from '../core/game.js?v=eras-3';
-import { renderJuggler } from './gif-juggler-view.js?v=eras-3';
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=eras-3';
-export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=eras-3';
+import { game } from '../core/game.js?v=eras-4';
+import { renderJuggler } from './gif-juggler-view.js?v=eras-4';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=eras-4';
+export { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=eras-4';
 
 export function catchPoints(y, touching = false) {
     const risk = Math.max(0, Math.min(1, (y - JUGGLER.catchStart) / (CONTACT_Y - JUGGLER.catchStart)));

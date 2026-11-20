@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js?v=eras-3';
-import { integer } from '../../core/random.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
+import { integer } from '../../core/random.js?v=eras-4';
 import { pinstripes, toolbar, brushed, gel as drawGel, light, poof, throb, isDark, text, etched,
-    addBurst, bursts, pruneBursts, addEffect, pruneEffects } from './display.js?v=eras-3';
+    addBurst, bursts, pruneBursts, addEffect, pruneEffects } from './display.js?v=eras-4';
 
 // Gel Factory: a gel button is extruded and grows wider; the dialog sheet above asks for buttons of
 // set widths. Raise L to stamp the growing button into the leftmost empty slot, R into the rightmost.

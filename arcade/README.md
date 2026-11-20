@@ -76,7 +76,7 @@ The profile uses close, broad body-relative direction boxes with a small gap,
 native Single Press and 120 ms continuous occupancy. Terminal regions extend
 outward to the schema limits so travelling farther does not create a far-edge miss. Each simultaneous step
 has Required and Trigger constraints in the same rectangle. Since npm 1.1.0
-(unchanged in 1.2.0), a trigger-only step does not reset its hold timer on brief exits; the Required
+(unchanged since), a trigger-only step does not reset its hold timer on brief exits; the Required
 constraint is what makes dwell continuous. No finger inference is required.
 Shoulders and the acting wrist suffice; the other wrist and legs may be absent.
 GestureGate deduplicates native deliveries and drops ambiguous same-wrist
@@ -91,9 +91,9 @@ Packaged-WASM tests cover close reaches for both wrists, 0.75/1.33/1.78 camera
 aspects, narrow/wide shoulder crops, short boundary jitter, holds and loss.
 
 The camera shows the six profile rectangles projected into the mirrored preview.
-MIGSession does not publicly expose its calibrated grid (1.2.0 adds `grid()` on
-the tracker only), so TriggerView matches
-the shoulder-relative metric and 35 ms grid filter as a live alignment guide.
+TriggerView matches the shoulder-relative metric and 35 ms grid filter as a live
+alignment guide. Since 1.3.0 MIGSession also exposes the engine's smoothed grid
+(`session.grid(space)` with `gridPoint`); moving TriggerView onto it is a follow-up.
 Box activation comes from the SDK tracker's native active state, not hit testing
 in the page. The guide and native profile share their region definitions.
 MarkerMotion eases marker positions over display frames with an 85 ms time
@@ -293,7 +293,8 @@ Paused/tutorial boards retain their paint; the maze tree is cached independently
 from its animated icons. Covered theme animations and GIF backgrounds suspend
 while the room is open and restore on close.
 
-The site depends on the published motion-input-grid 1.2.0 release, which ships
+The site depends on the motion-input-grid 1.3.0 release (the npm archive attached to the
+GitHub release until the npm publication), which ships
 these session options natively. `prepare:assets` copies the installed package's
 runtime unchanged into vendor/motion-input-grid; no upstream source override or
 private recognizer is involved.

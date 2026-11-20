@@ -1,4 +1,4 @@
-import { WRIST_COMMANDS, commandLabel } from './core/commands.js?v=eras-3';
+import { WRIST_COMMANDS, commandLabel } from './core/commands.js?v=eras-4';
 
 function entry(theme, engine, title, goal, left, right, options = {}) {
     return Object.freeze({ id: `${theme}-${engine}`, theme, engine, title, goal,

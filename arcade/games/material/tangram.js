@@ -1,8 +1,8 @@
-import { game } from '../../core/game.js?v=eras-3';
-import { decodeGesture } from '../../core/commands.js?v=eras-3';
-import { integer } from '../../core/random.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
+import { decodeGesture } from '../../core/commands.js?v=eras-4';
+import { integer } from '../../core/random.js?v=eras-4';
 import { type, header, sheet, elevated, ink, progress, chip, swatch, tint, surface, ease, clamp01,
-    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, loseLife, backdrop } from './display.js?v=eras-3';
+    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, loseLife, backdrop } from './display.js?v=eras-4';
 
 // Paper Tangram: turn a loose paper piece until it fits its outline. Sweeps turn it a quarter turn
 // (left sweep counter-clockwise, right sweep clockwise), a raise flips it over. It drops into the

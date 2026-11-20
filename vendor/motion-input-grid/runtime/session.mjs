@@ -1,13 +1,36 @@
+const poseModelNames = ["lite", "full", "heavy"];
+const gridSpaces = ["body", "calibrated"];
+
+/**
+ * Unmirrored normalized image position of a grid coordinate, projected exactly
+ * as the engine does: cell (4.5, 3.5) is the shoulder midpoint, x follows the
+ * shoulders. Use whole numbers for cell corners, e.g. [x, y] and [x + w, y + h].
+ */
+export function gridPoint(grid, column, row) {
+    const u = (column - 4.5) * grid.scale, v = (row - 3.5) * grid.scale;
+    return { x: (grid.centerX + grid.axisX * u - grid.axisY * v) / grid.aspect,
+        y: grid.centerY + grid.axisY * u + grid.axisX * v };
+}
+
 export class MIGSession {
     constructor(options = {}) {
         this.options = options;
         if (options.delegate != null && !["CPU", "GPU"].includes(options.delegate)) {
             throw new RangeError("delegate must be CPU or GPU");
         }
+        // Developers choose the default and the models a user may pick.
+        this.poseModels = options.poseModels ?? poseModelNames;
+        if (!this.poseModels.length || this.poseModels.some(name => !poseModelNames.includes(name))) {
+            throw new RangeError("poseModels must list lite, full or heavy");
+        }
+        const poseModel = options.poseModel ?? this.poseModels[0];
+        if (!this.poseModels.includes(poseModel)) {
+            throw new RangeError(`poseModel must be one of ${this.poseModels.join(", ")}`);
+        }
         this.assetBase = new URL(options.assetBase ?? "/mig/",
             globalThis.location?.href ?? "http://localhost/").href;
         this.state = { status: "Ready. Start the camera.", running: false,
-            busy: false, actions: [] };
+            busy: false, actions: [], poseModel };
         this.listeners = new Set();
         this.generation = 0;
         this.profileRevision = 0;
@@ -80,7 +103,7 @@ export class MIGSession {
             if (run !== this.generation) return;
             if (!this.models) {
                 const models = await this.dependencies.loadModels({ hands: this.tracker.trackHands(),
-                    delegate: this.options.delegate ?? "CPU" });
+                    delegate: this.options.delegate ?? "CPU", poseModel: this.state.poseModel });
                 if (this.disposed) {
                     models.pose.close();
                     models.hands?.close();
@@ -126,7 +149,8 @@ export class MIGSession {
             const now = performance.now();
             const due = this.lastInferenceAt == null || !this.maxInferenceFps ||
                 now - this.lastInferenceAt >= 1000 / this.maxInferenceFps;
-            if (due && !this.loadingHands && video.readyState >= 2 && video.currentTime !== this.lastVideoTime) {
+            if (due && !this.loadingHands && !this.loadingPose && video.readyState >= 2
+                && video.currentTime !== this.lastVideoTime) {
                 this.processFrame();
             }
             if (run === this.generation && !this.disposed) {
@@ -159,6 +183,17 @@ export class MIGSession {
         this.options.onFrame?.(this);
     }
 
+    /**
+     * The engine's own grid ("body" follows the shoulders, "calibrated" keeps the
+     * calibration anchor), already smoothed; null before calibration or after
+     * tracking loss. Draw guides with gridPoint() instead of recomputing it.
+     */
+    grid(space = "body") {
+        if (!gridSpaces.includes(space)) throw new RangeError('space must be "body" or "calibrated"');
+        if (this.disposed) return null;
+        return this.tracker?.grid(space) ?? null;
+    }
+
     coordinate(index, system = 0) {
         if (this.disposed) return null;
         return this.tracker?.coordinate(index, system) ?? null;
@@ -171,6 +206,31 @@ export class MIGSession {
         }
         this.maxInferenceFps = fps;
         this.lastInferenceAt = null;
+    }
+
+    /** Switch the pose model, keeping the camera and recognition state. Rejected names change nothing. */
+    async setPoseModel(name) {
+        if (!this.poseModels.includes(name)) {
+            throw new RangeError(`poseModel must be one of ${this.poseModels.join(", ")}`);
+        }
+        if (name === this.state.poseModel || this.disposed) return;
+        const models = this.models;
+        if (!models) { this.publish({ poseModel: name }); return; }
+        if (!models.loadPose) throw new Error("The model loader cannot change the pose model");
+        if (this.loadingPose) throw new Error("A pose model change is already in progress");
+        this.loadingPose = models.loadPose(name).finally(() => { this.loadingPose = null; });
+        this.publish({ busy: true, status: "Loading the pose model..." });
+        try {
+            await this.loadingPose;
+            if (this.disposed || this.models !== models) return;
+            this.publish({ poseModel: name, status: this.state.running
+                ? "Pose model changed." : "Pose model loaded." });
+        } catch (error) {
+            this.publish({ status: error.message });
+            throw error;
+        } finally {
+            if (!this.disposed) this.publish({ busy: false });
+        }
     }
 
     async ensureHands() {

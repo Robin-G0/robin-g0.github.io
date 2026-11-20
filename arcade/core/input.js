@@ -1,4 +1,4 @@
-import { decodeGesture } from './commands.js?v=eras-3';
+import { decodeGesture } from './commands.js?v=eras-4';
 
 /** Only accepted logical commands enter a game. No pose recognition lives here. */
 export class InputRouter {

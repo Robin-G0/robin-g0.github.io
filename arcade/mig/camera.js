@@ -1,8 +1,8 @@
-import { arcadeProfile } from './profile.js?v=eras-3';
-import { GestureGate } from './gesture-gate.js?v=eras-3';
-import { BindingGate } from './bindings.js?v=eras-3';
-import { PRESETS } from './precision.js?v=eras-3';
-import { precisionModelLoader, isPoseModelReady, POSE_MODELS } from './pose-models.js?v=eras-3';
+import { arcadeProfile } from './profile.js?v=eras-4';
+import { GestureGate } from './gesture-gate.js?v=eras-4';
+import { BindingGate } from './bindings.js?v=eras-4';
+import { PRESETS } from './precision.js?v=eras-4';
+import { precisionModelLoader, isPoseModelReady, POSE_MODELS } from './pose-models.js?v=eras-4';
 
 const RUNTIME = new URL('../../vendor/motion-input-grid/runtime/', import.meta.url).href;
 
@@ -47,7 +47,7 @@ export class MotionCamera {
                 assetBase: RUNTIME,
                 profileMode: true,
                 delegate,
-                // The published 1.2.0 loader only knows Lite: supply the chosen model and delegate.
+                // The site supplies its own loader so every precision preset maps to a verified model and delegate.
                 dependencies: {
                     createTracker: async json => (await import(`${RUNTIME}mig-tracker.mjs`)).MIGTracker.create(json),
                     loadModels: precisionModelLoader(RUNTIME, { model, delegate,

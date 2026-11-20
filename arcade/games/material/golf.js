@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js?v=eras-3';
-import { integer } from '../../core/random.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
+import { integer } from '../../core/random.js?v=eras-4';
 import { type, header, sheet, elevated, ink, chip, swatch, tint, surface, ease, clamp01,
-    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, backdrop } from './display.js?v=eras-3';
+    addBurst, drawBursts, addEffect, addSnack, drawSnacks, prune, backdrop } from './display.js?v=eras-4';
 
 // Ripple Golf: a straight paper fairway of cells. L chips the ball one cell, R drives it three.
 // The ball must stop exactly in the cup: a shot past the end of the sheet or into water costs the

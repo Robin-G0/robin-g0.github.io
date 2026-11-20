@@ -1,4 +1,4 @@
-import {challengeLink, compareChallenge} from './challenges.js?v=eras-3';
+import {challengeLink, compareChallenge} from './challenges.js?v=eras-4';
 
 /** Shared results UI for every engine/theme. Games only publish their score. */
 export class ArcadeResults {

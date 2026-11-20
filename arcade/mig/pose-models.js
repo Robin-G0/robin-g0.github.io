@@ -1,4 +1,4 @@
-// BlazePose GHUM pose models for the vendored MIG runtime (npm 1.2.0 bundles Lite only).
+// BlazePose GHUM pose models for the vendored MIG runtime (the package bundles Lite only).
 // Pinned MediaPipe release, float16 v1, Apache-2.0. Full and Heavy come from Google's
 // model storage once, are checked by size and SHA-256, then kept in Cache Storage.
 export const POSE_MODELS = Object.freeze({

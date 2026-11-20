@@ -1,6 +1,6 @@
-import { game } from '../core/game.js?v=eras-3';
-import { generateMaze, mazePenalties } from './link-maze-map.js?v=eras-3';
-import { renderMaze } from './link-maze-view.js?v=eras-3';
+import { game } from '../core/game.js?v=eras-4';
+import { generateMaze, mazePenalties } from './link-maze-map.js?v=eras-4';
+import { renderMaze } from './link-maze-view.js?v=eras-4';
 
 export const EXIT_SECONDS = 8;
 export const MAX_SECONDS = 90;

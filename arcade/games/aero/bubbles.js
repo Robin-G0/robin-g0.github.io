@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
 import { AERO, water, risingBubbles, glass, orb, bubble, glyph, text, header, addBurst, bursts, pruneBursts, addEffect, pruneEffects,
-    ring, timerRing, loseLife, isDark, aurora } from './display.js?v=eras-3';
+    ring, timerRing, loseLife, isDark, aurora } from './display.js?v=eras-4';
 
 // Bubble Cascade: bubbles float up and gather under the surface in three touching columns.
 // Each new bubble rises in the centre pipe; raise L or R to send it up the left or right column,

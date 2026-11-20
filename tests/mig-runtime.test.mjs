@@ -3,10 +3,13 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { MIGSession } from '../vendor/motion-input-grid/runtime/session.mjs';
 
-test('the vendored runtime is the published npm release the site depends on',async()=>{
+test('the vendored runtime is the published release the site depends on',async()=>{
     const site=JSON.parse(await readFile(new URL('../package.json',import.meta.url)));
     const metadata=JSON.parse(await readFile(new URL('../vendor/motion-input-grid/package.json',import.meta.url)));
-    assert.equal(metadata.version,site.dependencies['motion-input-grid']);
+    // Either an exact npm version or the npm archive attached to the matching GitHub release tag.
+    const wanted=site.dependencies['motion-input-grid'];
+    const version=wanted.match(/\/releases\/download\/v[\d.]+\/motion-input-grid-([\d.]+)\.tgz$/)?.[1]??wanted;
+    assert.equal(metadata.version,version);
     assert.equal(metadata.runtimeSource,undefined,'No upstream source override remains');
 });
 

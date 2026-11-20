@@ -1,7 +1,7 @@
-import { game, reward } from '../core/game.js?v=eras-3';
-import { clamp, integer } from '../core/random.js?v=eras-3';
-import { C, bevel, window95, folder, fileIcon, tree, hourglass, dialog, dragOutline, zoomRects, label } from './desktop95-art.js?v=eras-3';
-import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=eras-3';
+import { game, reward } from '../core/game.js?v=eras-4';
+import { clamp, integer } from '../core/random.js?v=eras-4';
+import { C, bevel, window95, folder, fileIcon, tree, hourglass, dialog, dragOutline, zoomRects, label } from './desktop95-art.js?v=eras-4';
+import { createFileDeck, fileSide, fileType, fileStage, knowledge } from './folder-sort-files.js?v=eras-4';
 
 // A lost third heart is a game over, not a completed round.
 function loseHeart(state,env,message) {

@@ -1,8 +1,8 @@
-import { game } from '../../core/game.js?v=eras-3';
-import { integer } from '../../core/random.js?v=eras-3';
-import { decodeGesture } from '../../core/commands.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
+import { integer } from '../../core/random.js?v=eras-4';
+import { decodeGesture } from '../../core/commands.js?v=eras-4';
 import { toolbar, gel, progress, beachball, genie, poof, isDark, text, linear,
-    addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-3';
+    addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-4';
 
 // Dock Bounce: seven icons on the Dock. Apps bounce to ask for attention; later some hang with the
 // wait cursor. Sweep either wrist sideways to glide the magnified pointer one icon; raise L to open

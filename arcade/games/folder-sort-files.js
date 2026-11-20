@@ -1,5 +1,5 @@
-import { integer } from '../core/random.js?v=eras-3';
-import { createFilenameGenerator } from './folder-sort-names.js?v=eras-3';
+import { integer } from '../core/random.js?v=eras-4';
+import { createFilenameGenerator } from './folder-sort-names.js?v=eras-4';
 
 // Every filename is fictional. Classification follows the extension, not the joke.
 export const FILE_TYPES = {

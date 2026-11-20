@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js?v=eras-3';
-import { integer } from '../../core/random.js?v=eras-3';
+import { game } from '../../core/game.js?v=eras-4';
+import { integer } from '../../core/random.js?v=eras-4';
 import { pinstripes, toolbar, brushed, gel, marble as drawMarble, gatePill, progress, poof, throb, isDark,
-    addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-3';
+    addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-4';
 
 // Marble Gates: brushed-metal shelves rise toward a striped ceiling. Each raise tilts the tray, so the
 // marble rolls that way and drops through the FIRST gate it meets. Choose the side whose first gate

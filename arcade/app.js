@@ -1,12 +1,12 @@
-import { games, gamesForTheme } from './catalog.js?v=eras-3';
-import { engines } from './registry.js?v=eras-3';
-import { seededRandom } from './core/random.js?v=eras-3';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-3';
-import { localBindings } from './mig/bindings.js?v=eras-3';
-import { GameRoom } from './room.js?v=eras-3';
+import { games, gamesForTheme } from './catalog.js?v=eras-4';
+import { engines } from './registry.js?v=eras-4';
+import { seededRandom } from './core/random.js?v=eras-4';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-4';
+import { localBindings } from './mig/bindings.js?v=eras-4';
+import { GameRoom } from './room.js?v=eras-4';
 
-import {ChallengeStore, readChallenge} from './core/challenges.js?v=eras-3';
-import { GamesGallery } from './gallery.js?v=eras-3';
+import {ChallengeStore, readChallenge} from './core/challenges.js?v=eras-4';
+import { GamesGallery } from './gallery.js?v=eras-4';
 
 const challenges = new ChallengeStore(games);
 const root = document.documentElement;

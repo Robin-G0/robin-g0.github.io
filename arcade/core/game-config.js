@@ -1,6 +1,6 @@
-import {arcadeProfile, popupProfile, constructionLiftProfile, wristRaiseProfile} from '../mig/profile.js?v=eras-3';
-import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=eras-3';
-import {PRESSURE_RULES} from './pressure.js?v=eras-3';
+import {arcadeProfile, popupProfile, constructionLiftProfile, wristRaiseProfile} from '../mig/profile.js?v=eras-4';
+import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=eras-4';
+import {PRESSURE_RULES} from './pressure.js?v=eras-4';
 
 // What the third HUD cell counts. Round puzzles spend attempts on timeouts, survival games
 // spend lives, one-life or stack/clock games show nothing there.
