@@ -84,12 +84,12 @@ test('contour scoring distinguishes an enclosed point from a nearby point', () =
     const polygon = [{ x: 1, y: 1 }, { x: 5, y: 1 }, { x: 5, y: 4 }, { x: 1, y: 4 }];
     assert.equal(containsPoint(polygon, { x: 3.5, y: 2.5 }), true);
     assert.equal(containsPoint(polygon, { x: 6, y: 2.5 }), false);
+    // Contour Survey v2: the pencil walks by itself; four right turns close a loop around the summit.
     const { game: g } = create('contour');
-    for (const length of [4, 3, 4, 3]) {
-        for (let i = 0; i < length; i++) g.input({ action: 'right' });
-        g.input({ action: 'left' });
-    }
-    assert.equal(g.state.score, 100);
+    g.state.summits = [{ x: 6, y: 4, kind: 'summit', height: 300 }]; g.state.marshes = [];
+    g.update(1.05); g.update(.7); // (6,6) -> (6,5) -> (6,4), one step every .7 s at pace 1
+    for (let i = 0; i < 3; i++) { g.input({ action: 'right' }); g.update(.7); } // (7,4), (7,5), back to (6,5)
+    assert.equal(g.state.score, 25, 'one summit ringed scores 25');
 });
 
 test('early and delayed rhythm recognition uses a broad explicit window', () => {
