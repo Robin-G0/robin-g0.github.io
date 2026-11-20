@@ -1,4 +1,4 @@
-import {CRT} from './display.js';
+import {CRT,mix} from './display.js';
 
 const MASK=['.#####.','#######','###.###','##...##'];
 export const BUNKER={top:265,cellWidth:10,cellHeight:6,health:2};
@@ -37,7 +37,7 @@ export function drawBunkers(bunkers,p,projectY,time) {
         if(cell.hp<=0)continue;
         const y=projectY(cell.y),height=Math.max(3,projectY(cell.y+BUNKER.cellHeight)-y-1);
         const flash=time-cell.hitAt<.16;
-        p.rect(cell.x,y,BUNKER.cellWidth-1,height,flash?CRT.white:cell.hp===BUNKER.health?CRT.green:'#358d60');
+        p.rect(cell.x,y,BUNKER.cellWidth-1,height,flash?CRT.white:cell.hp===BUNKER.health?CRT.green:mix(CRT.green,CRT.dark,.45));
         if(cell.hp<BUNKER.health)p.line([[cell.x+2,y+1],[cell.x+7,y+height-1]],CRT.dark,2);
     }
 }
