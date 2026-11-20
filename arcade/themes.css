@@ -217,3 +217,10 @@
 @keyframes metro-flash { 0%, 100% { opacity: .35; } 8%, 20% { opacity: 1; } 28% { opacity: .35; } }
 @keyframes metro-train { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-58px); } }
 @media(prefers-reduced-motion:reduce) { .metro-diagram * { animation: none !important; } }
+
+/* Desktop95 cards and results: a sunken white preview well, bold dialog captions and the shell's quick dialog pop. */
+[data-theme=desktop95] .guide-figure { background:#ffffff; border:2px solid; border-color:#808080 #ffffff #ffffff #808080; box-shadow:inset 1px 1px #000000; }
+[data-theme=desktop95] .guide-title, [data-theme=desktop95] #arcade-result h3 { font-weight:bold; color:#000000; }
+[data-theme=desktop95] #arcade-result:not([hidden]) { animation:desktop95-pop .16s steps(4,end) both; transform-origin:50% 0; }
+@keyframes desktop95-pop { from { transform:scale(.6); opacity:.4; } to { transform:none; opacity:1; } }
+@media(prefers-reduced-motion:reduce) { [data-theme=desktop95] #arcade-result:not([hidden]) { animation:none; } }
