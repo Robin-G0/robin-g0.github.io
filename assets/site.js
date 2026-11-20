@@ -30,7 +30,7 @@ function applyTheme(id, manual = false, updateURL = true) {
   else if (!manual && updateURL) { try { localStorage.removeItem(THEME_KEY); } catch { /* Optional. */ } }
   root.dataset.theme = id; root.dataset.mode = appearance;
   if (id==='glass') document.querySelectorAll('.scene-backdrop img[data-src]').forEach(image=> { image.src=image.dataset.src; delete image.dataset.src; });
-  Object.entries(theme[appearance]).forEach(([name,value]) => root.style.setProperty(`--${name}`, value));
+  Object.entries(theme[appearance]).forEach(([name,value]) => { root.style.setProperty(`--${name}`, value); root.style.setProperty(`--profile-${name}`, value); });
   $('meta[name="theme-color"]').content = theme[appearance].bg;
   $('#theme-name').textContent = theme.name;
   $('#theme-era').textContent = theme.era;

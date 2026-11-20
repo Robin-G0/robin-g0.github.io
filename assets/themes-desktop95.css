@@ -26,6 +26,18 @@
   --title-a: #0a1f6e; --title-b: #2a6fc0; --title-off-a: #3c3c3c; --title-off-b: #555555; --title-off-ink: #a8a8a8;
 }
 :root[data-theme=desktop95][data-mode=dark] body { --bg: #2c2c2c; --ink: #f0f0f0; --muted: #cfcfcf; --border: #6e6e6e; --accent: #7ec8ff; --soft: #0e0e0e; color: var(--ink); }
+/* The game room keeps the classic scheme its boards are drawn with, by day and by night. */
+:root[data-theme=desktop95][data-mode=dark] #arcade-player {
+  color-scheme: light;
+  --face: #c0c0c0; --hi: #ffffff; --lt: #dfdfdf; --sh: #808080; --dk: #000000;
+  --client: #ffffff; --client-ink: #000000; --sel: #000080; --sel-ink: #ffffff;
+  --title-a: #000080; --title-b: #1084d0; --title-off-a: #808080; --title-off-b: #b5b5b5; --title-off-ink: #d4d0c8;
+  --raised: inset -1px -1px var(--dk), inset 1px 1px var(--hi), inset -2px -2px var(--sh), inset 2px 2px var(--lt);
+  --frame: inset -1px -1px var(--dk), inset 1px 1px var(--lt), inset -2px -2px var(--sh), inset 2px 2px var(--hi);
+  --pressed: inset 1px 1px var(--dk), inset -1px -1px var(--hi), inset 2px 2px var(--sh), inset -2px -2px var(--lt);
+  --sunken: inset 1px 1px var(--sh), inset -1px -1px var(--hi), inset 2px 2px var(--dk), inset -2px -2px var(--lt);
+  --etched: inset 1px 1px var(--sh), inset -1px -1px var(--hi), 1px 1px 0 var(--hi) inset;
+}
 :root[data-theme=desktop95] body { background: var(--desk); }
 :root[data-theme=desktop95] ::selection { background: var(--sel); color: var(--sel-ink); }
 :root[data-theme=desktop95] :is(.hero h1, .scene h2, .scene h3, .scene .eyebrow, .hero-status, .scope-badge, .metrics dd, .language-share, .gesture-feedback) { font-family: var(--font); letter-spacing: normal; }

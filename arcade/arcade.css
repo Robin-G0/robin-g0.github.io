@@ -19,6 +19,9 @@
 .arcade-imports a { font-size: 11px; }
 #arcade-import-status { font-size: 12px; margin: 8px 0 0; min-height: 18px; }
 
+/* The game room keeps the era palette its boards are drawn with (see readPalette). */
+#arcade-player { --bg: var(--profile-bg); --ink: var(--profile-ink); --muted: var(--profile-muted); --accent: var(--profile-accent);
+    --soft: var(--profile-soft); --border: var(--profile-border); --gold: var(--profile-gold); color: var(--ink); }
 #arcade-player {
     width: min(1000px, calc(100% - 24px)); max-width: calc(100% - 12px); padding: 0;
     height: calc(100dvh - 24px); overflow-anchor: none;

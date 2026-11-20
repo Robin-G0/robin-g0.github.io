@@ -30,12 +30,13 @@ export async function loadArtwork(theme) {
 }
 
 export function readPalette() {
-    const style = getComputedStyle(document.body);
+    const style = getComputedStyle(document.body), root = getComputedStyle(document.documentElement);
     const result = { font: style.getPropertyValue('--arcade-font').trim() || style.fontFamily,
         displayFont: style.getPropertyValue('--arcade-display').trim() || style.fontFamily,
         theme: document.documentElement.dataset.theme };
     for (const key of ['bg', 'ink', 'muted', 'accent', 'soft', 'border', 'gold']) {
-        result[key] = style.getPropertyValue(`--${key}`).trim();
+        // Games follow the era palette from profile.json, even where a portfolio stylesheet re-tints the page.
+        result[key] = (root.getPropertyValue(`--profile-${key}`) || style.getPropertyValue(`--${key}`)).trim();
     }
     return result;
 }
