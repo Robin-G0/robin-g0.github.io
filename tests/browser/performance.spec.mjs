@@ -41,6 +41,7 @@ test('the memorisation tree is cached while its sprites animate and inference st
     expect(await page.evaluate(()=>window.motionTest.fps)).toBe(20);
 });
 test('covered Glass effects stop during play and restore when the game closes',async({page})=>{
+    await page.emulateMedia({colorScheme:'dark'});await page.addInitScript(()=>localStorage.setItem('appearance','dark')); // the ocean loop is the night Glass portfolio
     await page.goto('/?theme=glass#arcade');
     const background=()=>page.locator('.about').evaluate(e=>getComputedStyle(e).backgroundImage);
     const before=await background();expect(before).toContain('glass-ocean-water-loop');

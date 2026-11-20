@@ -122,7 +122,7 @@ test('the Material room bundles Roboto and keeps its paper materials in dark mod
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
     const typography=await page.evaluate(async()=>{
         await document.fonts.load('500 24px "Roboto"');
-        const style=getComputedStyle(document.body);
+        const style=getComputedStyle(document.querySelector('#arcade-player'));
         return {display:style.getPropertyValue('--arcade-display'),loaded:document.fonts.check('500 24px "Roboto"'),
             header:getComputedStyle(document.querySelector('.arcade-room-header')).backgroundColor,
             accent:style.getPropertyValue('--accent').trim()};

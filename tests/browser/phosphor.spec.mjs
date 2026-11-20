@@ -59,7 +59,7 @@ test('Phosphor boards and tutorial diagrams stay readable on phones and through 
             expect(await page.locator('#arcade-player').evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
             const dims=await page.locator('#arcade-canvas').evaluate(c=>({height:c.height,width:c.width,box:c.getBoundingClientRect().height}));
             if(viewport.width<400)expect(dims.height).toBeGreaterThan(dims.width);
-            expect(dims.box).toBeGreaterThanOrEqual(300);
+            expect(dims.box).toBeGreaterThanOrEqual(viewport.height>500?300:200); // landscape phones put the controls beside the board
             await expect(page.locator('#arcade-canvas')).toBeVisible();
         }
         await page.setViewportSize({width:390,height:844});await page.clock.runFor(64);

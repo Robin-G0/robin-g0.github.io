@@ -182,7 +182,7 @@ test('preview and individual wrist feedback are visible before starting', async 
     await expect(page.locator('[data-tracking=right]')).toHaveAttribute('data-visible', 'false');
     await expect(page.locator('[data-wrist=left]')).toBeVisible();
     await expect(page.locator('[data-wrist=right]')).not.toBeVisible();
-    await expect(page.locator('#arcade-trigger-zones [data-trigger]')).toHaveCount(2);
+    await expect(page.locator('#arcade-trigger-zones [data-trigger]')).toHaveCount(6); // School Rescue is a six-command game: three boxes per wrist.
     expect(await page.locator('[data-wrist=left]').evaluate(marker => marker.style.left)).toBe('30%');
     await page.evaluate(() => window.motionTest.stop());
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera', 'unavailable');

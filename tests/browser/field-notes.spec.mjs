@@ -106,7 +106,7 @@ test('an unattended Clockwork stops into Game over and the room keeps Caveat and
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
     const typography=await page.evaluate(async()=>{
         await document.fonts.load('600 24px "Caveat"');
-        const style=getComputedStyle(document.body);
+        const style=getComputedStyle(document.querySelector('#arcade-player'));
         return {display:style.getPropertyValue('--arcade-display'),loaded:document.fonts.check('600 24px "Caveat"'),bg:style.getPropertyValue('--bg').trim()};
     });
     expect(typography.display).toContain('Caveat');expect(typography.loaded).toBe(true);expect(typography.bg).toBe('#111c18');
