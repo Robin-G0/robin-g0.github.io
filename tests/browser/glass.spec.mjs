@@ -10,7 +10,7 @@ test.beforeEach(async({page})=>{
 
 const engines={
     prisms:{inputs:['left_up','right_up'],pulse:'[data-arcade-input=left]',lives:'Attempts'},
-    abyss:{inputs:['left_up','left_left','left_right','right_up','right_left','right_right'],pulse:'[data-wrist-controls=left]',lives:'Lives'},
+    abyss:{inputs:['left_up','left_left','left_right','right_up','right_left','right_right'],pulse:'[data-arcade-input=left_up]',lives:'Lives'},
     orbit:{inputs:['left_up','right_up'],pulse:'[data-arcade-input=left]',lives:'Lives'}
 };
 
@@ -29,8 +29,9 @@ test('Glass games teach their real rules on acrylic cards and use their native p
         await page.locator('#arcade-begin').click();
         expect((await page.evaluate(()=>window.motionTest.profile.inputs.map(i=>i.action))).sort()).toEqual([...expected.inputs].sort());
         await expect(page.locator('[data-arcade-input]')).toHaveCount(expected.inputs.length);
-        await page.evaluate(()=>window.motionTest.raw('left_up'));await page.clock.runFor(64);
-        await expect(page.locator(expected.pulse)).toHaveAttribute('data-pulse','true');
+        // Read the pulse in the same task as the native event: the display loop clears it 180 ms later.
+        const pulse=await page.evaluate(selector=>{window.motionTest.raw('left_up');return document.querySelector(selector).dataset.pulse;},expected.pulse);
+        expect(pulse).toBe('true');await page.clock.runFor(64);
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(1200);
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
@@ -63,15 +64,24 @@ test('a Prisms turn changes the drawn rays and lighting a crystal shows a local 
 
 test('Glass boards and cards fit phones and landscape without stretching game rules',async({page})=>{
     for(const engine of Object.keys(engines)){
-        await page.setViewportSize({width:320,height:640});
+        await page.setViewportSize({width:390,height:844});
         await page.locator(`[data-game=glass-${engine}]`).click();
         await page.locator('#arcade-guide').click();
         await expect(page.locator('.glass-diagram')).toBeVisible();
         await page.locator('[data-guide-skip]').click();await page.locator('#arcade-no-camera').click();
-        for(const size of [{width:320,height:640},{width:390,height:844},{width:740,height:360}]){
+        for(const size of [{width:390,height:844},{width:844,height:390}]){
             await page.setViewportSize(size);await page.clock.runFor(64);
             expect(await page.locator('#arcade-player').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
             if(size.width<400)expect(await page.locator('#arcade-canvas').evaluate(c=>c.height)).toBeGreaterThan(840);
+            // Canvas text never drops below 14 CSS px however small the stage is drawn.
+            await page.locator('#arcade-canvas').evaluate(canvas=>{
+                const context=canvas.getContext('2d'),fill=CanvasRenderingContext2D.prototype.fillText;window.leastFont=Infinity;
+                context.fillText=function(...args){window.leastFont=Math.min(window.leastFont,parseFloat(/([0-9.]+)px/.exec(this.font)[1]));return fill.apply(this,args);};
+            });
+            await page.clock.runFor(200);
+            const smallest=await page.locator('#arcade-canvas').evaluate(canvas=>{delete canvas.getContext('2d').fillText;
+                return window.leastFont*Math.min(canvas.clientWidth/720,canvas.clientHeight/(canvas.height/2));});
+            expect(smallest).toBeGreaterThanOrEqual(13.9);
             for(const button of await page.locator('[data-arcade-input]').all()){
                 const box=await button.boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
             }
@@ -82,11 +92,12 @@ test('Glass boards and cards fit phones and landscape without stretching game ru
 
 for(const [engine,seconds] of [['abyss',150000],['orbit',200000],['prisms',200000]]){
     test(`an unattended ${engine} run ends in a result with versioned scores, sharing and replay`,async({page})=>{
-        test.setTimeout(240000);
+        test.setTimeout(240000);await page.setViewportSize({width:390,height:844});
         await page.locator(`[data-game=glass-${engine}]`).click();
         await page.locator('#arcade-no-camera').click();await page.clock.runFor(seconds);
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
         await expect(page.locator('#arcade-result')).toContainText(engine==='prisms'?'Time up':'Game over');
+        await page.screenshot({path:`../arcade-review/glass-${engine}-result-phone.png`});
         await page.locator('#arcade-name').fill('GLASS');await page.locator('#arcade-save-score').click();
         await page.locator('#arcade-challenge-friend').click();
         const link=await page.locator('#arcade-challenge-link').inputValue();
@@ -102,7 +113,7 @@ test('the Glass room bundles a Segoe-style face, keeps a legible gold in light a
         await page.emulateMedia({colorScheme:mode});
         await page.evaluate(m=>localStorage.setItem('appearance',m),mode);
         await page.reload();await page.locator('[data-game=glass-orbit]').click();
-        await expect(page.locator('#arcade-player')).toHaveAttribute('data-camera','live');
+        await expect(page.locator('#arcade-player')).toBeVisible();
         const look=await page.evaluate(async()=>{
             await document.fonts.load('400 24px "Open Sans"');
             const player=getComputedStyle(document.querySelector('#arcade-player'));

@@ -35,7 +35,16 @@ export function mode() {
 export const tone = key => PALETTE[mode()][key];
 export const hue = index => SPECTRUM[index][mode()];
 
+/** Logical-to-CSS scale of the drawn board (object-fit: contain); 1 outside a browser. */
+export function cssScale(p) {
+    const canvas = p.c?.canvas; if (!canvas?.clientWidth) return 1;
+    return Math.min(canvas.clientWidth / 720, canvas.clientHeight / p.h) || 1;
+}
+/** Never let canvas text fall below 14 CSS px, however small the stage is drawn. */
+export const legible = (p, size) => Math.max(size, 14 / cssScale(p));
+
 export function text(p, value, x, y, size, color = tone('ink'), align = 'left', weight = 400) {
+    size = legible(p, size);
     const c = p.c; c.save();
     c.font = `${weight} ${size}px ${FAMILY}`; c.textAlign = align; c.textBaseline = 'middle';
     c.fillStyle = color; c.fillText(String(value), x, y); c.restore();
@@ -144,12 +153,12 @@ export function withAlpha(hex, alpha) {
 
 /** Live status in an acrylic pill: the room header already names the game and the HUD counts lives. */
 export function header(p, status, detail = '') {
-    const compact = p.compact, size = compact ? 34 : 22, y = compact ? 22 : 14, height = compact ? 62 : 40;
+    const compact = p.compact, size = legible(p, compact ? 34 : 22), y = compact ? 22 : 14, height = Math.max(compact ? 62 : 40, size * 1.75);
     const c = p.c; c.save(); c.font = `400 ${size}px ${FAMILY}`;
     const width = Math.min(compact ? 430 : 420, (c.measureText?.(status)?.width ?? status.length * size * .55) + (compact ? 48 : 36)); c.restore();
     acrylic(p, 22, y, width, height, height / 2);
     text(p, status, 22 + width / 2, y + height / 2 + 1, size, tone('ink'), 'center', 400);
-    if (detail) text(p, detail, 698, y + height / 2 + 1, compact ? 26 : 19, tone('muted'), 'right', 400);
+    if (detail) text(p, detail, 698, y + height / 2 + 1, compact ? 28 : 19, tone('muted'), 'right', 400);
 }
 
 export function shape(p, kind, x, y, r, color, filled = true, width = 3) {

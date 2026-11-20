@@ -117,8 +117,8 @@ export function orbit(env) {
         },
         render(s, p) {
             const compact = p.compact, reduced = env.reducedMotion, c = p.c;
-            const top = compact ? 104 : 60, outer = compact ? Math.max(180, Math.min(320, (p.h - top) / 2 - 16)) : 164;
-            const cx = 360, cy = compact ? top + (p.h - top) / 2 : 236, k = compact ? 1.6 : 1;
+            const top = compact ? 104 : 60, outer = compact ? Math.max(180, Math.min(320, (p.h - top) / 2 - 36)) : 164;
+            const cx = 360, cy = compact ? top + (p.h - top) / 2 : 236, k = compact ? 2 : 1;
             const radius = ring => outer * (.5 + ring * (.5 / 3));
             const at = (ring, angle) => [cx + Math.cos(angle) * radius(ring), cy + Math.sin(angle) * radius(ring)];
             scene(p, 'space', s.time, reduced);

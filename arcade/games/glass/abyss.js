@@ -124,7 +124,7 @@ export function abyss(env) {
                 c.save(); c.fillStyle = withAlpha('#d6e2ff', lane === s.lane ? .1 : .04);
                 c.beginPath(); c.roundRect(laneX(lane) - laneW / 2, compact ? 120 : 64, laneW, h - (compact ? 140 : 76), 22); c.fill(); c.restore();
             }
-            header(p, s.chain ? `chain ${s.chain} · ×${multiplier(s.chain)}` : STAGE_NAMES[s.stage], `${s.caught} motes`);
+            header(p, s.chain ? `chain ${s.chain} · ×${multiplier(s.chain)}` : STAGE_NAMES[s.stage], `${s.caught} mote${s.caught === 1 ? "" : "s"}`);
             const Y = depth => jellyY + depth * unit;
             for (const o of s.objects) {
                 const y = Y(o.depth); if (y < (compact ? 100 : 50) || y > h + 40) continue;
@@ -139,7 +139,7 @@ export function abyss(env) {
                     for (let i = steps; i >= 0; i--) { const x = left + (right - left) * i / steps; c.lineTo(x, y + rh / 2 - (i % 2 ? 0 : rh * .22)); }
                     c.closePath(); c.fill(); c.stroke(); c.restore();
                 } else if (o.kind === 'mote' && !o.done) {
-                    const x = laneX(o.lane), col = o.deep ? '#c9a4ff' : '#bff4ff', r = (compact ? 16 : 9) * (o.deep ? 1.25 : 1);
+                    const x = laneX(o.lane), col = o.deep ? '#c9a4ff' : '#bff4ff', r = (compact ? 26 : 11) * (o.deep ? 1.2 : 1);
                     const twinkle = reduced ? 1 : .85 + .15 * Math.sin(s.time * 4 + o.id);
                     reveal(p, x, y, r * 3.2, col, .45 * twinkle);
                     shape(p, o.deep ? 'hexagon' : 'circle', x, y, r, col);
@@ -172,7 +172,7 @@ export function abyss(env) {
             c.restore();
             // Glow meter: a slim acrylic bar in the lower corner.
             const mw = compact ? 300 : 170, my = h - (compact ? 40 : 24);
-            text(p, 'glow', compact ? 40 : 30, my + 5, compact ? 26 : 16, tone('muted'), 'left', 400);
+            text(p, 'glow', compact ? 40 : 30, my + 5, compact ? 28 : 16, tone('muted'), 'left', 400);
             meter(p, compact ? 110 : 72, my, mw, glow, glow < .25 ? tone('danger') : '#9fe8ff', compact ? 14 : 10);
             bursts(s, p, reduced, b => b.x === 'top' ? [360, compact ? 190 : 100] : [laneX(b.x), jellyY - (compact ? 90 : 50)]);
         }
