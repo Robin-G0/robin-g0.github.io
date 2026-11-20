@@ -4,9 +4,9 @@ export function pressureMultiplier(seconds) {
 }
 
 const survival = ['invaders', 'lander', 'snake', 'sort', 'ski', 'juggle', 'parry', 'rail', 'merge',
-    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'balance', 'abyss'];
+    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'dock', 'school', 'garden', 'balance', 'abyss'];
 const rounds = { stack: 18, golf: 24, orbit: 24, binary: 24, gel: 18,
-    dock: 18, memory: 24, tangram: 20, prisms: 32, clockwork: 24,
+    memory: 24, tangram: 20, prisms: 32, clockwork: 24,
     contour: 36, stars: 24, bubbles: 18 };
 
 export const PRESSURE_RULES = Object.freeze({
