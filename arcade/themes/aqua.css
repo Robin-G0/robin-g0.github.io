@@ -1,1 +1,101 @@
 /* aqua game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="aqua"]. */
+/* Mac OS X Aqua (2001-2007): Lucida Grande, pinstriped window bodies, brushed-metal title bars,
+   lickable gel buttons with a specular cap, a pulsing default button and translucent drop shadows.
+   Colours follow the theme palette in assets/profile.json; the dark appearance turns graphite. */
+:root[data-theme=aqua] {
+    --arcade-font: 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Verdana, 'Open Sans', sans-serif;
+    --arcade-display: 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Verdana, 'Open Sans', sans-serif;
+    --aqua-stripe-a: #eef2f6; --aqua-stripe-b: #f7f9fb; --aqua-metal-top: #fcfdff; --aqua-metal-bottom: #c5cbd2;
+    --aqua-gel-ink: #25455f; --aqua-sheet: #f9fbfdf2; --aqua-rim: #8ea4b8;
+}
+:root[data-theme=aqua][data-mode=dark] {
+    --aqua-stripe-a: #1b2834; --aqua-stripe-b: #21303d; --aqua-metal-top: #5d6a76; --aqua-metal-bottom: #2c353e;
+    --aqua-gel-ink: #e6f5ff; --aqua-sheet: #2a3d4ff2; --aqua-rim: #0e1820;
+}
+
+[data-theme=aqua] #arcade-player { font-family: var(--arcade-font); border-radius: 10px;
+    border: 1px solid var(--aqua-rim); box-shadow: 0 18px 50px #08233d66, 0 2px 6px #08233d33; }
+[data-theme=aqua] #arcade-player :is(h2, h3, h4, dt, dd, p, button, label, input, .eyebrow) { font-family: var(--arcade-font); letter-spacing: normal; }
+[data-theme=aqua] #arcade-player .arcade-room-header {
+    background: linear-gradient(var(--aqua-metal-top), var(--aqua-metal-bottom)); color: var(--ink);
+    border-bottom: 1px solid var(--aqua-rim); }
+[data-theme=aqua] #arcade-player .arcade-room-header h2 { font-weight: 700; font-size: clamp(19px, 2.4vw, 24px); text-shadow: 0 1px #ffffffaa; }
+[data-theme=aqua][data-mode=dark] #arcade-player .arcade-room-header h2 { text-shadow: 0 -1px #00000088; }
+[data-theme=aqua] #arcade-player .arcade-room-header p { color: var(--muted); }
+[data-theme=aqua] #arcade-player .arcade-hud dd { font-weight: 700; }
+[data-theme=aqua] #arcade-player .arcade-hud dt { color: var(--muted); }
+/* The letterbox around the canvas continues the window's pinstripes. */
+[data-theme=aqua] .arcade-stage { background: repeating-linear-gradient(var(--aqua-stripe-b) 0 2px, var(--aqua-stripe-a) 2px 4px); }
+
+/* Gel buttons: a clear capsule by default, blue for the default (primary) button, which pulses. */
+[data-theme=aqua] #arcade-player button:not(.arcade-action) {
+    border-radius: 999px; border: 1px solid var(--aqua-rim); color: var(--aqua-gel-ink);
+    background: linear-gradient(#ffffff, #e4edf5 50%, #d9e4ee 52%, #ffffff); box-shadow: inset 0 1px #fff, 0 2px 4px #0a284626; }
+[data-theme=aqua][data-mode=dark] #arcade-player button:not(.arcade-action) {
+    background: linear-gradient(#6c7a87, #48555f 50%, #3c4852 52%, #5d6a76); box-shadow: inset 0 1px #ffffff40, 0 2px 4px #0006; }
+[data-theme=aqua] #arcade-player :is(.button.primary, #arcade-begin, [data-guide-next], #arcade-again, #arcade-resume) {
+    color: #fff; border: 1px solid #1d5ea8; text-shadow: 0 -1px #1a5f9c;
+    background: linear-gradient(#e4faff, #79bdf1 25%, #2585cf 48%, #0a5baf 51%, #54a7e3); box-shadow: inset 0 1px #fff, 0 3px 7px #24588640;
+    animation: aqua-default 1.6s ease-in-out infinite; }
+[data-theme=aqua] #arcade-player button:disabled { opacity: .55; animation: none; }
+[data-theme=aqua] #arcade-player button:focus-visible { outline: 3px solid #6cb2f5aa; outline-offset: 2px; }
+@keyframes aqua-default { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.16) saturate(1.1); } }
+
+/* Action buttons under the stage: wide clear gel capsules; an accepted input lights them blue. */
+[data-theme=aqua] #arcade-player .arcade-action { border-radius: 999px; border: 1px solid var(--aqua-rim); color: var(--aqua-gel-ink);
+    background: linear-gradient(#ffffff, #e4edf5 50%, #d6e3ee 52%, #f4f8fb); box-shadow: inset 0 1px #fff, 0 2px 5px #0a284622; }
+[data-theme=aqua][data-mode=dark] #arcade-player .arcade-action { background: linear-gradient(#5d6a76, #3f4b56 50%, #34404a 52%, #4b5864); box-shadow: inset 0 1px #ffffff30, 0 2px 5px #0007; }
+[data-theme=aqua] #arcade-player .arcade-action[data-pulse=true] { color: #fff; border-color: #1d5ea8;
+    background: linear-gradient(#e4faff, #79bdf1 25%, #2585cf 48%, #0a5baf 51%, #54a7e3); }
+
+/* Walkthrough: an Aqua sheet over a pinstriped body. */
+[data-theme=aqua] .arcade-walkthrough { background: repeating-linear-gradient(var(--aqua-stripe-b) 0 2px, var(--aqua-stripe-a) 2px 4px); color: var(--ink); }
+[data-theme=aqua] .guide-heading h3, [data-theme=aqua] .guide-title { font-weight: 700; color: var(--ink); }
+[data-theme=aqua] .guide-figure { flex: 0 0 auto; background: var(--aqua-sheet); border: 1px solid var(--aqua-rim); border-top: 0;
+    border-radius: 0 0 8px 8px; box-shadow: 0 8px 18px #0a284630; padding: 4px; }
+[data-theme=aqua] .guide-progress span { border-radius: 50%; background: linear-gradient(#ffffff, #d9e4ee); border: 1px solid var(--aqua-rim); color: #25455f; }
+[data-theme=aqua] .guide-progress [aria-current=step] { color: #fff; border-color: #1d5ea8; background: linear-gradient(#a9d8ff, #2f87dc 50%, #2f87dc 52%, #7fd0ff); }
+
+/* Tutorial diagrams: gel and metal come from the SVG; ink follows the palette. */
+[data-theme=aqua] .aqua-diagram { font-family: var(--arcade-font); }
+[data-theme=aqua] .aqua-diagram text { fill: var(--ink); stroke: none; }
+[data-theme=aqua] .aqua-diagram path { stroke: var(--ink); }
+[data-theme=aqua] .aqua-diagram .aqua-muted { fill: var(--muted); }
+[data-theme=aqua] .aqua-diagram .aqua-accent { fill: var(--accent); }
+[data-theme=aqua] .aqua-diagram .aqua-accent-line { stroke: var(--accent); }
+[data-theme=aqua] .aqua-diagram .aqua-ink { fill: var(--ink); stroke: none; }
+[data-theme=aqua] .aqua-diagram .aqua-slot { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 5; }
+[data-theme=aqua] .aqua-diagram .aqua-sheet { fill: var(--aqua-sheet); stroke: var(--aqua-rim); }
+[data-theme=aqua] .aqua-diagram .aqua-track { fill: var(--aqua-stripe-a); stroke: var(--aqua-rim); }
+[data-theme=aqua] .aqua-diagram .aqua-dock { fill: #ffffffa0; stroke: #9fb3c6; }
+[data-theme=aqua][data-mode=dark] .aqua-diagram .aqua-dock { fill: #c8d6e244; }
+[data-theme=aqua] .aqua-diagram .aqua-tag { fill: #0b1a28cc; stroke: none; }
+[data-theme=aqua] .aqua-diagram .aqua-tag-text { fill: #fff; }
+[data-theme=aqua] .aqua-diagram .aqua-ceiling { fill: #e0503c; stroke: #a2342a; }
+[data-theme=aqua] .aqua-diagram g { transform-box: fill-box; transform-origin: center; }
+[data-theme=aqua] .aqua-tilt { animation: aqua-tilt 4s ease-in-out infinite; }
+[data-theme=aqua] .aqua-roll { animation: aqua-roll 4s ease-in-out infinite; }
+[data-theme=aqua] .aqua-run { animation: aqua-run 3.2s ease-in infinite; }
+[data-theme=aqua] .aqua-pulse { animation: aqua-default 1.6s ease-in-out infinite; }
+[data-theme=aqua] .aqua-grow { animation: aqua-grow 2.8s linear infinite; }
+[data-theme=aqua] .aqua-bounce { animation: aqua-bounce 1.1s ease-out infinite; transform-origin: 50% 100%; }
+[data-theme=aqua] .aqua-magnify { animation: aqua-magnify 2.4s ease-in-out infinite; transform-origin: 50% 100%; }
+[data-theme=aqua] .aqua-diagram .aqua-spin { animation: aqua-spin 1s linear infinite; transform-box: view-box; }
+@keyframes aqua-tilt { 0%, 8%, 92%, 100% { transform: rotate(0); } 22%, 40% { transform: rotate(-6deg); } 60%, 78% { transform: rotate(6deg); } }
+@keyframes aqua-roll { 0%, 8%, 92%, 100% { transform: translateX(0); } 40% { transform: translateX(-80px); } 78% { transform: translateX(80px); } }
+/* Roll left to the plain gate at x 115, drop through it, then rest on the shelf below. */
+@keyframes aqua-run { 0%, 10% { transform: translate(0, 0); } 45% { transform: translate(-55px, 0); } 70%, 100% { transform: translate(-55px, 52px); } }
+@keyframes aqua-grow { 0% { transform: scaleX(.12); } 80% { transform: scaleX(1); } 82%, 100% { transform: scaleX(1); opacity: 0; } }
+@keyframes aqua-bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-18px); } 70% { transform: translateY(0); } 82% { transform: translateY(-5px); } }
+@keyframes aqua-magnify { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes aqua-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    [data-theme=aqua] .aqua-diagram *, [data-theme=aqua] #arcade-player button { animation: none !important; }
+}
+
+/* Cards keep their natural height and the caption stays compact, so Back / Next fit the stage. */
+[data-theme=aqua] .arcade-walkthrough { gap: 6px; padding-block: 10px; }
+[data-theme=aqua] .arcade-walkthrough .guide-caption { font-size: clamp(15px, 1.7vw, 18px); line-height: 1.25; color: var(--ink); }
+[data-theme=aqua] .arcade-walkthrough .guide-title { font-size: clamp(17px, 2vw, 21px); margin: 2px 0 0; }
+[data-theme=aqua] .arcade-walkthrough .guide-art { max-height: 140px; }
+[data-theme=aqua] .arcade-toolbar button { padding: 5px 14px; min-height: 36px; }

@@ -1,6 +1,6 @@
 import { game } from '../../core/game.js';
 import { integer } from '../../core/random.js';
-import { pinstripes, toolbar, brushed, gel, marble as drawMarble, light, progress, poof, throb, isDark,
+import { pinstripes, toolbar, brushed, gel, marble as drawMarble, gatePill, progress, poof, throb, isDark,
     addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js';
 
 // Marble Gates: brushed-metal shelves rise toward a striped ceiling. Each raise tilts the tray, so the
@@ -142,10 +142,8 @@ export function marble(env) {
             const thick = compact ? 26 : 16, gapW = pitch * .74, r = Math.min(compact ? 34 : 19, row * .3);
             const ballShelf = shelfOf(s.ball.shelf), danger = ballShelf && !s.ball.falling && ballShelf.y < 1.2;
             const ceilY = y0 - barH - 6 + (compact ? 4 : 2);
-            progress(p, 24, ceilY, 672, barH, 1, s.time, reduced, 'red');
-            if (danger && !reduced) { p.c.save(); p.c.globalAlpha = .35 * throb(s.time); p.rect(24, ceilY + barH, 672, 8, '#e0503c', 4); p.c.restore(); }
             const gateFx = s.effects.filter(e => e.kind === 'gate');
-            p.c.save(); p.c.beginPath(); p.c.rect(0, 0, 720, Y(MARBLE.floor) - thick * .4); p.c.clip();
+            p.c.save(); p.c.beginPath(); p.c.rect(0, ceilY + barH, 720, Y(MARBLE.floor) - thick * .4 - ceilY - barH); p.c.clip();
             for (const shelf of s.shelves) {
                 const y = Y(shelf.y); if (y < ceilY - thick || shelf.y > MARBLE.floor + .5) continue;
                 const cuts = shelf.gates.map(g => g.lane).sort((a, b) => a - b);
@@ -156,13 +154,15 @@ export function marble(env) {
                     // A gate is a gel badge set into the gap; it wobbles (squash and stretch) when the marble passes.
                     const fx = gateFx.find(e => e.lane === gate.lane && Math.abs(e.shelf - shelf.y) < 1.5 && s.time - e.at < .5);
                     const age = fx ? s.time - fx.at : 1, wob = fx && !reduced ? Math.sin(age * 28) * (1 - age / .5) * .22 : 0;
-                    const size = thick * 1.5, w = size * (1 + wob), h = size * (1 - wob);
-                    const kind = { plain: 'plain', zoom: 'zoom', close: 'close', minimise: 'minimise' }[gate.kind];
-                    if (fx && reduced) p.outline(X(gate.lane) - size, y - size, size * 2, size * 2, 'accent', 3);
-                    light(p, X(gate.lane), y + (h - size) * .5, Math.min(w, h) / 2 * 1.05, kind);
+                    const w = gapW * .92 * (1 + wob), h = thick * 1.5 * (1 - wob);
+                    if (fx && reduced) p.outline(X(gate.lane) - gapW / 2, y - thick * 1.2, gapW, thick * 2.4, 'accent', 3);
+                    gatePill(p, X(gate.lane), y, w, h, gate.kind);
                 }
             }
             p.c.restore();
+            // The striped ceiling sits over the shelves it crushes; it throbs while the marble's shelf is close.
+            progress(p, 24, ceilY, 672, barH, 1, s.time, reduced, 'red');
+            if (danger) { p.c.save(); p.c.globalAlpha = .2 + .3 * throb(s.time, reduced); p.rect(24, ceilY + barH, 672, compact ? 12 : 8, '#e0503c', 4); p.c.restore(); }
             // The glass floor the marble can rest on; shelves rise out of it.
             brushed(p, 20, Y(MARBLE.floor) - thick * .4, 680, thick * 1.3, thick * .4);
             // The marble, resting on its shelf (or falling), with a tilt chevron showing where it rolls.

@@ -104,7 +104,7 @@ export function dock(env) {
             const toHeart = DOCK.heartEvery - s.served % DOCK.heartEvery;
             const top = toolbar(p, `${s.served} answered`, news ? STAGE_NEWS[news.stage] : s.streak >= 2 ? `streak ${s.streak} · ♥ in ${toHeart}` : `♥ back every ${DOCK.heartEvery}`);
             // Dock geometry with magnification: icons near the pointer swell and push their neighbours apart.
-            const base = compact ? 70 : 60, pad = compact ? 10 : 14, glide = Math.min(1, (s.time - s.movedAt) / DOCK.glide);
+            const base = compact ? 76 : 60, pad = compact ? 8 : 14, glide = Math.min(1, (s.time - s.movedAt) / DOCK.glide);
             const pointer = reduced ? s.cursor : s.from + (s.cursor - s.from) * glide * glide * (3 - 2 * glide);
             const scales = APPS.map((_, i) => 1 + .55 * Math.max(0, Math.cos(Math.min(Math.PI / 2, Math.abs(i - pointer) * Math.PI / 3.2))));
             const widths = scales.map(k => base * k + pad), total = widths.reduce((a, b) => a + b, 0);
@@ -154,8 +154,8 @@ export function dock(env) {
                 if (e.kind !== 'open') continue;
                 const age = s.time - e.at; if (age > 1.5) continue;
                 const t = reduced ? (age < 1.2 ? 1 : 0) : age < .45 ? age / .45 : age < 1 ? 1 : Math.max(0, 1 - (age - 1) / .5);
-                const ww = compact ? 420 : 260, wh = compact ? 280 : 150, wx = Math.max(20, Math.min(700 - ww, centers[e.icon] - ww / 2));
-                const wy = top + (compact ? 120 : 30);
+                const ww = compact ? 420 : 260, wh = compact ? Math.max(90, Math.min(240, dockY - 150 - top - 30)) : 150, wx = Math.max(20, Math.min(700 - ww, centers[e.icon] - ww / 2));
+                const wy = top + 30;
                 genie(p, centers[e.icon], iconBottom - base, { x: wx, y: wy, w: ww, h: wh }, t, { title: APPS[e.icon].name });
             }
             const heart = s.effects.findLast(e => e.kind === 'heart');

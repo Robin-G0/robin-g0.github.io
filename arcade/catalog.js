@@ -23,7 +23,7 @@ export const games = Object.freeze([
     entry('y2k', 'beat', 'Chrome Beat', 'Hit each note as it reaches its glowing line.', 'Left beat', 'Right beat'),
     entry('y2k', 'reactor', 'Reactor Balance', 'Produce energy while keeping the reactor stable.', 'Vent heat', 'Add charge'),
     entry('aqua', 'marble', 'Marble Gates', 'Tilt the tray. The marble drops through the first gate it meets. Stay below the ceiling.', 'Tilt left', 'Tilt right', {scoreVersion:2,illustrated:true,precision:'low'}),
-    entry('aqua', 'gel', 'Gel Factory', 'Stamp the growing gel button when it fits each slot of the sheet.', 'Stamp left slot', 'Stamp right slot', {scoreVersion:2,illustrated:true,precision:'low'}),
+    entry('aqua', 'gel', 'Gel Factory', 'Stamp the growing gel button when it fits each slot of the sheet.', 'Left slot', 'Right slot', {scoreVersion:2,illustrated:true,precision:'low'}),
     entry('aqua', 'dock', 'Dock Bounce', 'Glide along the Dock. Open bouncing apps, force-quit hung ones before they time out.', '', '', {scoreVersion:2,illustrated:true,precision:'full',inputScheme:'wrist-directions',controls:{left_left:'Glide ←',left_up:'Open',left_right:'Glide →',right_left:'Glide ←',right_up:'Force quit',right_right:'Glide →'}}),
     entry('aero', 'school', 'School Rescue', 'Open the right gate when a school reaches it.', 'Left gate', 'Right gate'),
     entry('aero', 'bubbles', 'Bubble Cascade', 'Choose an arc and burst clusters of bubbles.', 'Change arc', 'Launch bubble'),

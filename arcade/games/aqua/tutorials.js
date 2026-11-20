@@ -17,10 +17,10 @@ const defs = () => `<defs>${Object.entries(TONES).map(([tone, [, top, mid, botto
 const frame = content => `<svg viewBox="0 0 400 160" class="guide-art aqua-diagram" aria-hidden="true">${defs()}${content}</svg>`;
 /** A lickable gel capsule (or rounded tile) with its specular cap. */
 const gel = (x, y, w, h, tone = 'blue', cls = '', label = '', size = h * .5, ink = '', rx = Math.min(w, h) / 2) =>
-    `<g class="${cls}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#aqg-${tone})" stroke="${TONES[tone][0]}" stroke-width="1.2"/>`
-    + `<rect x="${x + h * .14}" y="${y + h * .07}" width="${Math.max(0, w - h * .28)}" height="${h * .42}" rx="${Math.min(rx, h * .2)}" fill="url(#aqg-gloss)" stroke="none"/>`
+    `<g class="${cls}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" style="fill:url(#aqg-${tone});stroke:${TONES[tone][0]};stroke-width:1.2"/>`
+    + `<rect x="${x + h * .14}" y="${y + h * .07}" width="${Math.max(0, w - h * .28)}" height="${h * .42}" rx="${Math.min(rx, h * .2)}" style="fill:url(#aqg-gloss);stroke:none"/>`
     + (label ? `<text x="${x + w / 2}" y="${y + h / 2 + size * .36}" text-anchor="middle" font-size="${size}" font-weight="700" style="fill:${ink || '#fff'};stroke:none">${escape(label)}</text>` : '') + '</g>';
-const metal = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" fill="url(#aqg-metal)" stroke="#8b949c" stroke-width="1"/>`;
+const metal = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" style="fill:url(#aqg-metal);stroke:#8b949c;stroke-width:1"/>`;
 const marble = (x, y, r, cls = '') => `<g class="${cls}"><circle cx="${x}" cy="${y}" r="${r}" fill="url(#aqg-marble)" stroke="none"/><ellipse cx="${x - r * .25}" cy="${y - r * .45}" rx="${r * .45}" ry="${r * .28}" fill="#fff" fill-opacity=".8" stroke="none"/></g>`;
 const GLYPH = {
     close: (x, y, k) => `M${x - k} ${y - k}L${x + k} ${y + k}M${x + k} ${y - k}L${x - k} ${y + k}`,
@@ -63,11 +63,11 @@ export const diagrams = {
     gel: [
         // Card 1: L fills the leftmost empty slot, R the rightmost.
         frame('<rect x="70" y="8" width="260" height="62" rx="6" class="aqua-sheet"/><rect x="92" y="25" width="86" height="28" rx="14" class="aqua-slot"/><rect x="220" y="25" width="90" height="28" rx="14" class="aqua-slot"/>'
-            + text('S', 135, 44, 14, 700, 'aqua-muted') + text('L', 265, 44, 14, 700, 'aqua-muted')
+            + text('S', 135, 44, 14, 700, 'aqua-muted') + text('XL', 265, 44, 14, 700, 'aqua-muted')
             + raise(40, 84, 'L') + raise(360, 84, 'R') + '<path d="M58 100Q110 96 132 60M342 100Q290 96 266 60" stroke-dasharray="4 4" fill="none" class="aqua-accent-line"/>'
             + text('L stamps the left slot, R the right one', 200, 148, 14)),
         // Card 2: the button grows; stamp as its edges cross the marks. Every stamp starts a new button.
-        frame(metal(70, 18, 260, 10) + '<path d="M118 40V112M282 40V112" stroke-width="3" class="aqua-accent-line"/>' + text('L · M', 118, 126, 13, 700, 'aqua-accent') + text('L · M', 282, 126, 13, 700, 'aqua-accent')
+        frame(metal(70, 18, 260, 10) + '<path d="M118 40V112M282 40V112" stroke-width="3" class="aqua-accent-line"/>' + text('L or R · M', 118, 126, 13, 700, 'aqua-accent') + text('L or R · M', 282, 126, 13, 700, 'aqua-accent')
             + `<g class="aqua-grow">${gel(80, 56, 240, 40, 'blue')}</g>`
             + text('stamp when the edges reach the marks', 200, 152, 14)),
         // Card 3: points and the clock.

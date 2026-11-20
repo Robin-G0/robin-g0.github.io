@@ -8,7 +8,7 @@ import { pinstripes, toolbar, brushed, gel as drawGel, light, poof, throb, isDar
 // Every stamp, good or not, starts a fresh button, so the order of the stamps is the plan.
 // A full sheet ships (slides back up) and scores; the host's 18 s score rounds are the pressure.
 export const GEL = { min: .14, max: 1, grow: 2.6, minGrow: 1.8, growStep: .05, good: .085, perfect: .03,
-    sizes: { S: .4, M: .63, L: .86 }, ship: .8, refill: .5, points: { good: 20, perfect: 40 }, clean: 20, cleanStep: 10, cleanMax: 60,
+    sizes: { S: .4, M: .63, XL: .86 }, ship: .8, refill: .5, points: { good: 20, perfect: 40 }, clean: 20, cleanStep: 10, cleanMax: 60,
     stages: { two: 3, three: 8 }, threeChance: .5 };
 /** Seconds the button takes from its smallest to its widest; sheets shipped make it a little quicker. */
 export const growSeconds = shipped => Math.max(GEL.minGrow, GEL.grow - GEL.growStep * shipped);
@@ -78,83 +78,90 @@ export function gel(env) {
             if (size() > GEL.max) { addEffect(s, { kind: 'pop' }); s.pops++; s.bornAt = s.time + GEL.refill; } // Over-inflated: it pops, harmlessly, and restarts.
         },
         render(s, p) {
-            const compact = p.compact, reduced = env.reducedMotion, dark = isDark(p);
+            const compact = p.compact, reduced = env.reducedMotion, dark = isDark(p), c = p.c;
             pinstripes(p);
             const news = s.effects.findLast(e => e.kind === 'stage');
-            const top = toolbar(p, `${s.shipped} sheets`, news ? news.text : s.cleanStreak ? `clean run ${s.cleanStreak} · next +${cleanBonus(s.cleanStreak)}` : 'clean sheet +20');
+            const top = toolbar(p, `${s.shipped} ${s.shipped === 1 ? 'sheet' : 'sheets'}`, news ? news.text : s.cleanStreak ? `clean run ${s.cleanStreak} · next +${cleanBonus(s.cleanStreak)}` : 'clean sheet +20');
+            // Buttons are drawn at true size everywhere: the slot on the sheet is exactly the width to reach.
+            const extW = compact ? 250 : 240, bh = compact ? 64 : 40, gap = compact ? 12 : 16;
             // A document window; the order hangs from its title bar as an Aqua sheet.
-            const winX = 24, winW = 672, titleY = top + (compact ? 22 : 10), titleH = compact ? 40 : 24;
-            const sheetH = compact ? 210 : 104, extW = compact ? 640 : 560, scale = compact ? .3 : .34;
+            const winX = 16, winW = 688, titleY = top + (compact ? 22 : 10), titleH = compact ? 40 : 24, sheetH = bh + (compact ? 96 : 56);
             brushed(p, winX, titleY, winW, titleH, 8);
             ['close', 'minimise', 'zoom'].forEach((kind, i) => light(p, winX + 20 + i * titleH * .8, titleY + titleH / 2, titleH * .26, kind));
             etched(p, 'Untitled Order', 360, titleY + titleH / 2, compact ? 22 : 13, dark ? '#e6f5ff' : '#25455f', 'center', 700);
             const sheet = s.sheet, since = s.time - sheet.at, shipT = s.ship ? (s.time - s.ship.at) / GEL.ship : 0;
-            const drop = reduced ? (s.ship ? (shipT < .5 ? 1 : 0) : 1) : s.ship ? Math.max(0, 1 - shipT * 1.4) : Math.min(1, since / .35);
-            const sy = titleY + titleH - sheetH * (1 - drop), c = p.c;
+            // Sheets slide down out of the title bar and back up into it when they ship.
+            const drop = reduced ? (s.ship && shipT >= .5 ? 0 : 1) : s.ship ? Math.max(0, 1 - shipT * 1.4) : Math.min(1, since / .35);
+            const sy = titleY + titleH - sheetH * (1 - drop);
             c.save(); c.beginPath(); c.rect(winX, titleY + titleH, winW, sheetH + 30); c.clip();
             c.shadowColor = '#0a284640'; c.shadowBlur = 16; c.shadowOffsetY = 6;
-            p.rect(winX + 40, sy, winW - 80, sheetH, dark ? '#2a3d4fee' : '#f7f9fbee', 8);
+            p.rect(winX + 8, sy, winW - 16, sheetH, dark ? '#2a3d4fee' : '#f9fbfdf0', 8);
             c.shadowColor = 'transparent';
-            const slotH = compact ? 56 : 34, gap = compact ? 18 : 22;
-            const widths = sheet.slots.map(slot => GEL.sizes[slot.size] * extW * scale + slotH * .6);
+            const widths = sheet.slots.map(slot => GEL.sizes[slot.size] * extW);
             const total = widths.reduce((a, b) => a + b, 0) + gap * (widths.length - 1);
-            let x = 360 - total / 2; const slotY = sy + sheetH * .5 - slotH / 2, slotX = [];
+            let x = 360 - total / 2; const slotY = sy + (compact ? 22 : 12), slotX = [];
             const nextL = slotFor(sheet.slots, 'left'), nextR = slotFor(sheet.slots, 'right');
             sheet.slots.forEach((slot, i) => {
                 slotX.push(x + widths[i] / 2);
                 const stampFx = s.effects.findLast(e => e.kind === 'stamp' && e.sheet === sheet.id && e.index === i);
                 const fresh = stampFx && s.time - stampFx.at < .25 && !reduced;
                 if (slot.fill && !fresh) {
-                    drawGel(p, x, slotY, widths[i], slotH, slot.fill === 'perfect' ? 'blue' : 'clear');
-                    text(p, slot.fill === 'perfect' ? '✓ ' + slot.size : slot.size, x + widths[i] / 2, slotY + slotH / 2, slotH * .42, slot.fill === 'perfect' ? '#ffffff' : '#25455f', 'center', 700);
+                    drawGel(p, x, slotY, widths[i], bh, slot.fill === 'perfect' ? 'blue' : 'clear');
+                    text(p, slot.fill === 'perfect' ? `✓ ${slot.size}` : slot.size, x + widths[i] / 2, slotY + bh / 2, bh * .42, slot.fill === 'perfect' ? '#ffffff' : '#25455f', 'center', 700);
                 } else {
-                    c.save(); c.setLineDash([6, 5]); c.strokeStyle = p.color(i === nextL || i === nextR ? 'accent' : 'border'); c.lineWidth = 2;
-                    c.beginPath(); c.roundRect(x, slotY, widths[i], slotH, slotH / 2); c.stroke(); c.restore();
-                    text(p, slot.size, x + widths[i] / 2, slotY + slotH / 2, slotH * .42, 'muted', 'center', 700);
-                    const owner = i === nextL && i === nextR ? 'L R' : i === nextL ? 'L' : i === nextR ? 'R' : '';
-                    if (owner) text(p, owner, x + widths[i] / 2, slotY + slotH + (compact ? 24 : 14), compact ? 22 : 13, 'accent', 'center', 700);
+                    const mine = i === nextL || i === nextR;
+                    c.save(); c.setLineDash([6, 5]); c.strokeStyle = p.color(mine ? 'accent' : 'border'); c.lineWidth = mine ? 2.5 : 2;
+                    c.beginPath(); c.roundRect(x, slotY, widths[i], bh, bh / 2); c.stroke(); c.restore();
+                    text(p, slot.size, x + widths[i] / 2, slotY + bh / 2, bh * .42, 'muted', 'center', 700);
+                    const owner = i === nextL && i === nextR ? 'L or R' : i === nextL ? 'L' : i === nextR ? 'R' : '';
+                    if (owner) text(p, owner, x + widths[i] / 2, slotY + bh + (compact ? 30 : 18), compact ? 24 : 14, 'accent', 'center', 700);
                 }
                 x += widths[i] + gap;
             });
             c.restore();
-            // The extruder: a brushed nozzle bar; the button grows out of it, centred. Tick pairs mark the next L and R widths.
-            const cy = compact ? Math.max(top + 560, p.h * .6) : 300, bh = compact ? 92 : 50;
+            // The extruder: a brushed nozzle; the button grows out of it, centred. Tick pairs mark the next widths.
+            const sheetBottom = titleY + titleH + sheetH, cy = compact ? Math.max(sheetBottom + bh * 1.6, (sheetBottom + p.h) / 2 - 20) : 296;
             const value = s.ship || s.time < s.bornAt ? 0 : Math.min(GEL.max, size()), w = value * extW;
-            brushed(p, 360 - extW / 2 - 20, cy - bh / 2 - (compact ? 46 : 28), extW + 40, compact ? 22 : 14, 7);
-            const targets = [];
-            if (!s.ship) {
-                if (nextL != null) targets.push({ index: nextL, label: nextL === nextR ? 'L R' : 'L' });
-                if (nextR != null && nextR !== nextL) targets.push({ index: nextR, label: 'R' });
+            brushed(p, 360 - (compact ? 60 : 44), cy - bh / 2 - (compact ? 40 : 26), compact ? 120 : 88, compact ? 24 : 16, compact ? 8 : 6);
+            p.rect(360 - 6, cy - bh / 2 - (compact ? 16 : 10), 12, compact ? 16 : 10, dark ? '#5d6a76' : '#b7bec5');
+            const targets = new Map();
+            if (!s.ship) for (const [index, who] of [[nextL, 'L'], [nextR, 'R']]) {
+                if (index == null) continue;
+                const name = sheet.slots[index].size, entry = targets.get(name) || { size: name, who: [] };
+                if (!entry.who.includes(who)) entry.who.push(who);
+                targets.set(name, entry);
             }
-            for (const target of targets) {
-                const t = GEL.sizes[sheet.slots[target.index].size], half = t * extW / 2, fit = fitOf(value, t);
-                const near = fit === 'good' || fit === 'perfect', pulse = near ? throb(s.time, reduced) : 0;
+            const widest = Math.max(0, ...[...targets.values()].map(v => GEL.sizes[v.size]));
+            let glow = false;
+            for (const target of targets.values()) {
+                const t = GEL.sizes[target.size], half = t * extW / 2, fit = fitOf(value, t);
+                const near = value > 0 && (fit === 'good' || fit === 'perfect'), pulse = near ? throb(s.time, reduced) : 0;
+                glow ||= near;
                 for (const side of [-1, 1]) {
                     const tx = 360 + side * half;
-                    if (near) { c.save(); c.globalAlpha = .25 + .35 * pulse; p.rect(tx - (compact ? 10 : 7), cy - bh * .9, compact ? 20 : 14, bh * 1.8, '#4aa8ff', 7); c.restore(); }
-                    p.line([[tx, cy - bh * .85], [tx, cy + bh * .85]], near ? 'accent' : 'muted', near ? (compact ? 5 : 3) : 2, near ? [] : [5, 4]);
+                    if (near) { c.save(); c.globalAlpha = .25 + .35 * pulse; p.rect(tx - (compact ? 9 : 6), cy - bh * .85, compact ? 18 : 12, bh * 1.7, '#4aa8ff', 6); c.restore(); }
+                    p.line([[tx, cy - bh * .8], [tx, cy + bh * .8]], near ? 'accent' : 'muted', near ? (compact ? 5 : 3) : 2, near ? [] : [5, 4]);
                 }
-                const labelY = target.label === 'R' && targets.length > 1 ? cy + bh * .85 + (compact ? 26 : 15) : cy - bh * .85 - (compact ? 22 : 13);
-                text(p, `${target.label} · ${sheet.slots[target.index].size}`, 360 + half, labelY, compact ? 22 : 13, near ? 'accent' : 'muted', 'center', 700);
+                const lower = targets.size > 1 && t === widest;
+                text(p, `${target.who.join(' or ')} · ${target.size}`, 360 + half, cy + bh * .8 + (compact ? 28 : 16) + (lower ? (compact ? 32 : 18) : 0), compact ? 24 : 14, near ? 'accent' : 'muted', 'center', 700);
             }
             // Gel wobble: the extruded button breathes a little as it grows (decoration only).
             const wob = reduced ? 0 : Math.sin(s.time * 11) * .04;
-            if (w > 4) drawGel(p, 360 - w / 2, cy - bh / 2 * (1 - wob), w, bh * (1 - wob), 'blue', { glow: targets.some(t => ['good', 'perfect'].includes(fitOf(value, GEL.sizes[sheet.slots[t.index].size]))) ? .8 : 0 });
+            if (w > 4) drawGel(p, 360 - w / 2, cy - bh / 2 * (1 - wob), w, bh * (1 - wob), 'blue', { glow: glow ? .8 : 0 });
             for (const e of s.effects) {
                 const age = s.time - e.at;
                 if (e.kind === 'pop') { poof(p, 360 - extW / 2, cy, bh, age); poof(p, 360 + extW / 2, cy, bh, age); }
                 if (e.kind === 'stamp' && age < .5 && e.sheet === sheet.id) {
-                    // The stamped button flies up to its slot and shrinks to the sheet's scale; a misfit drops away.
-                    const k = Math.min(1, age / .25), ew = e.value * extW, misfit = e.fit === 'small' || e.fit === 'big';
-                    if (reduced) { if (misfit && age < .4) p.outline(slotX[e.index] - 30, slotY - 6, 60, slotH + 12, '#e0503c', 3); continue; }
-                    const tx = misfit ? 360 : slotX[e.index], ty = misfit ? cy + bh * 2 : slotY + slotH / 2;
-                    const fw = ew + (ew * scale - ew) * (misfit ? 0 : k), fy = cy + (ty - cy) * k;
-                    c.save(); c.globalAlpha = misfit ? 1 - age / .5 : 1;
-                    drawGel(p, 360 + (tx - 360) * k - fw / 2, fy - bh * (1 - k * .5) / 2, fw, bh * (1 - (misfit ? 0 : k * .4)), misfit ? 'red' : 'blue');
+                    // The stamped button flies up into its slot (a misfit drops away, red).
+                    const misfit = e.fit === 'small' || e.fit === 'big', ew = e.value * extW;
+                    if (reduced) { if (misfit && age < .4) p.outline(slotX[e.index] - widths[e.index] / 2 - 4, slotY - 4, widths[e.index] + 8, bh + 8, '#e0503c', 3); continue; }
+                    const k = Math.min(1, age / .25), tx = misfit ? 360 : slotX[e.index], ty = misfit ? cy + bh * 2.5 : slotY + bh / 2;
+                    c.save(); c.globalAlpha = misfit ? Math.max(0, 1 - age / .5) : 1;
+                    drawGel(p, 360 + (tx - 360) * k - ew / 2, cy + (ty - cy) * k - bh / 2, ew, bh, misfit ? 'red' : 'blue');
                     c.restore();
                 }
             }
-            bursts({ ...s, bursts: s.bursts.map(b => ({ ...b, x: b.x < 0 ? 360 : slotX[b.x] ?? 360, y: b.x < 0 ? titleY + titleH + sheetH * .5 : slotY - (compact ? 30 : 18) })) }, p, reduced);
+            bursts({ ...s, bursts: s.bursts.map(b => ({ ...b, x: b.x < 0 ? 360 : slotX[b.x] ?? 360, y: b.x < 0 ? sy + sheetH * .5 : b.good ? slotY + bh + (compact ? 70 : 40) : cy - bh * 1.2 })) }, p, reduced);
         }
     });
 }

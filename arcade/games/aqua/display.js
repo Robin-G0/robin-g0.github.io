@@ -111,17 +111,27 @@ export function marble(p, x, y, r, tone = 'blue', alpha = 1) {
     c.restore();
 }
 
-/** Traffic-light window button: red close ×, yellow minimise −, green zoom +. */
-export function light(p, x, y, r, kind) {
-    const tone = { close: 'red', minimise: 'yellow', zoom: 'green', plain: 'blue' }[kind] || 'blue';
-    marble(p, x, y, r, tone);
-    const c = p.c; c.save(); c.strokeStyle = GEL[tone][0]; c.lineWidth = Math.max(2, r * .22); c.lineCap = 'round';
-    const k = r * .42; c.beginPath();
+const TONE_OF = { close: 'red', minimise: 'yellow', zoom: 'green', plain: 'blue' };
+/** The traffic-light glyphs: × close, − minimise, + zoom, and a down arrow for a plain gate. */
+export function glyph(p, x, y, k, kind, color, width) {
+    const c = p.c; c.save(); c.strokeStyle = color; c.lineWidth = width; c.lineCap = 'round'; c.lineJoin = 'round'; c.beginPath();
     if (kind === 'close') { c.moveTo(x - k, y - k); c.lineTo(x + k, y + k); c.moveTo(x + k, y - k); c.lineTo(x - k, y + k); }
     if (kind === 'minimise' || kind === 'zoom') { c.moveTo(x - k, y); c.lineTo(x + k, y); }
     if (kind === 'zoom') { c.moveTo(x, y - k); c.lineTo(x, y + k); }
     if (kind === 'plain') { c.moveTo(x, y - k); c.lineTo(x, y + k * .7); c.moveTo(x - k * .6, y + k * .1); c.lineTo(x, y + k * .7); c.lineTo(x + k * .6, y + k * .1); }
     c.stroke(); c.restore();
+}
+/** Traffic-light window button: red close ×, yellow minimise −, green zoom +. */
+export function light(p, x, y, r, kind) {
+    const tone = TONE_OF[kind] || 'blue';
+    marble(p, x, y, r, tone);
+    glyph(p, x, y, r * .42, kind, GEL[tone][0], Math.max(1.5, r * .22));
+}
+/** A gate: a gel trapdoor pill in the traffic-light colour, with its glyph in white. */
+export function gatePill(p, x, y, w, h, kind) {
+    const tone = TONE_OF[kind] || 'blue';
+    gel(p, x - w / 2, y - h / 2, w, h, tone);
+    glyph(p, x, y, h * .3, kind, '#ffffff', Math.max(2, h * .14));
 }
 
 /** The brushed-metal toolbar with an iTunes-style status display. It never repeats the room title or lives. */

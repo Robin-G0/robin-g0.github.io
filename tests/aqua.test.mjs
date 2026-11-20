@@ -157,7 +157,7 @@ test('Gel Factory stamps the button at the gesture time, restarts it, and ships 
     g.input({action:'left'});assert.equal(s.shipped,1,'Raises while a sheet ships are harmless');
     advance(GEL.ship+.01);assert.equal(s.solved,false);assert.notEqual(s.sheet.slots[0].fill,'perfect');
     // Misfits: no points, no life, the slot stays empty, the clean bonus is lost.
-    s.sheet.slots=[{size:'S',fill:null},{size:'L',fill:null}];s.bornAt=s.time;
+    s.sheet.slots=[{size:'S',fill:null},{size:'XL',fill:null}];s.bornAt=s.time;
     advance(.05);g.input({action:'left'});
     assert.equal(s.sheet.slots[0].fill,null);assert.equal(s.lives,3);assert.equal(s.sheet.clean,false);assert.equal(s.cleanStreak,0);
     assert.ok(s.bursts.some(b=>b.text==='too small'));assert.ok(sounds.some(e=>e.kind==='brake'));
@@ -165,7 +165,7 @@ test('Gel Factory stamps the button at the gesture time, restarts it, and ships 
     g.input({action:'right'});assert.equal(s.sheet.slots[1].fill,null,'No button during the refill: harmless');
     const grow=growSeconds(s.shipped),at=size=>(size-GEL.min)/(GEL.max-GEL.min)*grow;
     advance(GEL.refill+at(GEL.sizes.S)+.15);g.input({action:'left'});assert.equal(s.sheet.slots[0].fill,'good');
-    advance(GEL.refill+at(GEL.sizes.L));g.input({action:'right'});assert.equal(s.sheet.slots[1].fill,'perfect');
+    advance(GEL.refill+at(GEL.sizes.XL));g.input({action:'right'});assert.equal(s.sheet.slots[1].fill,'perfect');
     assert.equal(s.score,60+GEL.points.good+GEL.points.perfect,'No clean bonus after a misfit');assert.equal(s.cleanStreak,0);
     // Waiting too long pops the button harmlessly.
     advance(GEL.ship+.01);const pops=s.pops;advance(growSeconds(s.shipped)+.05);assert.equal(s.pops,pops+1);assert.equal(s.lives,3);
