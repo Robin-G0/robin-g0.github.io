@@ -73,14 +73,14 @@
 @keyframes web-new { 0%, 100% { transform: rotate(-8deg) scale(1); } 50% { transform: rotate(8deg) scale(1.12); } }
 
 /* ---------- Type ---------- */
-:root[data-theme=construction] h1 { font-weight: bold; font-size: clamp(64px, 7.6vw, 108px); color: var(--link); text-shadow: 3px 3px #5b1893, 6px 6px #0006; letter-spacing: -.05em; white-space: nowrap; }
-:root[data-theme=construction] h2 { font-weight: bold; color: #fff; text-shadow: 2px 2px #5b1893; letter-spacing: -.02em; }
-:root[data-theme=construction] .eyebrow { color: var(--hot); font: bold 13px var(--font); letter-spacing: .08em; }
+:root[data-theme=construction] #profile-title { font-weight: bold; font-size: clamp(64px, 7.6vw, 108px); color: var(--link); text-shadow: 3px 3px #5b1893, 6px 6px #0006; letter-spacing: -.05em; white-space: nowrap; }
+:root[data-theme=construction] .scene h2 { font-weight: bold; color: #fff; text-shadow: 2px 2px #5b1893; letter-spacing: -.02em; }
+:root[data-theme=construction] :is(.scene, .identity-strip) .eyebrow { color: var(--hot); font: bold 13px var(--font); letter-spacing: .08em; }
 :root[data-theme=construction] .hero-subtitle { font-style: italic; }
 :root[data-theme=construction] .hero-description { color: #ffb7ef; font-size: 18px; }
-:root[data-theme=construction] .text-link { color: var(--link); font-size: 14px; }
-:root[data-theme=construction] .text-link:hover { color: var(--hot); }
-:root[data-theme=construction] p { color: var(--muted); }
+:root[data-theme=construction] .scene .text-link { color: var(--link); font-size: 14px; }
+:root[data-theme=construction] .scene .text-link:hover { color: var(--hot); }
+:root[data-theme=construction] .scene p { color: var(--muted); }
 :root[data-theme=construction] .interests strong { color: var(--hot); text-decoration-color: var(--hot); }
 
 /* ---------- Buttons: hot yellow, outset, pressing in ---------- */
@@ -162,7 +162,7 @@
 
 /* ---------- Phone ---------- */
 @media (max-width: 640px) {
-  :root[data-theme=construction] h1 { font-size: clamp(56px, 16vw, 80px); }
+  :root[data-theme=construction] #profile-title { font-size: clamp(56px, 16vw, 80px); }
   :root[data-theme=construction] .window-chrome { font-size: 13px; }
   :root[data-theme=construction] .hero::before { top: 33px; height: 10px; }
   :root[data-theme=construction] .hero-description { font-size: 17px; }

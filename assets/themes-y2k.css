@@ -85,7 +85,7 @@
 @keyframes y2k-shine { from { background-position: -160% 0; } to { background-position: 160% 0; } }
 /* The secondary button is clear plastic. */
 :root[data-theme=y2k] .button:not(.primary) { color: #182b57; text-shadow: none; border-color: #9aa6cf; background: linear-gradient(#ffffffcc, #dfe4ffb3); }
-:root[data-theme=y2k] .text-link { color: var(--accent); font-weight: 700; }
+:root[data-theme=y2k] .scene .text-link { color: var(--accent); font-weight: 700; }
 
 /* ---------- Windows: foil-edged panels with a media-player title bar ---------- */
 :root[data-theme=y2k] .scene { clip-path: none; border: 1px solid transparent; border-radius: 26px; padding-top: calc(var(--section-padding) + 34px);
@@ -121,19 +121,19 @@
 }
 
 /* ---------- Type: liquid chrome headline with a sweeping highlight ---------- */
-:root[data-theme=y2k] :is(h1, h2) { font-family: var(--display); font-style: normal; font-weight: 800; letter-spacing: -.02em; }
-:root[data-theme=y2k] h1 { font-size: clamp(56px, 7vw, 100px); line-height: .95; width: fit-content; padding-bottom: .06em; color: var(--ink);
+:root[data-theme=y2k] :is(.hero h1, .scene h2) { font-family: var(--display); font-style: normal; font-weight: 800; letter-spacing: -.02em; }
+:root[data-theme=y2k] #profile-title { font-size: clamp(56px, 7vw, 100px); line-height: .95; width: fit-content; padding-bottom: .06em; color: var(--ink);
   background-image: linear-gradient(105deg, transparent 40%, #ffffffe6 50%, transparent 60%), var(--chrome-text); background-size: 260% 100%, 100% 100%; background-repeat: no-repeat;
   background-position: 160% 0, 0 0; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 0 #ffffff) drop-shadow(0 8px 14px #3734cc33); animation: y2k-sweep 7s ease-in-out 1s infinite; }
-:root[data-theme=y2k][data-mode=dark] h1 { filter: drop-shadow(0 0 1px #000) drop-shadow(0 6px 22px #8a6bff66); }
+:root[data-theme=y2k][data-mode=dark] #profile-title { filter: drop-shadow(0 0 1px #000) drop-shadow(0 6px 22px #8a6bff66); }
 @keyframes y2k-sweep { 0%, 55% { background-position: 160% 0, 0 0; } 85%, 100% { background-position: -60% 0, 0 0; } }
-:root[data-theme=y2k] h2 { font-size: clamp(28px, 3.6vw, 46px); color: var(--ink); }
+:root[data-theme=y2k] .scene h2 { font-size: clamp(28px, 3.6vw, 46px); color: var(--ink); }
 :root[data-theme=y2k] .project-feature h2 { font-size: clamp(40px, 5.6vw, 72px); }
-:root[data-theme=y2k] h3 { font-family: var(--display); }
-:root[data-theme=y2k] .eyebrow { font: 700 10px var(--display); letter-spacing: .3em; color: var(--accent); }
+:root[data-theme=y2k] .scene h3 { font-family: var(--display); }
+:root[data-theme=y2k] :is(.scene, .identity-strip) .eyebrow { font: 700 10px var(--display); letter-spacing: .3em; color: var(--accent); }
 :root[data-theme=y2k] .hero-subtitle { font: 700 16px var(--display); letter-spacing: .22em; text-transform: uppercase; color: var(--accent); }
-:root[data-theme=y2k] p { color: var(--muted); }
+:root[data-theme=y2k] .scene p { color: var(--muted); }
 :root[data-theme=y2k] .interests strong { text-decoration-color: #c6b2ff; text-decoration-thickness: 3px; }
 
 /* ---------- Hero ---------- */
@@ -200,7 +200,7 @@
   :root[data-theme=y2k] .site-header { border-radius: 0 0 22px 22px; }
   :root[data-theme=y2k] .scene { border-radius: 22px; }
   :root[data-theme=y2k] .window-chrome { font-size: 9px; letter-spacing: .12em; }
-  :root[data-theme=y2k] h1 { font-size: clamp(42px, 13vw, 60px); }
+  :root[data-theme=y2k] #profile-title { font-size: clamp(42px, 13vw, 60px); }
   :root[data-theme=y2k] .project-feature h2 { font-size: 40px; }
   :root[data-theme=y2k] .hero-subtitle { font-size: 14px; }
   :root[data-theme=y2k] .button { min-height: 44px; font-size: 14px; }
@@ -210,7 +210,7 @@
   :root[data-theme=y2k] .aurora-mid { top: 18%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-theme=y2k] :is(.aurora-far, .aurora-mid, .aurora-near, h1, .window-actions) { animation: none; }
+  :root[data-theme=y2k] :is(.aurora-far, .aurora-mid, .aurora-near, .hero h1, .window-actions) { animation: none; }
   :root[data-theme=y2k] .ambient::before, :root[data-theme=y2k] .journey-art::before, :root[data-theme=y2k] .journey-art::after,
   :root[data-theme=y2k] :is(.button, .theme-trigger):hover::after { animation: none; }
 }

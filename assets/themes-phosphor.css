@@ -108,14 +108,14 @@
 :root[data-theme=phosphor] .window-actions::before { content: 'ON LINE'; font-size: 11px; }
 
 /* ---------- Type: VT323 raster headings, typed in, with a resting block cursor ---------- */
-:root[data-theme=phosphor] :is(h1, h2, h3) { font-family: var(--display); font-weight: 400; letter-spacing: .01em; color: var(--ink); text-shadow: var(--glow); }
-:root[data-theme=phosphor] h1 { font-size: clamp(76px, 10vw, 136px); line-height: .9; animation: phos-type 1s steps(8, jump-none) .95s both; }
-:root[data-theme=phosphor] h1::after { content: ''; display: inline-block; width: .42em; height: .7em; margin-left: .06em; vertical-align: -.02em;
+:root[data-theme=phosphor] :is(.hero h1, .scene h2, .scene h3) { font-family: var(--display); font-weight: 400; letter-spacing: .01em; color: var(--ink); text-shadow: var(--glow); }
+:root[data-theme=phosphor] #profile-title { font-size: clamp(76px, 10vw, 136px); line-height: .9; animation: phos-type 1s steps(8, jump-none) .95s both; }
+:root[data-theme=phosphor] #profile-title::after { content: ''; display: inline-block; width: .42em; height: .7em; margin-left: .06em; vertical-align: -.02em;
   background: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent); animation: phos-blink 1.06s steps(1) 2s infinite; }
-:root[data-theme=phosphor] h2 { font-size: clamp(42px, 5.4vw, 66px); line-height: .95; }
+:root[data-theme=phosphor] .scene h2 { font-size: clamp(42px, 5.4vw, 66px); line-height: .95; }
 :root[data-theme=phosphor] .project-feature h2 { font-size: clamp(52px, 7vw, 92px); }
 :root[data-theme=phosphor] .section-heading h2 { font-size: clamp(42px, 5vw, 62px); }
-:root[data-theme=phosphor] h3 { font-size: 24px; }
+:root[data-theme=phosphor] .scene h3 { font-size: 24px; }
 :root[data-theme=phosphor] .hero-subtitle { font: clamp(26px, 3vw, 36px)/1.1 var(--display); color: var(--ink); }
 :root[data-theme=phosphor] .interests > p { font: clamp(26px, 3vw, 34px)/1.25 var(--display); }
 :root[data-theme=phosphor] .project-lead { font: 28px/1.2 var(--display); }
@@ -139,8 +139,8 @@
 :root[data-theme=phosphor] .button.primary::before { content: '['; margin-right: -4px; }
 :root[data-theme=phosphor] .button.primary::after { content: ']'; margin-left: -4px; }
 :root[data-theme=phosphor] .button:hover { transform: none; background: var(--accent); color: var(--bg); text-shadow: none; box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent); }
-:root[data-theme=phosphor] .text-link { color: var(--accent); text-decoration-style: dotted; }
-:root[data-theme=phosphor] .text-link:hover { background: var(--accent); color: var(--bg); text-decoration: none; text-shadow: none; }
+:root[data-theme=phosphor] .scene .text-link { color: var(--accent); text-decoration-style: dotted; }
+:root[data-theme=phosphor] .scene .text-link:hover { background: var(--accent); color: var(--bg); text-decoration: none; text-shadow: none; }
 :root[data-theme=phosphor] .site-footer a:hover { background: transparent; color: var(--ink); }
 :root[data-theme=phosphor] a:focus-visible, :root[data-theme=phosphor] button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 4px; }
 
@@ -214,13 +214,13 @@
   :root[data-theme=phosphor] .scene::before { bottom: -19px; height: 16px; line-height: 16px; font-size: 8px; letter-spacing: .24em; }
   :root[data-theme=phosphor] .window-chrome { height: 24px; padding: 0 12px; font-size: 9px; gap: 10px; border-radius: 12px 12px 0 0; }
   :root[data-theme=phosphor] .window-actions::before { font-size: 9px; }
-  :root[data-theme=phosphor] h1 { font-size: clamp(64px, 20vw, 92px); }
+  :root[data-theme=phosphor] #profile-title { font-size: clamp(64px, 20vw, 92px); }
   :root[data-theme=phosphor] .hero { padding-top: calc(var(--section-padding) + 30px); }
   :root[data-theme=phosphor] .project-feature h2 { font-size: 58px; }
   :root[data-theme=phosphor] .project-list a { font-size: 20px; padding: 14px 6px; }
   :root[data-theme=phosphor] .metrics dd, :root[data-theme=phosphor] .metrics > div:last-child dd { font-size: 52px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  :root[data-theme=phosphor] :is(h1, .section-heading h2, .wordmark-cursor, .window-lights i) { animation: none; }
-  :root[data-theme=phosphor] .scene::after, :root[data-theme=phosphor] h1::after, :root[data-theme=phosphor] .gesture-grid button.target::after { animation: none; }
+  :root[data-theme=phosphor] :is(.hero h1, .section-heading h2, .wordmark-cursor, .window-lights i) { animation: none; }
+  :root[data-theme=phosphor] .scene::after, :root[data-theme=phosphor] #profile-title::after, :root[data-theme=phosphor] .gesture-grid button.target::after { animation: none; }
 }
