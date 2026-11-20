@@ -35,3 +35,25 @@ test('Desktop95 windows do not repeat the room title, score or lives, and phone 
         for(const label of labels)assert.ok(label[5]>=22,`${label[2]} is ${label[5]} logical px on a phone`);
     }
 });
+
+import {popups} from '../arcade/games/popup-panic.js';
+import {maze} from '../arcade/games/link-maze.js';
+import {juggle} from '../arcade/games/gif-juggler.js';
+
+test('Construction sparkles, starfield, tape and marquee never change rules, scores or RNG',()=>{
+    for(const factory of [maze,juggle])
+        assert.deepEqual(playRendered(factory,{reducedMotion:true,every:23}).state,playRendered(factory,{every:23}).state);
+    // Pop-up Panic already settles rows instantly under reduced motion; its rules and scores must still match.
+    const actions=['left_up','right_left','left_right','right_up','left_left','right_right'];
+    const full=playRendered(popups,{actions,every:19}).state,reduced=playRendered(popups,{actions,every:19,reducedMotion:true}).state;
+    for(const key of ['score','cleared','level','chain','serial','queue','bag'])assert.deepEqual(reduced[key],full[key],key);
+    assert.deepEqual(reduced.windows.map(w=>[w.id,w.stack,w.direction]),full.windows.map(w=>[w.id,w.stack,w.direction]));
+});
+
+test('Construction canvases do not repeat the room title',()=>{
+    for(const [title,factory] of [['LINK MAZE',maze],['GIF JUGGLER',juggle]]){
+        const g=factory({pace:1,random:seededRandom(3),message(){},sound(){},finish(){}});g.start();g.update(.5);
+        const p=recordingPainter({},740,true);g.render(p);
+        assert.ok(!p.c.fills.some(fill=>fill[0]==='label'&&fill[2].toUpperCase().includes(title)),`${title} repeated`);
+    }
+});

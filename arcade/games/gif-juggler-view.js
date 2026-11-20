@@ -1,6 +1,7 @@
 import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=arcade-28';
 import { drawJugglerSprite } from './gif-juggler-art.js?v=arcade-28';
 import { Painter } from '../core/painter.js?v=arcade-28';
+import { starfield, sparkleBurst, pageColor, hash } from './construction-fx.js';
 
 const NAVY = '#100d35', INK = '#fff9e8', GOLD = '#fff16b', CYAN = '#65ffff';
 const laneX = lane => lane ? 525 : 195;
@@ -13,12 +14,10 @@ function geometry(p) {
 }
 
 function backdrop(p, g) {
-    p.rect(15, 12, 690, p.h - 26, '#08091e');
+    p.rect(15, 12, 690, p.h - 26, pageColor(p, '#08091e'));
     p.outline(15, 12, 690, p.h - 26, '#6d60a9', 2);
     p.rect(19, 16, 682, 42, '#30235c');
     p.line([[20, 58], [700, 58]], '#8c79c3', 2);
-    p.text('GIF JUGGLER', 36, 37, 30, INK);
-    p.text('1999', 679, 37, 24, '#b7a2ef', 'right');
     for (let i = 0; i < 48; i++) {
         const x = 35 + (i * 137 % 650), y = 76 + (i * 71 % Math.max(1, g.line - 95));
         p.rect(x, y, i % 5 ? 2 : 3, 2, i % 3 ? '#272448' : '#49416b');
@@ -40,20 +39,41 @@ function backdrop(p, g) {
 function staticLayer(p, g) {
     if (typeof document === 'undefined') { backdrop(p, g); return; }
     let layer = layers.get(p);
-    if (!layer || layer.height !== p.h || layer.compact !== p.compact) {
+    if (!layer || layer.height !== p.h || layer.compact !== p.compact || layer.colors !== p.colors) {
         const scale = p.c.getTransform().a || 1, canvas = document.createElement('canvas');
         canvas.width = p.w * scale; canvas.height = p.h * scale;
         const c = canvas.getContext('2d'); c.setTransform(scale, 0, 0, scale, 0, 0);
         const cached = new Painter(c, p.colors); cached.h = p.h; cached.compact = p.compact;
         backdrop(cached, g);
-        layer = { canvas, height: p.h, compact: p.compact }; layers.set(p, layer);
+        layer = { canvas, height: p.h, compact: p.compact, colors: p.colors }; layers.set(p, layer);
     }
     p.c.drawImage(layer.canvas, 0, 0, p.w, p.h);
+}
+
+const MARQUEE = '~*~ Welcome to my GIF collection ~*~ Thanks for stopping by ~*~ Sign my guestbook ~*~ ';
+/** Homepage header: a <marquee> greeting and a visitor-style counter of catches (the room shows the title). */
+function header(s, p, reducedMotion) {
+    const compact = p.compact, size = compact ? 30 : 23, digits = String(Math.min(999999, s.catches)).padStart(6, '0');
+    const cell = compact ? 28 : 20, counterX = 701 - 10 - digits.length * cell;
+    const c = p.c, clip = typeof c?.save === 'function' && typeof c.clip === 'function';
+    if (clip) { c.save(); c.beginPath(); c.rect(22, 16, counterX - 34, 42); c.clip(); }
+    const span = MARQUEE.length * size * .5, offset = reducedMotion ? 0 : (s.time * 70) % span;
+    for (let k = 0; k < 2; k++) p.text(MARQUEE, 30 - offset + k * span, 37, size, '#d1c5ff');
+    if (clip) c.restore();
+    // LED odometer: the classic hit counter, here counting catches.
+    p.rect(counterX - 4, 21, digits.length * cell + 8, 32, '#000000');
+    [...digits].forEach((digit, i) => {
+        p.rect(counterX + i * cell, 24, cell - 3, 26, '#141414');
+        p.text(digit, counterX + i * cell + (cell - 3) / 2, 37, compact ? 28 : 21, '#7dff6b', 'center');
+    });
 }
 
 export function renderJuggler(s, p, reducedMotion = false) {
     const g = geometry(p), size = g.size;
     staticLayer(p, g);
+    header(s, p, reducedMotion);
+    // A few stars glint over the cached backdrop (never RNG; still frame for reduced motion).
+    starfield(p, 35, 76, 650, Math.max(1, g.line - 120), s.time, reducedMotion, 0, 4);
     // Four little slots teach when the next gift is earned without a paragraph.
     for (let i = 0; i < JUGGLER.giftEvery; i++) {
         p.rect(304 + i * 30, 73, 22, 9, i < s.giftProgress ? GOLD : '#42365f');
@@ -101,6 +121,9 @@ export function renderJuggler(s, p, reducedMotion = false) {
         const x = laneX(burst.lane), y = Math.max(g.top + 30, g.y(Math.min(burst.y, CONTACT_Y)) - 55) - (reducedMotion ? 0 : age * 23);
         const color = burst.kind === 'miss' ? '#ff9bb4' : burst.kind === 'gift' ? CYAN : GOLD;
         const label = burst.text;
+        // Successful catches throw GIF-era sparkles from the line; misses stay plain.
+        if (burst.kind !== 'miss') sparkleBurst(p, laneX(burst.lane), g.y(Math.min(burst.y, CONTACT_Y)), age, Math.round(burst.at * 100) + burst.lane,
+            burst.kind === 'gift' ? [CYAN, '#ffffff'] : [GOLD, '#ffffff', CYAN], reducedMotion, 80);
         p.c.save(); p.c.globalAlpha = Math.min(1, (1 - age) * 3);
         const width = Math.max(115, label.length * (p.compact ? 21 : 17));
         p.rect(x - width / 2, y - 24, width, burst.detail ? 78 : 48, NAVY, 3);

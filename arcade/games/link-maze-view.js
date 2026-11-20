@@ -1,6 +1,7 @@
 import { LINK_EFFECTS } from './link-maze-map.js?v=traps-20';
 import { drawLinkEffect } from './link-maze-art.js?v=traps-20';
 import { Painter } from '../core/painter.js?v=arcade-28';
+import { starfield, sparkle, sparkleBurst, blinkOn, pageColor } from './construction-fx.js';
 
 const ink = '#f2eaff', navy = '#110b32', cyan = '#63ffff', yellow = '#fff15a';
 const wrist = side => side === 0 ? 'L' : 'R';
@@ -92,6 +93,8 @@ function links(s, p, reducedMotion) {
         p.text(wrist(side), center, top + 33, 60, selected ? navy : cyan, 'center');
         const illustrated = content && drawLinkEffect(p, next.effect, left + 50, top + 79, 45, s.time, reducedMotion);
         p.text(content?.label || 'LINK ?', center + (illustrated ? 15 : 0), top + 82, p.compact ? 44 : 33, selected ? navy : content?.color || ink, 'center');
+        // Unpeeked links are underlined like the era's hyperlinks.
+        if (!content) { const half = (p.compact ? 44 : 33) * 1.55; p.line([[center - half, top + 82 + (p.compact ? 24 : 18)], [center + half, top + 82 + (p.compact ? 24 : 18)]], selected ? navy : cyan, p.compact ? 3 : 2); }
     }
     p.rect(306, playerY - 43 + pulse, 108, 86, '#241747');
     p.outline(306, playerY - 43 + pulse, 108, 86, cyan, 3);
@@ -107,14 +110,25 @@ function links(s, p, reducedMotion) {
 }
 
 export function renderMaze(s, p, reducedMotion = false) {
-    p.rect(14, 64, 692, p.h - 72, navy); p.outline(14, 64, 692, p.h - 72, '#634491', 2);
-    p.rect(16, 66, 688, 22, '#342258');
-    p.text(`LINK MAZE   /   ROUND ${s.map.round || s.completed + 1}`, 32, 77, p.compact ? 26 : 18, '#b7a5dc');
+    const page = pageColor(p, navy), compact = p.compact, strip = compact ? 28 : 22;
+    p.rect(14, 64, 692, p.h - 72, page); p.outline(14, 64, 692, p.h - 72, '#634491', 2);
+    // Night-sky page background (fixed stars, a few glints on simulation time).
+    starfield(p, 24, 70 + strip, 672, p.h - 90 - strip, s.time, reducedMotion, 46, s.stage === 'navigate' ? 3 : 5);
+    p.rect(16, 66, 688, strip, '#342258');
+    // The strip reads like a browser location bar; the room header already names the game.
+    p.text(`ROUND ${s.map.round || s.completed + 1}`, 32, 66 + strip / 2, compact ? 27 : 18, '#b7a5dc');
+    if (s.stage === 'navigate') {
+        // A spinning "loading" glint, the era's browser throbber, while the clock runs.
+        const phase = reducedMotion ? .5 : (s.time * 1.4) % 1;
+        sparkle(p, 684, 66 + strip / 2, strip * .42, cyan, phase);
+    }
     if (s.stage === 'preview') {
-        p.text(`MEMORISE  ${Math.max(0, Math.ceil(s.until - s.time))}`, 360, 34, p.compact ? 48 : 35, yellow, 'center');
+        p.text(`MEMORISE  ${Math.max(0, Math.ceil(s.until - s.time))}`, 360, 34, compact ? 48 : 35, yellow, 'center');
         overview(s, p, reducedMotion);
     } else if (s.stage === 'arrival') {
-        p.text('HOMEPAGE!', 360, p.h * .36, 60, yellow, 'center');
+        const age = s.time - s.outcome.at;
+        sparkleBurst(p, 360, p.h * .36, age, s.completed * 7, undefined, reducedMotion, 190, 1.1);
+        if (blinkOn(age, reducedMotion) || age > 1) p.text('HOMEPAGE!', 360, p.h * .36, 60, yellow, 'center');
         p.text('+8s', 360, p.h * .54, 70, cyan, 'center');
         p.text(`+${s.outcome.points}`, 360, p.h * .7, 42, ink, 'center');
     } else if (s.stage === 'over') {

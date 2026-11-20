@@ -1,6 +1,7 @@
 import { game } from '../core/game.js?v=motion-6';
 import { decodeGesture, DIRECTIONS, ARROWS, WRISTS } from '../core/commands.js';
 import { clamp } from '../core/random.js';
+import { starfield, sparkle, sparkleBurst, blinkOn, hazardTape } from './construction-fx.js';
 
 export const STACK_LIMIT = 9;
 export const CHAIN_SECONDS = 4.5;
@@ -114,16 +115,21 @@ export function popups(env) {
                 arrow(x + 143, y + tile / 2, window.direction);
                 c.restore();
             }
-            p.text('L', 48, 42, 31, '#d0b6ff'); p.text('R', 400, 42, 31, '#ffd1a6');
+            const reduced = env.reducedMotion, compact = p.compact;
+            // A quiet GeoCities starfield sits behind the stacks; it never overlaps the arrows' meaning.
+            starfield(p, 40, 84, 640, p.h - 110, s.time, reduced, 34, 4);
+            p.text('L', 48, 42, compact ? 40 : 31, '#d0b6ff'); p.text('R', 400, 42, compact ? 40 : 31, '#ffd1a6');
             // Preview the next two paired arrivals. Shape encodes direction; colour is secondary.
-            for (let i = 0; i < 4; i++) arrow((i % 2 ? 490 : 100) + Math.floor(i / 2) * 60, 43, s.queue[i], 30);
-            p.line([[43, 78], [329, 78]], '#9564da', 2, [5, 7]);
-            p.line([[390, 78], [676, 78]], '#9564da', 2, [5, 7]);
+            for (let i = 0; i < 4; i++) arrow((i % 2 ? 490 : 100) + Math.floor(i / 2) * (compact ? 82 : 60) + (compact ? 30 : 0), 43, s.queue[i], compact ? 52 : 30);
             const counts = [0, 0];
-            for (const window of s.windows) {
-                counts[window.stack]++;
-                windowBox(window.stack ? 390 : 43, floor - window.row * pitch, window);
+            for (const window of s.windows) counts[window.stack]++;
+            for (let stack = 0; stack < 2; stack++) {
+                const left = stack ? 390 : 43;
+                // The limit line turns into crawling construction tape when that stack is one window from full.
+                if (counts[stack] >= STACK_LIMIT - 1) hazardTape(p, left, 74, 286, 9, s.time, reduced);
+                else p.line([[left, 78], [left + 286, 78]], '#9564da', 2, [5, 7]);
             }
+            for (const window of s.windows) windowBox(window.stack ? 390 : 43, floor - window.row * pitch, window);
             for (let stack = 0; stack < 2; stack++) {
                 const x = stack ? 685 : 29, pressure = clamp(counts[stack] / STACK_LIMIT, 0, 1);
                 const bottom = p.h - 22, height = bottom - 83;
@@ -139,12 +145,8 @@ export function popups(env) {
                 } else {
                     c.save(); c.translate(x + 143, y + tile / 2); c.scale(1 + progress * .13, 1 - progress * .65);
                     windowBox(-143, -tile / 2, burst, 1 - progress); c.restore();
-                    for (let i = 0; i < 4; i++) {
-                        const angle = (burst.id * 2.4 + i * 1.57), travel = 45 * progress;
-                        c.save(); c.globalAlpha = 1 - progress;
-                        p.rect(x + 143 + Math.cos(angle) * travel, y + tile / 2 + Math.sin(angle) * travel, 5, 5, colours[burst.direction]);
-                        c.restore();
-                    }
+                    // GIF-era sparkles fly from the closed pop-up (positions hashed from its id).
+                    sparkleBurst(p, x + 143, y + tile / 2, age, burst.id, [colours[burst.direction], '#ffffff'], false, 70);
                 }
             }
             for (const wrist of WRISTS) {
@@ -158,7 +160,12 @@ export function popups(env) {
                 p.text(`+${clear.points}`, 0, 40, 35, '#fff', 'center'); c.restore();
                 if (clear.perfect && clear === s.lastClear) {
                     p.line([[75, p.h - 23], [645, p.h - 23]], '#fff15a', 5);
-                    p.text('ALL CLEAR', 360, p.h * .58, 47, '#fff15a', 'center');
+                    // A gentle <blink> and a few sparkles, like a guestbook "NEW!" badge.
+                    if (blinkOn(age, reduced)) p.text('ALL CLEAR', 360, p.h * .58, compact ? 56 : 47, '#fff15a', 'center');
+                    for (const [dx, dy, k] of [[-170, -30, 0], [165, -24, 1], [-120, 34, 2], [140, 30, 3]]) {
+                        const phase = reduced ? .5 : ((age + k * .17) / .6) % 1;
+                        sparkle(p, 360 + dx, p.h * .58 + dy, 14, k % 2 ? '#62ffff' : '#ffffff', phase);
+                    }
                 }
             }
             if (s.chain > 1 && s.time - s.lastClearAt < CHAIN_SECONDS) {
