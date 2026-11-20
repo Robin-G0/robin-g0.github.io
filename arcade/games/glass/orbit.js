@@ -117,15 +117,16 @@ export function orbit(env) {
         },
         render(s, p) {
             const compact = p.compact, reduced = env.reducedMotion, c = p.c;
-            const cx = 360, cy = compact ? Math.max(500, p.h * .5) : 236, outer = compact ? 320 : 164, k = compact ? 1.8 : 1;
+            const top = compact ? 104 : 60, outer = compact ? Math.max(180, Math.min(320, (p.h - top) / 2 - 16)) : 164;
+            const cx = 360, cy = compact ? top + (p.h - top) / 2 : 236, k = compact ? 1.6 : 1;
             const radius = ring => outer * (.5 + ring * (.5 / 3));
             const at = (ring, angle) => [cx + Math.cos(angle) * radius(ring), cy + Math.sin(angle) * radius(ring)];
             scene(p, 'space', s.time, reduced);
-            header(p, s.chain ? `chain ×${s.chain}` : STAGE_NAMES[s.stage], `${s.collected} beacons`);
+            header(p, s.chain > 1 ? `chain ×${s.chain}` : STAGE_NAMES[s.stage], `${s.collected} beacon${s.collected === 1 ? '' : 's'}`);
             // Planet with a soft atmosphere.
             reveal(p, cx, cy, outer * .48, '#8fc8ff', .3);
             const earth = art('earth'), er = outer * .36;
-            if (earth) c.drawImage(earth, cx - er, cy - er, er * 2, er * 2); else shape(p, 'circle', cx, cy, er, '#2b5a8f');
+            if (earth) { const scale = er * 2.04 / earth.naturalHeight, w = earth.naturalWidth * scale, h = earth.naturalHeight * scale; c.drawImage(earth, cx - w / 2, cy - h / 2, w, h); } else shape(p, 'circle', cx, cy, er, '#2b5a8f');
             // Probe position, gliding between rings during a transfer.
             let pr = radius(s.ring);
             if (s.transfer) { const u = Math.min(1, (s.time - s.transfer.at) / ORBIT.transfer), e = u * u * (3 - 2 * u); pr = radius(s.transfer.from) + (radius(s.transfer.to) - radius(s.transfer.from)) * e; }

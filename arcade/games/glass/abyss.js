@@ -115,7 +115,7 @@ export function abyss(env) {
         },
         render(s, p) {
             const compact = p.compact, reduced = env.reducedMotion, h = p.h;
-            const jellyY = compact ? 360 : 138, unit = (h - jellyY) / 4.4;
+            const jellyY = compact ? Math.max(190, h * .3) : 138, unit = (h - jellyY) / 4.4;
             const laneX = lane => compact ? 135 + lane * 150 : 210 + lane * 100, laneW = compact ? 140 : 92;
             scene(p, 'abyss', s.time, reduced);
             const c = p.c;
@@ -129,11 +129,15 @@ export function abyss(env) {
             for (const o of s.objects) {
                 const y = Y(o.depth); if (y < (compact ? 100 : 50) || y > h + 40) continue;
                 if (o.kind === 'reef') {
-                    const left = laneX(o.lanes[0]) - laneW / 2 - 6, right = laneX(o.lanes.at(-1)) + laneW / 2 + 6, rh = (compact ? 70 : 36);
-                    c.save(); c.fillStyle = '#0d1426'; c.strokeStyle = withAlpha(tone('danger'), o.done ? .3 : .9); c.lineWidth = 2;
-                    c.beginPath(); c.moveTo(left, y + rh / 2);
-                    const steps = 6; for (let i = 0; i <= steps; i++) { const x = left + (right - left) * i / steps; c.lineTo(x, y - rh / 2 + (i % 2 ? 0 : rh * .3)); }
-                    c.lineTo(right, y + rh / 2); c.closePath(); c.fill(); c.stroke(); c.restore();
+                    const left = laneX(o.lanes[0]) - laneW / 2 - 6, right = laneX(o.lanes.at(-1)) + laneW / 2 + 6, rh = (compact ? 80 : 40);
+                    // A coral reef: jagged top and bottom, warm translucent body, so it reads as solid rock.
+                    const steps = Math.max(5, o.lanes.length * 5), g = c.createLinearGradient ? c.createLinearGradient(0, y - rh / 2, 0, y + rh / 2) : null;
+                    if (g) { g.addColorStop(0, withAlpha(tone('danger'), .55)); g.addColorStop(1, withAlpha('#5a2c3a', .85)); }
+                    c.save(); c.globalAlpha = o.done ? .45 : 1; c.fillStyle = g || '#5a2c3a'; c.strokeStyle = tone('danger'); c.lineWidth = 2;
+                    c.beginPath(); c.moveTo(left, y);
+                    for (let i = 0; i <= steps; i++) { const x = left + (right - left) * i / steps; c.lineTo(x, y - rh / 2 + (i % 2 ? rh * .28 : 0)); }
+                    for (let i = steps; i >= 0; i--) { const x = left + (right - left) * i / steps; c.lineTo(x, y + rh / 2 - (i % 2 ? 0 : rh * .22)); }
+                    c.closePath(); c.fill(); c.stroke(); c.restore();
                 } else if (o.kind === 'mote' && !o.done) {
                     const x = laneX(o.lane), col = o.deep ? '#c9a4ff' : '#bff4ff', r = (compact ? 16 : 9) * (o.deep ? 1.25 : 1);
                     const twinkle = reduced ? 1 : .85 + .15 * Math.sin(s.time * 4 + o.id);

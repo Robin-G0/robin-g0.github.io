@@ -74,7 +74,12 @@ export function prisms(env) {
         const a = -Math.PI / 2 + spoke * Math.PI * 2 / SPOKES;
         return [layout.cx + Math.cos(a) * radius, layout.cy + Math.sin(a) * radius];
     };
-    const layout = p => p.compact ? { cx: 360, cy: Math.max(430, p.h * .47), R: 270, k: 1.75 } : { cx: 360, cy: 240, R: 138, k: 1 };
+    // Phones get a taller logical board (h ≈ 600-1500): the dial fills what is left under the header pill.
+    const layout = p => {
+        if (!p.compact) return { cx: 360, cy: 234, R: 130, k: 1 };
+        const k = 1.6, top = 104, R = Math.max(150, Math.min(270, (p.h - top) / 2 - 40 * k - 8));
+        return { cx: 360, cy: top + (p.h - top) / 2, R, k };
+    };
     return game(s, {
         feedback: () => ({ hideAll: true }),
         input(s, event) {
@@ -113,7 +118,7 @@ export function prisms(env) {
             const lit = s.crystals.filter(c => c.lit).length;
             header(p, s.solved ? `set ${s.sets} clear` : `set ${s.sets + 1} · ${lit} / ${s.crystals.length} lit`, `par ${s.par} · turns ${s.moves}`);
             // Acrylic dial behind the ring.
-            acrylic(p, cx - R - 46 * k, cy - R - 46 * k, (R + 46 * k) * 2, (R + 46 * k) * 2, R + 46 * k);
+            acrylic(p, cx - R - 40 * k, cy - R - 40 * k, (R + 40 * k) * 2, (R + 40 * k) * 2, R + 40 * k);
             const c = p.c;
             for (let spoke = 0; spoke < SPOKES; spoke++) {
                 const [x, y] = spokeScreen(spoke, L, R); shape(p, 'circle', x, y, 4 * k, withAlpha(tone('ink'), .35));

@@ -146,13 +146,10 @@ export function withAlpha(hex, alpha) {
 export function header(p, status, detail = '') {
     const compact = p.compact, size = compact ? 34 : 22, y = compact ? 22 : 14, height = compact ? 62 : 40;
     const c = p.c; c.save(); c.font = `400 ${size}px ${FAMILY}`;
-    const width = Math.min(compact ? 676 : 420, (c.measureText?.(status)?.width ?? status.length * size * .55) + (compact ? 48 : 36)); c.restore();
+    const width = Math.min(compact ? 430 : 420, (c.measureText?.(status)?.width ?? status.length * size * .55) + (compact ? 48 : 36)); c.restore();
     acrylic(p, 22, y, width, height, height / 2);
     text(p, status, 22 + width / 2, y + height / 2 + 1, size, tone('ink'), 'center', 400);
-    if (detail) {
-        if (compact) text(p, detail, 698, y + height + 30, 26, tone('muted'), 'right', 400);
-        else text(p, detail, 698, y + height / 2 + 1, 19, tone('muted'), 'right', 400);
-    }
+    if (detail) text(p, detail, 698, y + height / 2 + 1, compact ? 26 : 19, tone('muted'), 'right', 400);
 }
 
 export function shape(p, kind, x, y, r, color, filled = true, width = 3) {

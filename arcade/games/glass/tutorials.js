@@ -25,8 +25,8 @@ export const diagrams = {
     prisms: [
         // Card 1: two raises turn the prism one spoke each way; the three rays turn with it.
         frame(hand(55, 66, 'L') + text('turn left', 55, 120, 18, 400, INK) + hand(345, 66, 'R') + text('turn right', 345, 120, 18, 400, INK)
-            + `<g class="glass-spin" style="transform-origin:200px 80px">${ray(200, 80, 200, 20, ROSE)}${ray(200, 80, 242, 38, MINT)}${ray(200, 80, 260, 80, SKY)}${glyph('triangle', 200, 38, 6, ROSE)}${glyph('square', 230, 50, 6, MINT)}${glyph('circle', 244, 80, 6, SKY)}${prism(200, 82)}</g>`
-            + text('↺', 122, 90, 34, 300, INK) + text('↻', 278, 90, 34, 300, INK) + text('one spoke per raise', 200, 150, 16, 400, MUTED)),
+            + `<g class="glass-spin" style="transform-origin:200px 80px">${ray(200, 80, 200, 26, ROSE)}${ray(200, 80, 238, 42, MINT)}${ray(200, 80, 254, 80, SKY)}${glyph('triangle', 200, 44, 6, ROSE)}${glyph('square', 226, 54, 6, MINT)}${glyph('circle', 240, 80, 6, SKY)}${prism(200, 82)}</g>`
+            + text('↺', 112, 78, 34, 300, INK) + text('↻', 288, 78, 34, 300, INK) + text('one spoke per raise', 200, 150, 16, 400, MUTED)),
         // Card 2: a crystal lights when the ray of its own colour points at it; two at once score ×4.
         frame(ray(110, 92, 110, 30, ROSE) + ray(110, 92, 154, 48, MINT) + ray(110, 92, 172, 92, SKY) + prism(110, 94)
             + crystal(110, 24, ROSE, 'triangle', 'glass-lit') + crystal(178, 92, SKY, 'circle', 'glass-lit') + crystal(52, 48, MINT, 'square')
