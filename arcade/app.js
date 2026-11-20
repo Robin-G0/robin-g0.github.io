@@ -6,6 +6,7 @@ import { localBindings } from './mig/bindings.js?v=phosphor-33';
 import { GameRoom } from './room.js?v=desktop95-6';
 
 import {ChallengeStore, readChallenge} from './core/challenges.js?v=phosphor-33';
+import { GamesGallery } from './gallery.js';
 
 const challenges = new ChallengeStore(games);
 const root = document.documentElement;
@@ -85,17 +86,36 @@ document.querySelector('#arcade-clear-bindings').addEventListener('click', () =>
     document.querySelector('#arcade-import-status').textContent='Game defaults restored.';
 });
 
+let gallery = null;
+async function showGallery() {
+    if (root.dataset.view !== 'games') return;
+    if (!gallery) {
+        const response = await fetch('./assets/profile.json');
+        const { themes } = await response.json();
+        gallery ??= new GamesGallery(document.querySelector('#games'), { themes, appearance: root.dataset.mode || 'light',
+            loadImages: loadArtwork,
+            onPlay(description, opener) {
+                // The room takes its era's styling from the document theme, as challenge links do.
+                window.dispatchEvent(new CustomEvent('arcade:theme', { detail: description.theme }));
+                queueMicrotask(() => openGame(description, opener));
+            } });
+        gallery.render();
+    } else if (gallery.appearance !== root.dataset.mode) gallery.render(root.dataset.mode);
+}
+
 let identity = `${root.dataset.theme}/${root.dataset.mode}`;
 const observer = new MutationObserver(() => {
+    showGallery();
     const next = `${root.dataset.theme}/${root.dataset.mode}`;
     if (next === identity) return;
     identity = next; renderCollection();
 });
-observer.observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-mode'] });
+observer.observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-mode', 'data-view'] });
+showGallery();
 window.addEventListener('pagehide', () => { room?.dispose(); observer.disconnect(); });
 window.addEventListener('pageshow', event => {
     if (!event.persisted) return;
-    observer.observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-mode'] });
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-mode', 'data-view'] });
     renderCollection();
 });
 renderCollection();

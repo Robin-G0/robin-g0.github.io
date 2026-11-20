@@ -6,6 +6,7 @@ import {SCORE_KEY} from '../../arcade/core/scores.js';
 test.use({storageState:{cookies:[],origins:[]}});
 async function setup(page) {
     await page.clock.install();
+    await page.addInitScript(()=>localStorage.getItem('robin-g0-precision')||localStorage.setItem('robin-g0-precision',JSON.stringify({version:1,preset:'low'})));
     await page.route('https://raw.githubusercontent.com/**',r=>r.abort());
     await page.route('**/vendor/motion-input-grid/src/index.mjs',r=>r.abort());
 }

@@ -1,4 +1,8 @@
+import { Experience } from './experience.js';
+import { readPrecision, resolvePreset, isMobileDevice } from '../arcade/mig/precision.js';
+
 const $ = (selector) => document.querySelector(selector);
+const THEME_KEY = 'robin-g0-theme';
 const root = document.documentElement;
 const profileBase = 'https://raw.githubusercontent.com/Robin-G0/Robin-G0/main/assets/';
 const defaultTheme = 'construction';
@@ -22,6 +26,8 @@ function applyTheme(id, manual = false, updateURL = true) {
   const theme = catalog.find(item => item.id === id);
   if (!theme) return;
   active = theme; explicit = manual;
+  if (manual && updateURL) { try { localStorage.setItem(THEME_KEY, id); } catch { /* Optional. */ } }
+  else if (!manual && updateURL) { try { localStorage.removeItem(THEME_KEY); } catch { /* Optional. */ } }
   root.dataset.theme = id; root.dataset.mode = appearance;
   if (id==='glass') document.querySelectorAll('.scene-backdrop img[data-src]').forEach(image=> { image.src=image.dataset.src; delete image.dataset.src; });
   Object.entries(theme[appearance]).forEach(([name,value]) => root.style.setProperty(`--${name}`, value));
@@ -119,9 +125,56 @@ $('#toggle-mode').addEventListener('click',() => {
   try { localStorage.setItem('appearance',appearance); } catch { /* Keep working without persistence. */ }
   if (active) applyTheme(active.id,explicit,false);
 });
+function storedTheme() {
+  try { const id = localStorage.getItem(THEME_KEY); return catalog.some(t => t.id === id) ? id : null; } catch { return null; }
+}
 window.addEventListener('popstate',() => {
-  const id=new URL(location.href).searchParams.get('theme');
+  setView(new URL(location.href).searchParams.get('view') === 'games' ? 'games' : 'portfolio');
+  const id=new URL(location.href).searchParams.get('theme') ?? storedTheme();
   applyTheme(catalog.some(t=>t.id===id) ? id : defaultTheme, Boolean(id && catalog.some(t=>t.id===id)),false);
+});
+
+// Two views of one page: the portfolio, or the gallery of every game.
+function setView(view) {
+  root.dataset.view = view;
+  $('#games').hidden = view !== 'games';
+  document.querySelectorAll('#main > .scene, .identity-strip').forEach(node => { node.hidden = view === 'games'; });
+  document.querySelectorAll('[data-games-link]').forEach(link => link.toggleAttribute('aria-current', view === 'games'));
+  document.title = view === 'games' ? 'Games / Robin-G0' : 'Robin-G0 / Software Engineer';
+  showPrecisionLabel();
+}
+function navigate(view, hash = '') {
+  const url = new URL(location.href);
+  if (view === 'games') url.searchParams.set('view', 'games'); else url.searchParams.delete('view');
+  url.hash = hash;
+  history.pushState(null, '', url);
+  setView(view);
+  if (hash) document.querySelector(hash)?.scrollIntoView({ block: 'start' }); else scrollTo({ top: 0 });
+}
+document.addEventListener('click', event => {
+  const link = event.target.closest('[data-games-link],[data-portfolio-link]');
+  if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+  event.preventDefault();
+  navigate(link.hasAttribute('data-games-link') ? 'games' : 'portfolio', new URL(link.href).hash);
+});
+function showPrecisionLabel() {
+  const mobile = isMobileDevice();
+  const preset = resolvePreset(readPrecision(undefined, mobile), mobile);
+  $('#gallery-precision-label').textContent = preset ? preset.label : 'Choose';
+}
+window.addEventListener('precisionchange', showPrecisionLabel);
+
+// A game opened from the gallery dresses the page in its era; closing it restores the previous theme.
+let themeBeforeGame = null;
+window.addEventListener('arcade:theme', event => {
+  if (!catalog.some(t => t.id === event.detail)) return;
+  themeBeforeGame ??= { id: active?.id ?? defaultTheme, explicit };
+  applyTheme(event.detail, true, false);
+});
+$('#arcade-player').addEventListener('close', () => {
+  if (!themeBeforeGame || root.dataset.view !== 'games') { themeBeforeGame = null; return; }
+  const previous = themeBeforeGame; themeBeforeGame = null;
+  applyTheme(previous.id, previous.explicit, false);
 });
 
 const pattern=[0,3,4,5], cells=[...document.querySelectorAll('[data-cell]')];
@@ -180,8 +233,19 @@ try {
   catalog=snapshot.themes;
   daily=snapshot.theme;
   buildPicker(); renderStats(snapshot.stats);
-  const requested=new URL(location.href).searchParams.get('theme');
-  applyTheme(catalog.some(t=>t.id===requested) ? requested : defaultTheme,catalog.some(t=>t.id===requested));
+  const params=new URL(location.href).searchParams;
+  const requested=params.get('theme') ?? storedTheme();
+  applyTheme(catalog.some(t=>t.id===requested) ? requested : defaultTheme,catalog.some(t=>t.id===requested),params.has('theme'));
+  setView(params.get('view') === 'games' ? 'games' : 'portfolio');
+  const experience = new Experience($('#experience'), { themes: catalog,
+    previewFor: id => `./assets/previews/${id}-${appearance}.svg`,
+    onTheme: id => { applyTheme(id, true); navigate('portfolio'); },
+    onGames: () => navigate('games') });
+  // First visit: precision always; the gallery/theme question only when the visitor arrived without a destination.
+  if (!readPrecision(undefined, isMobileDevice())) {
+    const directed = params.has('theme') || params.get('view') === 'games' || /challenge/.test(location.hash);
+    experience.open(directed ? ['precision'] : ['precision', 'start', 'theme']);
+  }
   root.dataset.ready='true';
   refreshPublicProfile();
 } catch {

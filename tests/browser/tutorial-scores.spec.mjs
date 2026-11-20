@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 test.use({storageState:{cookies:[],origins:[]}});
 test.beforeEach(async({page})=>{
     await page.clock.install();
+    // These players already chose a precision; the welcome is covered by welcome.spec.mjs.
+    await page.addInitScript(()=>localStorage.getItem('robin-g0-precision')||localStorage.setItem('robin-g0-precision',JSON.stringify({version:1,preset:'low'})));
     await page.route('https://raw.githubusercontent.com/**',route=>route.abort());
     await page.route('**/vendor/motion-input-grid/src/index.mjs',route=>route.fulfill({
         path:fileURLToPath(new URL('./fixtures/camera-session.mjs',import.meta.url)),contentType:'text/javascript'

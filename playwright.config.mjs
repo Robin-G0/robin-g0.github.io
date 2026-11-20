@@ -16,7 +16,9 @@ export default defineConfig({
     testDir: './tests/browser', timeout: 30000, workers: 2,
     use: { baseURL: origin, viewport: { width: 1365, height: 1000 },
         storageState: { cookies: [], origins: [{ origin,
-            localStorage:[{name:SCORE_KEY,value:JSON.stringify(returningPlayer)}] }] },
+            localStorage:[{name:SCORE_KEY,value:JSON.stringify(returningPlayer)},
+                // Returning visitors already chose a precision; the welcome has its own spec.
+                {name:'robin-g0-precision',value:JSON.stringify({version:1,preset:'low'})}] }] },
         launchOptions: { executablePath }, trace: 'retain-on-failure' },
     webServer: { command: 'node scripts/serve.mjs', url: origin,
         reuseExistingServer: true, timeout: 15000 }
