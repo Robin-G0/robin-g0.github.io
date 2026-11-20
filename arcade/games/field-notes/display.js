@@ -21,7 +21,7 @@ export function write(p, text, x, y, size, color = 'ink', align = 'left', { seri
 export function header(p, status, detail = '') {
     const compact = p.compact, y = compact ? 46 : 30, rule = y + (compact ? 30 : 19);
     write(p, status, compact ? 70 : 58, y, compact ? 46 : 31, 'accent', 'left');
-    if (detail) write(p, detail, 694, y + 2, compact ? 30 : 19, 'muted', 'right', { serifFace: true, italic: true });
+    if (detail) write(p, detail, 694, y + 2, compact ? 30 : 20, 'muted', 'right', { serifFace: true, italic: true });
     p.line([[compact ? 60 : 50, rule], [704, rule]], 'border', 1);
 }
 

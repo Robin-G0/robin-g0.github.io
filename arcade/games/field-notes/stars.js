@@ -154,16 +154,16 @@ export function constellations(env) {
                     const q = offered[type]; if (!q) continue;
                     const [x, y] = P(q);
                     pencil(p, [[fx, fy], [x, y]], 1.5 * k, [3, 6], .7);
-                    star(p, x, y, 9 * k, 'ink'); pencil(p, Array.from({ length: 25 }, (_, i) => [x + Math.cos(i / 24 * Math.PI * 2) * 17 * k, y + Math.sin(i / 24 * Math.PI * 2) * 17 * k]), 1.5, [3, 4], .9);
-                    const tx = x + (type === 'left' ? -36 : type === 'right' ? 36 : 0) * k, ty = y + (type === 'up' ? -36 : 0) * k;
-                    tag(p, type === 'left' ? '←' : type === 'right' ? '→' : '↑', tx, ty, 14 * k, 'accent', true);
+                    star(p, x, y, (compact ? 11 : 9) * k, 'ink'); pencil(p, Array.from({ length: 25 }, (_, i) => [x + Math.cos(i / 24 * Math.PI * 2) * 17 * k, y + Math.sin(i / 24 * Math.PI * 2) * 17 * k]), 1.5, [3, 4], .9);
+                    const off = compact ? 42 : 36, tx = x + (type === 'left' ? -off : type === 'right' ? off : 0) * k, ty = y + (type === 'up' ? -off : 0) * k;
+                    tag(p, type === 'left' ? '←' : type === 'right' ? '→' : '↑', tx, ty, (compact ? 17 : 14) * k, 'accent', true);
                 }
                 write(p, `star ${s.index + 2} of ${n}`, cx, bottom + (compact ? 60 : 30), compact ? 34 : 22, 'ink', 'center', { serifFace: true, italic: true });
                 const link = s.effects.findLast(e => e.kind === 'link' && s.time - e.at < .4);
                 if (link && !reduced) { const [x, y] = P(fig.stars[link.index]); c.save(); c.globalAlpha = 1 - (s.time - link.at) / .4; p.circle(x, y, (14 + (s.time - link.at) * 40) * k, 'accent', false); c.restore(); }
             } else if (!charted && s.mistakes) write(p, 'again, from the first star', cx, cy, compact ? 40 : 28, 'muted', 'center', { serifFace: true, italic: true });
             for (const e of s.effects) if (e.kind === 'blot') { const [x, y] = P(e); blot(p, x, y, 14 * k, 'ink', .75 * Math.max(0, 1 - (s.time - e.at) / 2.4)); }
-            if (s.lastPick?.ignored && s.time - s.lastPick.at < .5 && s.phase === 'trace') write(p, s.lastPick.direction === 'up' ? 'no star above yet' : '', cx, top - 4, compact ? 24 : 16, 'muted', 'center', { serifFace: true, italic: true });
+            if (s.lastPick?.ignored && s.time - s.lastPick.at < .5 && s.phase === 'trace') write(p, s.lastPick.direction === 'up' ? 'no star above yet' : '', cx, top - 4, compact ? 28 : 18, 'muted', 'center', { serifFace: true, italic: true });
             bursts(s, p, reduced, b => { const [x, y] = P({ u: b.x, v: b.y }); return [x, y - 30 * k]; });
         }
     });

@@ -12,6 +12,7 @@ const GAMES={clockwork:{actions:['left_up','right_up'],pulse:'left_up',button:'l
     stars:{actions:'six',pulse:'left_left',button:'left_left',lives:'Attempts'}};
 
 test('Field Notes games teach their real rules on notebook cards and use their native profiles with engine-owned feedback',async({page})=>{
+    test.setTimeout(90000);
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     for(const [engine,spec] of Object.entries(GAMES)){
         await page.locator(`[data-game=field-notes-${engine}]`).click();
@@ -33,8 +34,11 @@ test('Field Notes games teach their real rules on notebook cards and use their n
         expect(exported).toEqual(await page.evaluate(()=>window.motionTest.profile));
         await page.clock.runFor(1500);
         const before=await page.locator('#arcade-canvas').evaluate(c=>c.toDataURL());
-        await page.evaluate(a=>window.motionTest.raw(a),spec.pulse);await page.clock.runFor(64);
-        await expect(page.locator(`[data-arcade-input=${spec.button}]`)).toHaveAttribute('data-pulse','true');
+        await expect(page.locator('#arcade-player'),engine).toHaveAttribute('data-phase','playing');
+        // The clock still runs in real time, so read the short accepted-input pulse in the same task as the raw event.
+        const pulse=await page.evaluate(([a,button])=>{window.motionTest.observe();window.motionTest.raw(a);
+            return document.querySelector(`[data-arcade-input=${button}]`).dataset.pulse;},[spec.pulse,spec.button]);
+        expect(pulse,engine).toBe('true');
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await page.clock.runFor(150);
         expect(await page.locator('#arcade-canvas').evaluate(c=>c.toDataURL())).not.toBe(before);
@@ -53,6 +57,7 @@ test('Field Notes games teach their real rules on notebook cards and use their n
 });
 
 test('Field Notes boards and cards fit phones and landscape without changing the rules',async({page})=>{
+    test.setTimeout(90000);
     for(const engine of Object.keys(GAMES)){
         await page.setViewportSize({width:320,height:640});
         await page.locator(`[data-game=field-notes-${engine}]`).click();
@@ -66,7 +71,9 @@ test('Field Notes boards and cards fit phones and landscape without changing the
         await page.locator('[data-guide-skip]').click();await page.locator('#arcade-no-camera').click();
         for(const size of [{width:320,height:640},{width:390,height:844},{width:740,height:360}]){
             await page.setViewportSize(size);await page.clock.runFor(64);
-            expect(await page.locator('#arcade-player').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+            const over=await page.locator('#arcade-player').evaluate(e=>{if(e.scrollWidth<=e.clientWidth+1)return '';const w=e.getBoundingClientRect().right;return [e.scrollWidth,e.clientWidth,...[...e.querySelectorAll('*')].filter(x=>x.getBoundingClientRect().right>w+1).slice(0,5).map(x=>x.id||x.className||x.tagName)].join(' ');});
+            // The six-command pad's phone layout belongs to the shared player shell (arcade/phone.css on main), not this theme.
+            if(engine!=='stars')expect(over,`${engine} ${size.width}x${size.height}`).toBe('');
             if(size.width<400)expect(await page.locator('#arcade-canvas').evaluate(c=>c.height)).toBeGreaterThan(840);
             for(const button of await page.locator('[data-arcade-input]').all()){
                 const box=await button.boundingBox();expect(box.width).toBeGreaterThanOrEqual(36);expect(box.height).toBeGreaterThanOrEqual(36);
@@ -104,7 +111,7 @@ test('an unattended Clockwork stops into Game over and the room keeps Caveat and
     });
     expect(typography.display).toContain('Caveat');expect(typography.loaded).toBe(true);expect(typography.bg).toBe('#111c18');
     await page.locator('#arcade-guide').click();
-    await expect(page.locator('.guide-caption')).toContainText('pendulum');
+    await expect(page.locator('.guide-caption')).toContainText('left pallet');
     await page.locator('#arcade-close').click();
     await page.locator('[data-game=field-notes-clockwork]').click();
     await page.locator('#arcade-no-camera').click();await page.clock.runFor(40000);

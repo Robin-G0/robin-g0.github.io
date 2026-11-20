@@ -153,8 +153,8 @@ export function clockwork(env) {
             const chime = s.effects.find(e => e.kind === 'chime' && s.time - e.at < 1.2);
             if (chime) for (let i = 0; i < 3; i++) { const age = s.time - chime.at, r = R + (10 + i * 10 + (reduced ? 0 : age * 25)) * k; c.save(); c.globalAlpha = Math.max(0, 1 - age / 1.2); p.c.beginPath(); p.c.arc(px, py, r, -2.4, -.7); p.c.strokeStyle = p.color('gold'); p.c.lineWidth = 2; p.c.stroke(); c.restore(); }
             // Tally of the run toward the next chime: pencil strokes in fives.
-            const tallyX = compact ? 110 : 72, tallyY = compact ? p.h - 70 : 392, unit = compact ? 16 : 10;
-            write(p, 'to the chime', tallyX, tallyY - (compact ? 40 : 24), compact ? 24 : 16, 'muted', 'left', { serifFace: true, italic: true });
+            const tallyX = compact ? 110 : 72, tallyY = compact ? p.h - 70 : 392, unit = compact ? 18 : 10;
+            write(p, 'to the chime', tallyX, tallyY - (compact ? 44 : 26), compact ? 30 : 18, 'muted', 'left', { serifFace: true, italic: true });
             for (let i = 0; i < CLOCK.hour; i++) {
                 const group = Math.floor(i / 5), j = i % 5, x = tallyX + group * unit * 6 + j * unit, done = i < s.streak % CLOCK.hour;
                 if (j === 4) pencil(p, [[tallyX + group * unit * 6 - unit * .4, tallyY + unit * .9], [x + unit * .3, tallyY - unit * .9]], 2, [], done ? .95 : .25, done ? 'ink' : 'muted');

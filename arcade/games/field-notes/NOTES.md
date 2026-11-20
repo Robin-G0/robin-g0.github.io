@@ -52,6 +52,14 @@ a finished figure adds 10 per link, doubled without a mistake. A wrong star blot
 an attempt and the figure is shown again. Figures keep room for every decoy; decoys only avoid the
 stars visible at that step. Generation never fell back to the fixed zigzag in 1,000 seeds per size.
 
+## Phone layout
+
+All three draw a compact layout when `painter.compact` (stage under 480 CSS px): logical text >= 28
+(about 14 CSS px on a 370 px stage), tags, bob, summits and candidate rings >= 46 logical, nothing
+critical in the outer 16 logical px. Contour keeps its 12 x 8 sheet in portrait (rules never depend
+on layout) and grows cells to 56. `arcade/themes/field-notes.css` only skins (colours, fonts,
+borders); the six-command pad's phone layout is left to the shared player shell.
+
 ## Tests
 
 `tests/field-notes.test.mjs`: band/jewel/grace/one-strike rules, chimes, gold and grit stages,

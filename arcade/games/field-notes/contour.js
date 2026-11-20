@@ -107,8 +107,8 @@ export function contour(env) {
             const compact = p.compact, reduced = env.reducedMotion, k = compact ? 1.5 : 1;
             page(p);
             header(p, `${s.surveys} surveyed`, s.surveys < CONTOUR.marshAfter ? 'ring the summits ▲' : s.surveys < CONTOUR.trigAfter ? 'keep the marsh out' : 'trig pillar ◆ counts twice');
-            const cell = compact ? Math.min(53, (p.h - 230) / CONTOUR.rows) : 40, w = cell * CONTOUR.cols, h = cell * CONTOUR.rows;
-            const left = 360 - w / 2 + (compact ? 14 : 0), top = compact ? 110 : 68;
+            const cell = compact ? Math.min(56, (p.h - 230) / CONTOUR.rows) : 40, w = cell * CONTOUR.cols, h = cell * CONTOUR.rows;
+            const left = 360 - w / 2, top = compact ? 110 : 68;
             const X = x => left + x * cell, Y = y => top + y * cell, V = v => [X(v.x), Y(v.y)];
             // The sheet: a soft wash, faint contour lines (fixed, decorative) and the dot grid.
             p.rect(left, top, w, h, 'soft'); p.outline(left, top, w, h, 'ink', 1.5);
@@ -127,7 +127,7 @@ export function contour(env) {
                 if (!e.empty && !e.spoiled) hatch(p, pts, reduced ? 1 : age / .5, 'accent', 8 * k, .4);
                 ink(p, pts, e.spoiled ? 'gold' : e.empty ? 'muted' : 'accent', (e.empty ? 2 : 3.5) * k, reduced ? 1 : Math.min(1, age / .35));
                 if (e.spoiled) blot(p, ...V({ x: e.loop[0].x, y: e.loop[0].y }), 12 * k, 'ink', .6);
-                for (const t of e.surveyed || []) write(p, `${t.height} m`, X(t.x + .5), Y(t.y + .5) + cell * .55, 18 * k, 'accent', 'center', { serifFace: true, italic: true });
+                for (const t of e.surveyed || []) write(p, `${t.height} m`, X(t.x + .5), Y(t.y + .5) + cell * .62, 19 * k, 'accent', 'center', { serifFace: true, italic: true });
                 c.restore();
             }
             // Marshes: reed tufts over a blue-green wash, with a cross for colour-blind reading.
@@ -139,7 +139,7 @@ export function contour(env) {
             }
             // Summits: an inked triangle with its height; a trig pillar is a brass diamond worth two.
             for (const t of s.summits) {
-                const x = X(t.x + .5), y = Y(t.y + .5), r = cell * .32;
+                const x = X(t.x + .5), y = Y(t.y + .5), r = cell * (compact ? .42 : .34);
                 if (t.kind === 'trig') { c.save(); c.beginPath(); c.moveTo(x, y - r * 1.2); c.lineTo(x + r, y); c.lineTo(x, y + r * 1.2); c.lineTo(x - r, y); c.closePath(); c.fillStyle = p.color('gold'); c.fill(); c.strokeStyle = p.color('ink'); c.lineWidth = 2; c.stroke(); c.restore(); }
                 else { c.save(); c.beginPath(); c.moveTo(x, y - r); c.lineTo(x + r, y + r * .75); c.lineTo(x - r, y + r * .75); c.closePath(); c.fillStyle = p.color('ink'); c.fill(); c.restore(); }
             }
@@ -169,8 +169,8 @@ export function contour(env) {
             p.circle(rx, ry, rr, 'border', false);
             const settle = reduced ? 0 : Math.sin(s.time * 3) * Math.exp(-((s.time - (s.lastTurn?.at ?? -9)) * 2)) * .5;
             c.save(); c.translate(rx, ry); c.rotate(settle); c.beginPath(); c.moveTo(0, -rr * .9); c.lineTo(rr * .2, 0); c.lineTo(0, rr * .9); c.lineTo(-rr * .2, 0); c.closePath(); c.fillStyle = p.color('gold'); c.fill(); c.restore();
-            write(p, 'N', rx, ry - rr - 10 * k, 16 * k, 'ink', 'center', { serifFace: true, weight: 700 });
-            write(p, `line ${s.trail.length - 1} of ${CONTOUR.trail}`, left, top + h + (compact ? 34 : 18), compact ? 28 : 16, 'muted', 'left', { serifFace: true, italic: true });
+            write(p, 'N', rx, ry - rr - 12 * k, 19 * k, 'ink', 'center', { serifFace: true, weight: 700 });
+            write(p, `line ${s.trail.length - 1} of ${CONTOUR.trail}`, left, top + h + (compact ? 36 : 18), compact ? 30 : 18, 'muted', 'left', { serifFace: true, italic: true });
             bursts(s, p, reduced, b => [X(b.x), Y(b.y) - cell * .8]);
         }
     });
