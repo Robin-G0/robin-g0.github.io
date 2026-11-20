@@ -1,14 +1,14 @@
-import * as phosphor from './games/phosphor.js?v=phosphor-33';
-import * as desktop from './games/desktop95.js?v=desktop95-6';
-import * as web from './games/construction.js?v=arcade-28';
-import * as matrix from './games/matrix.js?v=tutorial-3';
-import * as chrome from './games/y2k.js?v=tutorial-3';
-import * as aqua from './games/aqua.js?v=tutorial-3';
-import * as aero from './games/aero.js?v=pressure-19';
-import * as metro from './games/metro.js?v=metro-1';
-import * as paper from './games/material.js?v=tutorial-3';
-import * as glass from './games/glass.js?v=tutorial-3';
-import * as notes from './games/field-notes.js?v=tutorial-3';
+import * as phosphor from './games/phosphor.js?v=eras-1';
+import * as desktop from './games/desktop95.js?v=eras-1';
+import * as web from './games/construction.js?v=eras-1';
+import * as matrix from './games/matrix.js?v=eras-1';
+import * as chrome from './games/y2k.js?v=eras-1';
+import * as aqua from './games/aqua.js?v=eras-1';
+import * as aero from './games/aero.js?v=eras-1';
+import * as metro from './games/metro.js?v=eras-1';
+import * as paper from './games/material.js?v=eras-1';
+import * as glass from './games/glass.js?v=eras-1';
+import * as notes from './games/field-notes.js?v=eras-1';
 
 // This is the only executable registry. Imports cannot add module paths to it.
 export const engines = Object.freeze({

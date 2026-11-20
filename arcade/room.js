@@ -1,21 +1,21 @@
-import { engines } from './registry.js?v=desktop95-6';
-import { GameRunner } from './core/runner.js?v=desktop95-6';
-import { bindAlternativeControls } from './core/input.js?v=phosphor-33';
+import { engines } from './registry.js?v=eras-1';
+import { GameRunner } from './core/runner.js?v=eras-1';
+import { bindAlternativeControls } from './core/input.js?v=eras-1';
 import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=arcade-28';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=phosphor-33';
-import { ArcadeAudio } from './core/audio.js?v=phosphor-33';
-import { MotionNavigation } from './core/motion-navigation.js?v=ready-21';
-import { lessonFor } from './lessons.js?v=desktop95-6';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-1';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=eras-1';
+import { ArcadeAudio } from './core/audio.js?v=eras-1';
+import { MotionNavigation } from './core/motion-navigation.js?v=eras-1';
+import { lessonFor } from './lessons.js?v=eras-1';
 import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js?v=bindings-29';
+import { TriggerView } from './mig/trigger-view.js?v=eras-1';
 import { FrameBudget } from './core/frame-budget.js';
-import { gameConfig } from './core/game-config.js?v=desktop95-6';
-import { ArcadeResults } from './core/results.js?v=phosphor-33';
-import { localScores } from './core/scores.js?v=phosphor-33';
-import { GameGuide, greetingHand } from './core/guide.js?v=desktop95-6';
+import { gameConfig } from './core/game-config.js?v=eras-1';
+import { ArcadeResults } from './core/results.js?v=eras-1';
+import { localScores } from './core/scores.js?v=eras-1';
+import { GameGuide, greetingHand } from './core/guide.js?v=eras-1';
 import { seededRandom } from './core/random.js';
-import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=phosphor-33';
+import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=eras-1';
 import { PRESETS, readPrecision, resolvePreset, isMobileDevice, meetsLevel, LEVEL_LABELS } from './mig/precision.js';
 
 export class GameRoom {
@@ -45,7 +45,7 @@ export class GameRoom {
         this.defaultProfile = config.profile;
         this.bindingPlan = compileBindings(description,this.defaultProfile,localBindings.profile,localBindings.assignments(description));
         const profile = this.bindingPlan.profile;
-        this.$('a[download]').href = `./arcade/profiles/${config.profileFile}.json?v=targets-25`;
+        this.$('a[download]').href = `./arcade/profiles/${config.profileFile}.json?v=eras-1`;
         this.defaultProfileURL = this.$('a[download]').href;
         this.wristPulseUntil = {};
         this.markerMotion = Object.fromEntries(WRISTS.map(wrist => [wrist, new MarkerMotion()]));

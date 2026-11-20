@@ -1,5 +1,5 @@
-import {arcadeProfile, popupProfile, constructionLiftProfile, wristRaiseProfile} from '../mig/profile.js?v=phosphor-31';
-import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=survival-17';
+import {arcadeProfile, popupProfile, constructionLiftProfile, wristRaiseProfile} from '../mig/profile.js?v=eras-1';
+import {WRIST_DIRECTION_COOLDOWN_MS} from '../games/popup-panic.js?v=eras-1';
 import {PRESSURE_RULES} from './pressure.js';
 
 // What the third HUD cell counts. Round puzzles spend attempts on timeouts, survival games

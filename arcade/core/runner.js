@@ -1,4 +1,4 @@
-import { InputRouter } from './input.js?v=gestures-7';
+import { InputRouter } from './input.js?v=eras-1';
 import { seededRandom } from './random.js';
 import { PRESSURE_RULES, RoundPressure, pressureMultiplier } from './pressure.js';
 
