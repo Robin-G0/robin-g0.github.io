@@ -126,8 +126,8 @@
 @keyframes phos-led { 0%, 64% { opacity: .3; } 65%, 72% { opacity: 1; } 73%, 80% { opacity: .3; } 81%, 86% { opacity: 1; } }
 /* Single-line section titles are typed when they scroll onto the tube. */
 @supports (animation-timeline: view()) {
-  :root[data-theme=phosphor] .section-heading h2 { animation: phos-type linear both; animation-timing-function: steps(16, jump-none);
-    animation-timeline: view(); animation-range: entry 20% cover 32%; }
+  :root[data-theme=phosphor] .section-heading h2 { animation: phos-type linear forwards; animation-timing-function: steps(16, jump-none);
+    animation-timeline: view(); animation-range: entry 0% cover 32%; }
 }
 
 /* ---------- Controls: reverse video, with phosphor persistence on release ---------- */
