@@ -232,6 +232,7 @@
 [data-theme=construction] .guide-title, [data-theme=construction] #arcade-result h3 { font-family: Georgia, 'Times New Roman', serif; font-weight: bold; color: #62ffff; text-shadow: 3px 3px #662e8a; }
 [data-theme=construction] .guide-figure { border: 2px ridge #8d68ff; background: #0b0a2a; }
 [data-theme=construction] .guide-progress [aria-current] { background: #fff15a; color: #110b32; border-color: #fff15a; }
+[data-theme=construction] #arcade-result h3 { max-width: 100%; min-width: 0; }
 [data-theme=construction] #arcade-result h3::after { content: '\2605  Thanks for visiting!  \2605  Come back soon  \2605  Sign my guestbook  \2605'; display: block; overflow: hidden; white-space: nowrap; margin-top: 6px;
     font: bold 14px 'Trebuchet MS', Arial, sans-serif; color: #fff15a; text-shadow: none; border-block: 2px solid #fff15a; padding-block: 2px;
     background: repeating-linear-gradient(135deg, #17102c 0 10px, #221a44 10px 20px); animation: construction-marquee 11s linear infinite; }
