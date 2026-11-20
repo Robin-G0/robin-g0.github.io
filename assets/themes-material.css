@@ -1,1 +1,195 @@
-/* material portfolio materials and era animations, loaded after themes.css. Scope every rule to :root[data-theme=material]. */
+/* Material Design (2014-2020): paper surfaces at real elevations, a flexible app bar with overlapping content,
+   ink ripples, an extended floating action button and the standard easing curves.
+   Loaded after themes.css; every rule is scoped to the Material theme. Dark follows the 2019 Material dark theme
+   (#121212 base, lighter surfaces as they rise, desaturated primary).
+   Era motion: ripple on press, cards rising on hover, staggered card entrance, FAB grow-in, app bar lifting on scroll. */
+
+:root[data-theme=material] {
+  --font: Roboto, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  --display: Roboto, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  --radius: 4px;
+  --md-primary: #5e35b1; --md-primary-dark: #4527a0; --md-on-primary: #ffffff;
+  --md-secondary: #d81b60; --md-on-secondary: #ffffff;
+  --md-page: #eeecf3; --md-surface: #ffffff; --md-band: var(--md-primary);
+  --md-overlay: transparent;
+  --md-e1: 0 1px 3px #0000001f, 0 1px 2px #0000003d;
+  --md-e2: 0 3px 6px #00000029, 0 3px 6px #0000003b;
+  --md-e4: 0 6px 12px #00000026, 0 4px 6px #00000038;
+  --md-e8: 0 10px 20px #00000030, 0 6px 6px #0000003b;
+  --md-e12: 0 15px 24px #00000035, 0 10px 10px #00000030;
+  --md-standard: cubic-bezier(.4, 0, .2, 1);
+  --md-decelerate: cubic-bezier(0, 0, .2, 1);
+  background: var(--md-page);
+}
+:root[data-theme=material][data-mode=dark] {
+  --md-primary: #b39ddb; --md-primary-dark: #9575cd; --md-on-primary: #1b1230;
+  --md-secondary: #f48fb1; --md-on-secondary: #2b0a17;
+  --md-page: #121212; --md-surface: #1e1e1e; --md-band: #2a2533;
+  --md-e1: 0 1px 3px #00000080, 0 1px 2px #000000a0;
+  --md-e2: 0 3px 6px #00000080, 0 3px 6px #000000a0;
+  --md-e4: 0 6px 12px #00000090, 0 4px 6px #000000a0;
+  --md-e8: 0 10px 20px #000000a0, 0 6px 6px #000000a0;
+  --md-e12: 0 15px 24px #000000a8, 0 10px 10px #000000a0;
+}
+:root[data-theme=material] body { font-family: var(--font); background: linear-gradient(var(--md-band) 0 330px, var(--md-page) 330px);
+  --bg: var(--md-surface); --ink: #212121; --muted: #616161; --border: #e0e0e0; --accent: var(--md-primary); --soft: #ede7f6; }
+:root[data-theme=material][data-mode=dark] body { --ink: #ffffffde; --muted: #ffffff99; --border: #ffffff1f; --soft: #2d2838; }
+
+/* ---------- App bar: flat on the band, lifting when the page scrolls under it ---------- */
+:root[data-theme=material] .site-header { border: 0; border-radius: 0; background: var(--md-band); color: #fff; box-shadow: none; }
+:root[data-theme=material][data-mode=dark] .site-header { color: #ffffffde; }
+:root[data-theme=material] .wordmark { font-family: var(--font); font-weight: 500; letter-spacing: .01em; }
+:root[data-theme=material] .wordmark img { border-radius: 50%; background: #fff; padding: 2px; }
+:root[data-theme=material] :is(.site-header nav, .site-nav) a { position: relative; text-decoration: none; text-transform: uppercase; font-weight: 500; letter-spacing: .08em; color: inherit; }
+:root[data-theme=material] .site-header nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: currentColor;
+  transform: scaleX(0); transition: transform .25s var(--md-standard); }
+:root[data-theme=material] .site-header nav a:hover { text-decoration: none; }
+:root[data-theme=material] .site-header nav a:hover::after { transform: scaleX(1); }
+@media (min-width: 641px) {
+  :root[data-theme=material] .site-header { position: sticky; top: 0; z-index: 20; width: 100%; max-width: none; margin: 0; min-height: 64px;
+    padding: 0 max(24px, calc((100% - 1180px) / 2)); }
+  :root[data-theme=material] .wordmark { font-size: 20px; }
+  :root[data-theme=material] .site-header nav { font-size: 13px; gap: 30px; }
+  @supports (animation-timeline: scroll()) {
+    :root[data-theme=material] .site-header { animation: material-appbar-lift linear both; animation-timeline: scroll(root); animation-range: 0 140px; }
+  }
+}
+@keyframes material-appbar-lift { to { box-shadow: var(--md-e4); } }
+@media (max-width: 640px) {
+  :root[data-theme=material] .site-header nav { border-color: #ffffff40; }
+  /* The shared phone tab bar reads as a Material bottom navigation on a raised surface. */
+  :root[data-theme=material] .site-nav { background: var(--md-surface); color: var(--muted); box-shadow: 0 -2px 6px #00000026; border-top: 0; }
+  :root[data-theme=material] .site-nav a { text-transform: none; letter-spacing: .02em; }
+  :root[data-theme=material] .site-nav a:hover, :root[data-theme=material] .site-nav a[aria-current] { color: var(--md-primary); }
+}
+:root[data-theme=material] .identity-strip { color: #fff; }
+:root[data-theme=material] .identity-strip :is(.eyebrow, #theme-era, time, button) { color: #ffffffcc; }
+:root[data-theme=material][data-mode=dark] .identity-strip { color: #ffffffde; }
+
+/* ---------- Floating action button: the theme switch, extended, bottom right ---------- */
+:root[data-theme=material] .theme-trigger { position: relative; overflow: hidden; border: 0; border-radius: 28px; background: var(--md-secondary); color: var(--md-on-secondary);
+  font: 500 14px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; box-shadow: var(--md-e4); transition: box-shadow .28s var(--md-standard), background .2s; }
+:root[data-theme=material] .theme-trigger:hover { background: var(--md-secondary); border: 0; box-shadow: var(--md-e8); }
+:root[data-theme=material] .theme-trigger:active { box-shadow: var(--md-e12); }
+@media (min-width: 641px) {
+  :root[data-theme=material] .site-header .theme-trigger { position: fixed; right: 28px; bottom: 28px; z-index: 30; min-height: 56px; padding: 0 22px 0 18px; gap: 12px;
+    animation: material-fab-in .45s var(--md-decelerate) .3s both; }
+  :root[data-theme=material] .site-header .theme-trigger > span:first-child { font-size: 20px; }
+  :root[data-theme=material] .site-footer { padding-bottom: 110px; }
+}
+@keyframes material-fab-in { from { transform: scale(0) rotate(-90deg); } to { transform: none; } }
+
+/* ---------- Ink ripple: spreads from the centre and fades when released ---------- */
+:root[data-theme=material] :is(.button, .theme-trigger, .project-list a, .gesture-grid button, .demo-heading button, .text-link) { position: relative; overflow: hidden; }
+:root[data-theme=material] :is(.button, .theme-trigger, .project-list a, .gesture-grid button, .demo-heading button, .text-link)::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(circle, currentColor 10%, transparent 10.01%) center / 1200% 1200% no-repeat; opacity: 0;
+  transition: background-size .6s var(--md-standard), opacity .9s var(--md-standard); }
+:root[data-theme=material] :is(.button, .theme-trigger, .project-list a, .gesture-grid button, .demo-heading button, .text-link):active::after { background-size: 0 0; opacity: .24; transition: 0s; }
+
+/* ---------- Type ---------- */
+:root[data-theme=material] h1 { font-weight: 400; letter-spacing: -.035em; }
+:root[data-theme=material] h2 { font-weight: 400; letter-spacing: -.02em; }
+:root[data-theme=material] .eyebrow { font: 500 11px/1.5 var(--font); letter-spacing: .15em; color: var(--md-primary); }
+:root[data-theme=material] .hero-subtitle { font-weight: 300; }
+
+/* ---------- Buttons: contained and text buttons ---------- */
+:root[data-theme=material] .button { border: 0; border-radius: 4px; min-height: 36px; padding: 10px 18px; font: 500 13px/1 var(--font); letter-spacing: .09em; text-transform: uppercase;
+  background: transparent; color: var(--md-primary); transition: box-shadow .28s var(--md-standard), background .2s; }
+:root[data-theme=material] .button:hover { transform: none; background: color-mix(in srgb, var(--md-primary) 8%, transparent); }
+:root[data-theme=material] .button.primary { background: var(--md-primary); color: var(--md-on-primary); box-shadow: var(--md-e2); }
+:root[data-theme=material] .button.primary:hover { background: var(--md-primary); box-shadow: var(--md-e4); }
+:root[data-theme=material] .button.primary:active { box-shadow: var(--md-e8); }
+:root[data-theme=material] .text-link { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; margin-inline: -10px 0; border-radius: 4px; color: var(--md-primary);
+  text-decoration: none; font: 500 13px/1 var(--font); letter-spacing: .09em; text-transform: uppercase; transition: background .2s; }
+:root[data-theme=material] .text-link:hover { background: color-mix(in srgb, var(--md-primary) 8%, transparent); }
+
+/* ---------- Surfaces ---------- */
+:root[data-theme=material] .scene { border: 0; border-radius: 4px; background: var(--md-surface); box-shadow: var(--md-e1); }
+:root[data-theme=material][data-mode=dark] .scene { background: #1e1e1e; }
+/* The hero sheet sits higher than the rest and carries two folded paper shapes, cut from coloured stock. */
+:root[data-theme=material] .hero { box-shadow: var(--md-e2); overflow: hidden; }
+:root[data-theme=material] .hero::before { right: -12%; top: -60%; width: 46%; height: 160%; opacity: 1; z-index: -1;
+  background: color-mix(in srgb, var(--md-primary) 12%, var(--md-surface)); transform: rotate(28deg); box-shadow: -4px 0 10px #0000001a; }
+:root[data-theme=material] .hero::after { content: ''; position: absolute; right: -24%; top: -40%; width: 40%; height: 160%; z-index: -1;
+  background: color-mix(in srgb, var(--md-secondary) 12%, var(--md-surface)); transform: rotate(28deg); box-shadow: -4px 0 10px #0000001f; }
+:root[data-theme=material] .journey { background: var(--md-surface); border-radius: 4px; box-shadow: var(--md-e2); transition: box-shadow .28s var(--md-standard); }
+:root[data-theme=material][data-mode=dark] .journey { background: #2c2c2c; }
+:root[data-theme=material] .journey:hover { box-shadow: var(--md-e8); }
+:root[data-theme=material] .wire-world { stroke: var(--md-primary); opacity: .6; }
+:root[data-theme=material] .hero-status { color: var(--muted); border-color: var(--border); }
+:root[data-theme=material] .status-blocks i { border-radius: 2px; }
+:root[data-theme=material] .interests strong { text-decoration-color: var(--md-secondary); text-decoration-thickness: 2px; }
+
+/* ---------- Motion demo: a card of raised tiles ---------- */
+:root[data-theme=material] .gesture-demo { background: var(--md-surface); border-radius: 4px; box-shadow: var(--md-e2); }
+:root[data-theme=material][data-mode=dark] .gesture-demo { background: #2c2c2c; }
+:root[data-theme=material] .demo-heading button { border-radius: 4px; color: var(--md-primary); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+:root[data-theme=material] .gesture-grid { --accent: var(--md-primary); }
+:root[data-theme=material] .gesture-grid button { border: 0; border-radius: 4px; background: var(--md-surface); box-shadow: var(--md-e1); transition: box-shadow .28s var(--md-standard), background .2s; }
+:root[data-theme=material][data-mode=dark] .gesture-grid button { background: #383838; }
+:root[data-theme=material] .gesture-grid button::before { display: none; }
+:root[data-theme=material] .gesture-grid button.target { background: color-mix(in srgb, var(--md-primary) 10%, var(--md-surface)); }
+:root[data-theme=material][data-mode=dark] .gesture-grid button.target { background: #3d3550; }
+:root[data-theme=material] .gesture-grid button:hover { transform: none; box-shadow: var(--md-e4); }
+:root[data-theme=material] .gesture-grid button.visited { background: var(--md-primary); color: var(--md-on-primary); box-shadow: var(--md-e4); }
+:root[data-theme=material] .gesture-grid button.visited::after { background: radial-gradient(circle, currentColor 10%, transparent 10.01%) center / 1200% 1200% no-repeat; }
+:root[data-theme=material] .gesture-feedback { color: var(--md-primary); font-family: var(--font); font-weight: 500; }
+
+/* ---------- Projects: a two-line list with circular avatars ---------- */
+:root[data-theme=material] .project-list { column-gap: 24px; }
+:root[data-theme=material] .project-list li { border-color: var(--border); }
+:root[data-theme=material] .project-list a { padding: 16px 12px; gap: 16px; font-size: 16px; border-radius: 4px; transition: background .2s var(--md-standard); }
+:root[data-theme=material] .project-list a:hover { background: color-mix(in srgb, var(--md-primary) 6%, transparent); }
+:root[data-theme=material] .project-list img { width: 40px; height: 40px; padding: 8px; border-radius: 50%; background: var(--soft); }
+:root[data-theme=material] .project-list small { font-size: 13px; color: var(--muted); }
+:root[data-theme=material] .project-arrow { color: var(--muted); }
+
+/* ---------- Activity: metric cards that rise, chips and linear progress ---------- */
+:root[data-theme=material] .scope-badge { border: 0; border-radius: 16px; padding: 8px 14px; background: var(--soft); color: var(--ink); font: 500 12px/1 var(--font); letter-spacing: .02em; text-transform: none; }
+:root[data-theme=material] .metrics { gap: 16px; border-bottom: 0; padding-bottom: 0; }
+:root[data-theme=material] .metrics > div { padding: 20px 20px 18px; border-radius: 4px; background: var(--md-surface); box-shadow: var(--md-e1); transition: box-shadow .28s var(--md-standard), transform .28s var(--md-standard); }
+:root[data-theme=material][data-mode=dark] .metrics > div { background: #2c2c2c; }
+:root[data-theme=material] .metrics > div:hover { box-shadow: var(--md-e8); transform: translateY(-2px); }
+:root[data-theme=material] .metrics dd { color: var(--md-primary); font-weight: 300; }
+:root[data-theme=material] .metrics dt { font-size: 12px; letter-spacing: .03em; }
+:root[data-theme=material] .language-heading h3 { font-weight: 500; }
+:root[data-theme=material] .language-track { height: 4px; border-radius: 0; background: color-mix(in srgb, var(--language) 22%, transparent); }
+:root[data-theme=material] .language-fill { border-radius: 0; }
+:root[data-theme=material] .language-fill::after { display: none; }
+:root[data-theme=material] .stats-footnote { border-color: var(--border); }
+:root[data-theme=material] .arcade-card { transition: transform .28s var(--md-standard); }
+
+/* ---------- Picker dialog as a Material dialog ---------- */
+:root[data-theme=material] dialog#theme-picker { border: 0; border-radius: 4px; background: var(--md-surface); box-shadow: 0 24px 38px #00000036, 0 9px 46px #0000002e; }
+
+/* ---------- Staggered entrance: cards rise in on the deceleration curve ---------- */
+@supports (animation-timeline: view()) {
+  :root[data-theme=material] :is(.project-list li, .metrics > div, .language-row, .gesture-demo, .interests) {
+    animation: material-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+  :root[data-theme=material] :is(.project-list li, .metrics > div):nth-child(2n) { animation-range: entry 10% entry 70%; }
+  :root[data-theme=material] :is(.metrics > div):nth-child(3) { animation-range: entry 20% entry 80%; }
+  :root[data-theme=material] .language-row:nth-child(2n) { animation-range: entry 12% entry 72%; }
+}
+@keyframes material-rise { from { opacity: 0; transform: translateY(28px); } 70% { opacity: 1; } to { opacity: 1; transform: none; } }
+
+@media (max-width: 640px) {
+  :root[data-theme=material] body { background: linear-gradient(var(--md-band) 0 260px, var(--md-page) 260px); }
+  :root[data-theme=material] .theme-trigger { border-radius: 999px; }
+  :root[data-theme=material] .journey-art { height: 210px; }
+  :root[data-theme=material] .hero::before { right: -30%; width: 60%; }
+  :root[data-theme=material] .hero::after { display: none; }
+  :root[data-theme=material] .project-list a { padding: 14px 4px; }
+  :root[data-theme=material] .metrics { gap: 10px; }
+  :root[data-theme=material] .metrics > div { padding: 16px 14px; }
+  /* Phone legibility: reading text at 14px or more, labels at 12px, every control at least 44px tall. */
+  :root[data-theme=material] :is(.eyebrow, .project-list small, .metrics dt, .scope-badge, .language-heading > span, .language-share, .hero-status, .project-note, .identity-strip strong, .identity-strip time, .identity-strip button, .identity-strip .eyebrow) { font-size: 12px; }
+  :root[data-theme=material] :is(.hero-description, .about p, .project-copy > p, .scope-explanation, .stats-footnote p, .arcade-intro, #gesture-help, .language-name) { font-size: 14px; }
+  :root[data-theme=material] :is(.button, .text-link, .demo-heading button, .stats-footnote a, .site-footer a, .identity-strip button, .arcade-imports a, .arcade-imports button) { min-height: 44px; display: inline-flex; align-items: center; font-size: 14px; }
+  :root[data-theme=material] :is(.journey figcaption, .gesture-feedback, .site-footer) { font-size: 13px; }
+  :root[data-theme=material] .gesture-grid button span { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme=material] :is(.site-header, .theme-trigger, .project-list li, .metrics > div, .language-row, .gesture-demo, .interests) { animation: none; }
+  :root[data-theme=material] .site-header { box-shadow: var(--md-e4); }
+}
