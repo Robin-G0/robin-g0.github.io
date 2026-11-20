@@ -1,12 +1,12 @@
-import { games, gamesForTheme } from './catalog.js?v=eras-1';
-import { engines } from './registry.js?v=eras-1';
-import { seededRandom } from './core/random.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-1';
-import { localBindings } from './mig/bindings.js?v=eras-1';
-import { GameRoom } from './room.js?v=eras-1';
+import { games, gamesForTheme } from './catalog.js?v=eras-2';
+import { engines } from './registry.js?v=eras-2';
+import { seededRandom } from './core/random.js?v=eras-2';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-2';
+import { localBindings } from './mig/bindings.js?v=eras-2';
+import { GameRoom } from './room.js?v=eras-2';
 
-import {ChallengeStore, readChallenge} from './core/challenges.js?v=eras-1';
-import { GamesGallery } from './gallery.js';
+import {ChallengeStore, readChallenge} from './core/challenges.js?v=eras-2';
+import { GamesGallery } from './gallery.js?v=eras-2';
 
 const challenges = new ChallengeStore(games);
 const root = document.documentElement;
@@ -28,7 +28,9 @@ function preview(canvas, description, palette, images) {
     context.setTransform(.5, 0, 0, .5, 0, 0);
     const sample = engines[description.engine]({ random: seededRandom(123), pace: .8,
         message() {}, finish() {} });
-    painter.background(); sample.render(painter); sample.dispose();
+    // Play the first moments so opening animations (CRT warm-up, entrances) have settled.
+        for (let i = 0; i < 40; i++) sample.update(1 / 30);
+        painter.background(); sample.render(painter); sample.dispose();
 }
 
 async function renderCollection() {

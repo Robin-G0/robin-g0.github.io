@@ -1,9 +1,9 @@
 // The games gallery: every engine of every era, each preview painted in its own era's palette.
-import { games } from './catalog.js';
-import { engines } from './registry.js';
-import { seededRandom } from './core/random.js';
-import { Painter } from './core/painter.js';
-import { LEVEL_LABELS } from './mig/precision.js';
+import { games } from './catalog.js?v=eras-2';
+import { engines } from './registry.js?v=eras-2';
+import { seededRandom } from './core/random.js?v=eras-2';
+import { Painter } from './core/painter.js?v=eras-2';
+import { LEVEL_LABELS } from './mig/precision.js?v=eras-2';
 
 // Canvas fonts per era, mirroring the --arcade-font/--arcade-display room variables.
 const FONTS = {
@@ -31,6 +31,8 @@ function paintPreview(canvas, description, palette, images) {
     const painter = new Painter(context, palette, images);
     try {
         const sample = engines[description.engine]({ random: seededRandom(123), pace: .8, message() {}, finish() {} });
+        // Play the first moments so opening animations (CRT warm-up, entrances) have settled.
+        for (let i = 0; i < 40; i++) sample.update(1 / 30);
         painter.background(); sample.render(painter); sample.dispose();
     } catch { painter.background(); /* A preview must never break the gallery. */ }
 }
