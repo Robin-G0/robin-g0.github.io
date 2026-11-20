@@ -77,3 +77,18 @@ root values), so the canvas and room keep the profile's dark chart in both; `dis
 to the light chart only if the room background became light. Light mode used to inherit the light gold
 (#84612c) on the dark HUD; `glass.css` pins the dark chart on `#arcade-player`. Open Sans (bundled, OFL)
 stands in for Segoe UI Variable.
+
+## Phone legibility (2026-11-20, phone-first addendum)
+
+`display.text` never draws below 14 CSS px: `cssScale(p)` reads the canvas's displayed size (object-fit:
+contain) and `legible()` raises the logical font size; the header pill grows with it. Compact layouts size
+from `p.h` (a 390x844 phone gives a ~370x380 CSS stage, about 720x740 logical): Prisms' dial and Orbit's rings
+fill the height under the header, Abyss puts the jellyfish at 30 % height; crystals, motes, beacons and the
+probe are at least ~48 logical px (~24 CSS px) there. Tutorial SVGs use a 400x134 view box with labels of 15
+units or more and no row below y≈130; stage details moved into the captions. `glass.css` is skin only (no
+sizes on the player, stage, inputs, toolbar, camera dock or overlays). The browser spec measures the smallest
+canvas font in CSS px at 390x844 and 844x390.
+
+Shared-shell note: phone rules for the six-direction button row are keyed to `[data-engine=popups]` in
+`arcade.css`; at 320 px wide Abyss Drift's six buttons overflow the dialog by about 25 px. A shell rule keyed
+to the six-direction scheme (or `.wrist-controls`) would cover it; this theme does not set layout itself.
