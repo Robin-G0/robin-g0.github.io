@@ -119,7 +119,7 @@ export function school(env) {
             s.rows = s.rows.filter(row => row.progress < 1.3);
         },
         render(s, p) {
-            const compact = p.compact, h = p.h, k = compact ? 1.45 : 1, t = env.reducedMotion ? 0 : s.time, dark = isDark(p);
+            const compact = p.compact, h = p.h, k = compact ? 1.45 : 1, fk = compact ? 1.75 : 1, t = env.reducedMotion ? 0 : s.time, dark = isDark(p);
             const top = compact ? 140 : 70, line = h - (compact ? 190 : 84), yOf = progress => top + progress * (line - top);
             water(p, t);
             if (dark) aurora(p, t, top + 40, { amplitude: 18, opacity: .28, colors: ['#4dffc4', '#5fd6ff'] });
@@ -160,7 +160,7 @@ export function school(env) {
                         if (stray.gold) { c.save(); c.shadowColor = '#ffe37a'; c.shadowBlur = 22; orb(p, x, y, r, AERO.sun, { opacity: .55 }); c.restore(); }
                         fish(p, x, y + 2, r * 1.5, stray.gold ? AERO.sun : AERO.orange, Math.sin(t * 2 + stray.lane) * .2, t);
                         bubble(p, x, y, r, .95);
-                        if (stray.gold) text(p, `+${SCHOOL.goldFish}`, x + r, y - r, 18 * k, dark ? '#ffe9a0' : '#7a5300', 'left', 600);
+                        if (stray.gold) text(p, `+${SCHOOL.goldFish}`, x + r, y - r, compact ? 30 : 18, dark ? '#ffe9a0' : '#7a5300', 'left', 600);
                     }
                 }
                 c.restore();
@@ -171,11 +171,11 @@ export function school(env) {
             const lead = glideX(s.time), tilt = env.reducedMotion ? 0 : (laneX(s.glide.to) - glideX(s.time - .05)) * .004;
             for (let i = s.fish - 2; i >= 0; i--) {
                 const rowk = Math.floor(i / 5) + 1, col = (i % 5) - 2; // up to three rows of five followers
-                const fx = glideX(s.time - rowk * .06) + col * 21 * k + (rowk % 2 ? 10 : 0) * k + Math.sin(t * 2.2 + i) * 3;
-                const fy = line + 6 + rowk * 18 * k + Math.cos(t * 1.8 + i * 1.3) * 3;
-                fish(p, fx, fy, 34 * k, i % 3 === 1 ? AERO.sky : AERO.orange, -Math.PI / 2 + Math.sin(t * 2 + i) * .12, t + i);
+                const fx = glideX(s.time - rowk * .06) + col * 22 * fk + (rowk % 2 ? 10 : 0) * fk + Math.sin(t * 2.2 + i) * 3;
+                const fy = line + 6 + rowk * 19 * fk + Math.cos(t * 1.8 + i * 1.3) * 3;
+                fish(p, fx, fy, 34 * fk, i % 3 === 1 ? AERO.sky : AERO.orange, -Math.PI / 2 + Math.sin(t * 2 + i) * .12, t + i);
             }
-            fish(p, lead, line - 4, 54 * k, AERO.orange, -Math.PI / 2 + tilt, t);
+            fish(p, lead, line - 4, 54 * fk, AERO.orange, -Math.PI / 2 + tilt, t);
             if (s.time < s.shieldUntil) {
                 const left = (s.shieldUntil - s.time) / SCHOOL.shield;
                 bubble(p, lead, line + 14 * k, (64 + (s.fish > 5 ? 22 : 0)) * k, .55 + .35 * left);
@@ -196,13 +196,13 @@ export function school(env) {
                 }
             }
             // Pearl tray: each pearl buys one bubble shield (raise a wrist).
-            const trayW = 34 * k * SCHOOL.maxPearls + 18, trayX = 706 - trayW, trayY = compact ? 92 : 58;
+            const pk = compact ? 1.9 : 1, trayW = 34 * pk * SCHOOL.maxPearls + 18, trayX = 700 - trayW, trayY = compact ? 92 : 58;
             const refused = s.lastInput?.direction === 'up' && !s.lastInput.ok && s.time - s.lastInput.at < .5;
-            glass(p, trayX, trayY, trayW, 34 * k, 17 * k, { tint: refused ? AERO.coral : '#ffffff', shadow: false });
+            glass(p, trayX, trayY, trayW, 34 * pk, 17 * pk, { tint: refused ? AERO.coral : '#ffffff', shadow: false });
             for (let i = 0; i < SCHOOL.maxPearls; i++) {
-                const x = trayX + 9 + 17 * k + i * 34 * k, y = trayY + 17 * k;
-                if (i < s.pearls) orb(p, x, y, 11 * k, '#eef8ff');
-                else { c.save(); c.beginPath(); c.arc(x, y, 9 * k, 0, Math.PI * 2); c.setLineDash([3, 3]); c.lineWidth = 2; c.strokeStyle = dark ? 'rgba(200,240,255,.6)' : 'rgba(7,108,168,.5)'; c.stroke(); c.restore(); }
+                const x = trayX + 9 + 17 * pk + i * 34 * pk, y = trayY + 17 * pk;
+                if (i < s.pearls) orb(p, x, y, 12 * pk, '#eef8ff');
+                else { c.save(); c.beginPath(); c.arc(x, y, 10 * pk, 0, Math.PI * 2); c.setLineDash([3, 3]); c.lineWidth = 2; c.strokeStyle = dark ? 'rgba(200,240,255,.6)' : 'rgba(7,108,168,.5)'; c.stroke(); c.restore(); }
             }
             const next = s.rows.filter(row => !row.resolved), gate = next.findIndex(row => row.kind === 'gate');
             header(p, `school ${s.fish}`, gate >= 0 ? (gate === 0 ? 'gate next' : `gate in ${gate + 1}`) : `best home ×${s.bestHome}`);

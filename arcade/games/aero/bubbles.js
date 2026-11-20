@@ -145,9 +145,9 @@ export function bubbles(env) {
         },
         render(s, p) {
             const compact = p.compact, h = p.h, t = env.reducedMotion ? 0 : s.time, dark = isDark(p), c = p.c;
-            const cell = compact ? Math.min(92, (h - 340) / BUBBLES.rows) : 40, top = compact ? 118 : 58, r = cell * .47;
+            const cell = compact ? Math.min(92, (h - 340) / BUBBLES.rows) : 36, top = compact ? 118 : 50, r = cell * .47;
             const colX = [360 - cell, 360, 360 + cell], bottom = top + BUBBLES.rows * cell;
-            const startY = h - (compact ? 70 : 20), forkY = bottom + cell * .75, cellY = i => top + cell / 2 + i * cell;
+            const startY = h - (compact ? 70 : 22), forkY = bottom + cell * .75, cellY = i => top + cell / 2 + i * cell;
             water(p, t, { bed: compact });
             if (dark) aurora(p, t, top + 10, { amplitude: 14, opacity: .25, colors: ['#4dffc4', '#5fd6ff'] });
             risingBubbles(p, t, 14, { top, bottom: h });
@@ -190,8 +190,8 @@ export function bubbles(env) {
                 } else timerRing(p, x, y, r + 7, 1 - current.progress, dark ? '#9fe8ff' : AERO.deep);
                 drawBubble(p, x, y, r, current.value, t);
             }
-            const nx = 360 + cell * 2.6, ny = startY - 4;
-            text(p, 'next', nx, ny - r * .75 - 12, compact ? 22 : 13, 'muted', 'center', 400);
+            const nx = 360 + cell * 2.4, ny = (startY + forkY) / 2;
+            text(p, 'next', nx + r * .8 + 8, ny, compact ? 28 : 16, 'ink', 'left', 600);
             drawBubble(p, nx, ny, r * .7, s.next, t);
             const pending = MILESTONES.find(([at]) => at > s.time && at - s.time <= 8);
             header(p, `popped ${s.popped}`, pending ? `${pending[1]} in ${Math.ceil(pending[0] - s.time)}s` : s.bestChain ? `best cascade ×${s.bestChain}` : '');

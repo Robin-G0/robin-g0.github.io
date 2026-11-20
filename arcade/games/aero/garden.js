@@ -98,7 +98,7 @@ export function garden(env) {
         },
         render(s, p) {
             const compact = p.compact, h = p.h, k = compact ? 1.45 : 1, t = env.reducedMotion ? 0 : s.time, dark = isDark(p), c = p.c;
-            const horizon = compact ? h * .36 : 190, soil = h - (compact ? 150 : 52);
+            const horizon = compact ? h * .4 : 190, soil = h - (compact ? 160 : 52), grow = compact ? 1.3 : .9;
             const n = s.beds.length, span = 640, bedX = i => 40 + span * (i + .5) / n, pot = Math.min(96, span / n - 14);
             meadow(p, t, horizon);
             grass(p, t, soil + 4, { blades: 40, height: 26 * k, dark });
@@ -109,19 +109,19 @@ export function garden(env) {
             orb(p, sunX, skyY, 30 * k, AERO.sun); glyph(p, 'sun', sunX, skyY, 22 * k, '#fff8d8');
             for (const [x, type, color] of [[cloudX + 44 * k, 'water', AERO.aqua], [sunX + 40 * k, 'sun', AERO.sun]]) {
                 const count = waiting(type);
-                glass(p, x - 4, skyY + 8 * k, 46 * k, 30 * k, 15 * k, { tint: count ? color : '#ffffff', shadow: false });
-                text(p, `×${count}`, x + 19 * k, skyY + 23 * k, 19 * k, 'ink', 'center', 600, { glow: false });
+                glass(p, x - 4, skyY + 8 * k, 50 * k, 32 * k, 16 * k, { tint: count ? color : '#ffffff', shadow: false });
+                text(p, `×${count}`, x + 21 * k, skyY + 24 * k, compact ? 30 : 19, 'ink', 'center', 600, { glow: false });
             }
             for (let i = 0; i < n; i++) {
                 const x = bedX(i), bed = s.beds[i];
                 const stress = s.effects.find(e => e.kind === 'stress' && e.bed === i && s.time - e.at < .5);
                 const wilt = s.effects.find(e => e.kind === 'wilt' && e.bed === i);
                 const shake = stress && !env.reducedMotion ? Math.sin((s.time - stress.at) * 60) * 4 : 0;
-                plant(p, x + shake, soil, Math.min(pot, 80) * k * .9, wilt ? 2 : bed.growth, t + i, wilt ? Math.min(1, (s.time - wilt.at) * 2) : 0);
+                plant(p, x + shake, soil, Math.min(pot, 80) * k * grow, wilt ? 2 : bed.growth, t + i, wilt ? Math.min(1, (s.time - wilt.at) * 2) : 0);
                 glass(p, x - pot / 2, soil - 4, pot, 34 * k, 10, { tint: AERO.leaf, strength: .9 });
                 for (let g = 0; g < GARDEN.bloomAfter; g++) orb(p, x - (GARDEN.bloomAfter - 1) * 7 * k + g * 14 * k, soil + 14 * k, 4.5 * k, g < bed.growth ? AERO.lime : '#e8f4ee', { opacity: g < bed.growth ? 1 : .6 });
                 if (bed.need) {
-                    const need = bed.need, y = soil - 150 * k, r = 22 * k, left = (need.deadline - s.time) / need.total;
+                    const need = bed.need, y = soil - (compact ? 280 : 150), r = 22 * k, left = (need.deadline - s.time) / need.total;
                     const bob = env.reducedMotion ? 0 : Math.sin(t * 2 + i) * 3;
                     if (need.type === 'rainbow') {
                         orb(p, x, y + bob, r, '#ffffff'); glyph(p, 'rainbow', x, y + bob, r * .7);

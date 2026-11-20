@@ -238,13 +238,14 @@ export function header(p, status, detail = '') {
     const c = p.c; c.save(); c.font = `400 ${size}px ${SANS}`;
     const width = Math.min(420, (c.measureText?.(status)?.width || status.length * size * .55) + 40);
     c.restore();
-    glass(p, 14, y, width, hgt, hgt / 2);
-    text(p, status, 34, y + hgt / 2 + 1, size, 'ink', 'left', 400);
+    // Kept clear of the outer 8 CSS px of a phone stage (about 16 logical units at 370 px wide).
+    glass(p, 20, y, width, hgt, hgt / 2);
+    text(p, status, 40, y + hgt / 2 + 1, size, 'ink', 'left', 400);
     if (detail) {
         c.save(); c.font = `400 ${size * .8}px ${SANS}`;
         const dw = Math.min(330, (c.measureText?.(detail)?.width || detail.length * size * .45) + 34); c.restore();
-        glass(p, 706 - dw, y + 4, dw, hgt - 8, (hgt - 8) / 2, { shadow: false, strength: .8 });
-        text(p, detail, 706 - dw / 2, y + hgt / 2 + 1, size * .8, 'muted', 'center', 400);
+        glass(p, 700 - dw, y + 4, dw, hgt - 8, (hgt - 8) / 2, { shadow: false, strength: .8 });
+        text(p, detail, 700 - dw / 2, y + hgt / 2 + 1, size * .8, 'muted', 'center', 400);
     }
 }
 

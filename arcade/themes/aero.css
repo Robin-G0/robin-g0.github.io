@@ -93,6 +93,8 @@
 }
 [data-theme=aero] #arcade-player .arcade-room-close:hover { background: linear-gradient(180deg, #ffc0a8 0, #ef8566 46%, #db3e1c 52%, #f2754d 100%); box-shadow: inset 0 1px #fff, 0 0 14px #ff8a5c; }
 [data-theme=aero] #arcade-player .arcade-controls-trigger { padding: 8px 18px; font-size: 14px; }
+[data-theme=aero] #arcade-player :is(.camera-alternative, .arcade-camera-dock button:not(.button)) { padding: 6px 18px; text-decoration: none; }
+[data-theme=aero] #arcade-player .start-hand { fill: #9be75a; stroke: #1e5f12; }
 
 /* HUD: a glass strip; figures in Segoe UI Light, labels small and muted. */
 [data-theme=aero] #arcade-player .arcade-hud {
@@ -132,11 +134,12 @@
 }
 [data-theme=aero] #arcade-player .guide-heading h3 { font-family: var(--arcade-display); font-weight: 300; }
 [data-theme=aero] #arcade-player .guide-figure { flex: 0 0 auto; }
-[data-theme=aero] #arcade-player .aero-diagram { max-height: 170px; overflow: hidden; border-radius: 18px; color: var(--accent); filter: drop-shadow(0 6px 14px rgba(8,80,120,.25)); }
+[data-theme=aero] #arcade-player .aero-diagram { max-height: 138px; overflow: hidden; border-radius: 18px; color: var(--accent); filter: drop-shadow(0 6px 14px rgba(8,80,120,.25)); }
 [data-theme=aero] #arcade-player .aero-diagram text.aero-label {
     font-family: var(--arcade-font); fill: var(--aero-label); stroke: var(--aero-halo); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke;
 }
-[data-theme=aero] #arcade-player .arcade-walkthrough .guide-caption { font-weight: 400; color: var(--ink); }
+[data-theme=aero] #arcade-player .arcade-walkthrough .guide-caption { font-weight: 400; color: var(--ink); font-size: clamp(16px, 2vw, 20px); line-height: 1.3; }
+[data-theme=aero] #arcade-player .guide-title { font-size: clamp(22px, 2.6vw, 28px); }
 .aero-sweep { animation: aero-card-sweep 5s ease-in-out infinite; }
 .aero-swim { animation: aero-swim 4s ease-in-out infinite; }
 .aero-shield { animation: aero-shield 4s ease-in-out infinite; }
@@ -164,7 +167,7 @@
 @keyframes aero-bloom { 0%, 30% { transform: scale(.2); opacity: 0; } 50%, 90% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
 
 /* Motion inputs: big aqua gel keys that glow lime when a wrist command is accepted. */
-[data-theme=aero] #arcade-player .arcade-action { border-radius: 18px; min-height: 60px; }
+[data-theme=aero] #arcade-player .arcade-action { border-radius: 18px; }
 [data-theme=aero] #arcade-player .wrist-buttons .arcade-action { border-radius: 16px; }
 [data-theme=aero] #arcade-player .arcade-action .action-key { font: 400 24px var(--arcade-font); color: var(--accent); }
 [data-theme=aero] #arcade-player .arcade-action .action-name { font-size: 15px; }
@@ -180,23 +183,23 @@
 
 /* Toolbar as a Windows 7 taskbar: smoked glass with small glass buttons. */
 [data-theme=aero] #arcade-player .arcade-toolbar {
-    margin: 12px 18px 16px; padding: 6px 10px; gap: 6px 8px; border-radius: 10px;
+    border-radius: 10px;
     background: linear-gradient(180deg, rgba(60,120,160,.55) 0, rgba(20,70,105,.62) 50%, rgba(8,45,72,.72) 51%, rgba(20,70,100,.66) 100%);
     border: 1px solid rgba(10,50,80,.6); box-shadow: inset 0 1px rgba(255,255,255,.45), 0 3px 10px rgba(5,50,80,.2);
 }
 [data-theme=aero] #arcade-player .arcade-toolbar button {
-    min-height: 40px; padding: 6px 14px; font-size: 13px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.6); border-radius: 6px;
+    padding: 6px 14px; font-size: 13px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.6); border-radius: 6px;
     border: 1px solid rgba(255,255,255,.28);
     background: linear-gradient(180deg, rgba(255,255,255,.32) 0, rgba(255,255,255,.12) 49%, rgba(255,255,255,.02) 51%, rgba(255,255,255,.1) 100%);
     box-shadow: inset 0 1px rgba(255,255,255,.4);
 }
 [data-theme=aero] #arcade-player .arcade-toolbar button[aria-pressed=false] { opacity: .6; }
 [data-theme=aero] #arcade-player .arcade-toolbar a { color: #dff6ff; font-size: 12px; }
-[data-theme=aero] #arcade-player #arcade-feedback { margin: 10px 24px 0; color: var(--accent); }
+[data-theme=aero] #arcade-player #arcade-feedback { color: var(--accent); }
 
 /* Camera dock and results: glass panels. */
 [data-theme=aero] #arcade-player .arcade-camera-dock {
-    margin: 0 18px 18px; border: 1px solid rgba(110,180,210,.5); border-radius: 14px;
+    border: 1px solid rgba(110,180,210,.5); border-radius: 14px;
     background: linear-gradient(180deg, var(--aero-glass), rgba(255,255,255,.2)); box-shadow: inset 0 1px var(--aero-glass-edge);
 }
 [data-theme=aero] #arcade-player .camera-view { border-radius: 12px; border-color: rgba(255,255,255,.9); box-shadow: 0 0 0 1px #7db7cf, 0 4px 12px rgba(5,60,90,.2); }
@@ -215,22 +218,14 @@
 [data-theme=aero] #arcade-player .friend-target { font-family: var(--arcade-font); }
 
 @media (max-width: 640px) {
-    [data-theme=aero] #arcade-player .arcade-room-header { padding: 10px 10px 10px 14px; gap: 8px; }
+    /* Phone layout belongs to the shared shell (arcade/phone.css); only type and art sizes change here. */
     [data-theme=aero] #arcade-player .arcade-room-header h2 { font-size: 24px; }
     [data-theme=aero] #arcade-player .arcade-room-header p { display: none; }
-    [data-theme=aero] #arcade-player .arcade-controls-trigger { font-size: 15px; padding: 8px 12px; }
-    [data-theme=aero] #arcade-player .arcade-hud { padding: 6px 12px; }
     [data-theme=aero] #arcade-player .arcade-hud dd { font-size: 24px; }
-    /* A taller board on phones: the engines draw a portrait layout from the same rules. */
-    [data-theme=aero] #arcade-player .arcade-stage { height: clamp(300px, calc(100dvh - 300px), 480px); min-height: 300px; max-height: none; aspect-ratio: auto; }
-    [data-theme=aero] #arcade-player .arcade-inputs { padding: 10px 10px 0; gap: 8px; }
-    [data-theme=aero] #arcade-player .wrist-controls { gap: 6px; }
-    [data-theme=aero] #arcade-player .wrist-title { font-size: 22px; }
-    [data-theme=aero] #arcade-player .wrist-buttons { gap: 4px; }
+    [data-theme=aero] #arcade-player .aero-diagram { max-height: 120px; }
+    [data-theme=aero] #arcade-player .arcade-walkthrough .guide-caption { font-size: 16px; line-height: 1.25; }
+    [data-theme=aero] #arcade-player .guide-title { font-size: 21px; }
     [data-theme=aero] #arcade-player .wrist-buttons kbd { display: none; }
-    [data-theme=aero] #arcade-player .arcade-toolbar { margin: 10px; gap: 6px; }
-    [data-theme=aero] #arcade-player .arcade-toolbar button { padding: 6px 10px; }
-    [data-theme=aero] #arcade-player .arcade-camera-dock { margin: 0 10px 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
     [data-theme=aero] #arcade-player .aero-diagram *, [data-theme=aero] #arcade-player button::after { animation: none !important; }
