@@ -1,1 +1,109 @@
 /* material game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="material"]. */
+/* Roboto (OFL, The Roboto Project Authors), the era's own typeface, bundled under assets/fonts. */
+@font-face { font-family: 'Roboto'; src: url('../../assets/fonts/roboto.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }
+:root[data-theme=material] { --arcade-font: 'Roboto', 'Open Sans', Arial, sans-serif; --arcade-display: 'Roboto', 'Open Sans', Arial, sans-serif;
+    --md-standard: cubic-bezier(.4, 0, .2, 1); --md-decelerate: cubic-bezier(0, 0, .2, 1); --md-accelerate: cubic-bezier(.4, 0, 1, 1);
+    --md-shadow-2: 0 1px 5px #13112c1f, 0 2px 2px #13112c24, 0 3px 1px -2px #13112c33;
+    --md-shadow-8: 0 5px 5px -3px #13112c33, 0 8px 10px 1px #13112c24, 0 3px 14px 2px #13112c1f;
+    --md-shadow-24: 0 11px 15px -7px #13112c33, 0 24px 38px 3px #13112c24, 0 9px 46px 8px #13112c1f; }
+:root[data-theme=material][data-mode=dark] { --md-shadow-2: 0 1px 5px #0008, 0 2px 2px #0006; --md-shadow-8: 0 5px 5px -3px #0009, 0 8px 10px 1px #0007, 0 3px 14px 2px #0006; --md-shadow-24: 0 11px 15px -7px #0009, 0 24px 38px 3px #0008; }
+
+/* The room is a dialog sheet at 24 dp with an app bar in the theme's primary colour. */
+[data-theme=material] #arcade-player { border: 0; border-radius: 8px; box-shadow: var(--md-shadow-24); font-family: var(--arcade-font); }
+[data-theme=material] #arcade-player .arcade-room-header { background: var(--accent); color: var(--bg); box-shadow: var(--md-shadow-2); position: relative; z-index: 1; align-items: center; }
+[data-theme=material] #arcade-player .arcade-room-header h2 { font-weight: 500; letter-spacing: .005em; }
+[data-theme=material] #arcade-player .arcade-room-header :is(p, .eyebrow) { color: color-mix(in srgb, var(--bg) 80%, transparent); }
+[data-theme=material] #arcade-player .arcade-room-header button { background: transparent; color: var(--bg); border: 0; box-shadow: none; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; border-radius: 4px; }
+[data-theme=material] #arcade-player .arcade-room-header button:hover { background: color-mix(in srgb, var(--bg) 14%, transparent); }
+[data-theme=material] #arcade-player .arcade-hud { border: 0; }
+[data-theme=material] #arcade-player .arcade-hud dt { text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+[data-theme=material] #arcade-player .arcade-hud dd { font-family: var(--arcade-font); font-weight: 300; }
+
+/* The play surface: a taller board on phones (the engines lay out by height), no frame line around the canvas. */
+[data-theme=material] #arcade-player .arcade-stage { outline: 0; }
+@media (max-width: 640px) { [data-theme=material] #arcade-player .arcade-stage { height: clamp(300px, calc(100dvh - 330px), 500px); max-height: none; aspect-ratio: auto; } }
+
+/* Buttons: Material raised buttons, uppercase medium type, lifting from 2 dp to 8 dp on press. */
+[data-theme=material] #arcade-player button { font-family: var(--arcade-font); border-radius: 4px; transition: box-shadow .28s var(--md-standard), background-color .2s var(--md-standard); }
+[data-theme=material] #arcade-player .arcade-action { position: relative; overflow: hidden; border: 0; background: var(--bg); color: var(--ink); box-shadow: var(--md-shadow-2); }
+[data-theme=material] #arcade-player .arcade-action .action-key { color: var(--accent); font-family: var(--arcade-font); font-weight: 500; }
+[data-theme=material] #arcade-player .arcade-action .action-name { text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+[data-theme=material] #arcade-player .arcade-action[data-pulse] { outline: 0; background: var(--bg); box-shadow: var(--md-shadow-8); }
+/* Ink ripple from the button's centre on every accepted input (the pulse attribute is set by the host). */
+[data-theme=material] #arcade-player .arcade-action::after { content: ''; position: absolute; left: 50%; top: 50%; width: 220%; aspect-ratio: 1; border-radius: 50%;
+    background: var(--accent); opacity: 0; transform: translate(-50%, -50%) scale(0); pointer-events: none; }
+[data-theme=material] #arcade-player .arcade-action[data-pulse]::after { animation: md-ripple .55s var(--md-decelerate); }
+@keyframes md-ripple { 0% { transform: translate(-50%, -50%) scale(0); opacity: .28; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+[data-theme=material] #arcade-player .wrist-controls .wrist-title { color: var(--accent); font-weight: 500; }
+[data-theme=material] #arcade-player .button.primary, [data-theme=material] #arcade-player [data-guide-next], [data-theme=material] #arcade-player #arcade-save-score {
+    background: var(--accent); color: var(--bg); border: 0; box-shadow: var(--md-shadow-2); text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+[data-theme=material] #arcade-player :is(.button.primary, [data-guide-next], #arcade-save-score):active { box-shadow: var(--md-shadow-8); }
+[data-theme=material] #arcade-player :is([data-guide-back], [data-guide-skip], #arcade-challenge-friend) { background: transparent; border: 0; color: var(--accent); box-shadow: none; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+[data-theme=material] #arcade-player :is([data-guide-back], [data-guide-skip], #arcade-challenge-friend):hover { background: var(--soft); }
+
+/* Walkthrough: a card on the room surface; numbered stepper circles; content enters staggered. */
+[data-theme=material] .arcade-walkthrough { background: var(--soft); }
+[data-theme=material] .arcade-walkthrough .guide-heading h3 { font-weight: 500; }
+[data-theme=material] .guide-progress span { border-radius: 50%; border: 0; background: color-mix(in srgb, var(--ink) 30%, transparent); color: var(--bg); font-size: 13px; font-weight: 500; }
+[data-theme=material] .guide-progress [aria-current=step] { background: var(--accent); color: var(--bg); }
+[data-theme=material] .guide-figure { background: var(--bg); border-radius: 4px; box-shadow: var(--md-shadow-2); padding: 14px 10px; box-sizing: border-box; flex: 0 0 auto; animation: md-enter .32s var(--md-decelerate); }
+[data-theme=material] .guide-title { font-weight: 400; letter-spacing: 0; animation: md-enter .32s var(--md-decelerate) .05s backwards; }
+[data-theme=material] .arcade-walkthrough .guide-caption { font-weight: 400; animation: md-enter .32s var(--md-decelerate) .1s backwards; }
+@keyframes md-enter { from { opacity: 0; transform: translateY(16px); } }
+
+/* Start surface: a paper sheet with the floating action button as the start action. */
+[data-theme=material] [data-brief=start] #arcade-tutorial { background: var(--soft); color: var(--ink); }
+[data-theme=material] [data-brief=start] #arcade-tutorial::before { background: var(--accent); opacity: .16; box-shadow: none; }
+[data-theme=material] [data-brief=start] #arcade-controls-status { color: var(--ink); font-weight: 400; }
+[data-theme=material] #arcade-player #arcade-begin { background: var(--accent); color: var(--bg); box-shadow: var(--md-shadow-8); text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+[data-theme=material] #arcade-result { background: var(--soft); }
+[data-theme=material] #arcade-result h3 { font-weight: 400; }
+[data-theme=material] #arcade-result #arcade-final-score { font-weight: 300; color: var(--accent); }
+[data-theme=material] #arcade-result input { border: 0; border-bottom: 2px solid var(--accent); border-radius: 0; background: transparent; font-family: var(--arcade-font); }
+
+/* Diagram materials. */
+[data-theme=material] .material-diagram { overflow: visible; }
+[data-theme=material] .material-diagram text { font-family: var(--arcade-font); fill: var(--ink); }
+[data-theme=material] .material-diagram .md-muted { fill: var(--muted); }
+[data-theme=material] .material-diagram .md-on { fill: var(--bg); }
+[data-theme=material] .material-diagram rect.md-sheet { fill: var(--bg); stroke: none; filter: drop-shadow(0 1px 1.5px #13112c40) drop-shadow(0 1px 3px #13112c26); }
+[data-theme=material][data-mode=dark] .material-diagram rect.md-sheet { fill: color-mix(in srgb, var(--bg), #fff 8%); filter: drop-shadow(0 1px 2px #000a); }
+[data-theme=material] .material-diagram .md-fab { fill: var(--accent); filter: drop-shadow(0 3px 3px #13112c38); }
+[data-theme=material] .material-diagram .md-on-icon { fill: none; stroke: var(--bg); stroke-width: 3; stroke-linecap: round; }
+[data-theme=material] .material-diagram .md-on-icon-head { fill: var(--bg); stroke: none; }
+[data-theme=material] .material-diagram .md-piece { stroke: none; filter: drop-shadow(0 4px 4px #13112c40); }
+[data-theme=material] .material-diagram .md-outline { fill: color-mix(in srgb, var(--ink) 7%, var(--bg)); stroke: var(--muted); stroke-width: 2; stroke-dasharray: 5 4; }
+[data-theme=material] .material-diagram .md-track { fill: var(--accent); opacity: .22; stroke: none; }
+[data-theme=material] .material-diagram .md-bar { fill: var(--accent); stroke: none; }
+[data-theme=material] .material-diagram .md-chip { stroke: none; }
+[data-theme=material] .material-diagram .md-cell { fill: color-mix(in srgb, #43a047 22%, var(--bg)); stroke: none; }
+[data-theme=material] .material-diagram .md-water { fill: #0288d1; }
+[data-theme=material] .material-diagram .md-ball { fill: #fff; stroke: var(--border); stroke-width: 1.5; filter: drop-shadow(0 2px 2px #13112c40); }
+[data-theme=material] .material-diagram .md-arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4 4; }
+[data-theme=material] .material-diagram .md-arc-r { stroke: #d81b60; }
+[data-theme=material] .material-diagram .md-hole { fill: var(--ink); stroke: none; }
+[data-theme=material] .material-diagram .md-pole { stroke: var(--ink); stroke-width: 2; fill: none; }
+[data-theme=material] .material-diagram .md-ring { fill: none; stroke: var(--accent); stroke-width: 2; }
+[data-theme=material] .material-diagram .md-string { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+[data-theme=material] .material-diagram .md-beam { fill: var(--accent); stroke: none; }
+[data-theme=material] .material-diagram .md-beam.md-danger { fill: #ffa000; }
+[data-theme=material] .material-diagram .md-card { stroke: none; filter: drop-shadow(0 1px 2px #13112c40); }
+[data-theme=material] .material-diagram .md-pip { fill: var(--bg); stroke: none; }
+[data-theme=material] .material-diagram circle[style], [data-theme=material] .material-diagram rect[style] { stroke: none; }
+
+/* Diagram motion, all from the Material vocabulary: FABs scale in staggered, the piece turns (standard curve)
+   then travels into its outline as a shared element, the ball hops cell to cell, cards lift away on a level. */
+[data-theme=material] .md-fab-group { animation: md-fab-in 3.2s var(--md-decelerate) infinite; animation-delay: var(--delay, 0s); transform-box: fill-box; transform-origin: center; }
+@keyframes md-fab-in { 0% { transform: scale(0); } 12%, 100% { transform: scale(1); } }
+[data-theme=material] .md-tangram-turn { animation: md-tangram 4s var(--md-standard) infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes md-tangram { 0%, 15% { transform: translateX(0) rotate(0); } 35%, 50% { transform: translateX(0) rotate(90deg); } 72%, 92% { transform: translateX(-197px) rotate(90deg); } 100% { transform: translateX(0) rotate(0); } }
+[data-theme=material] .md-golf-ball { animation: md-golf 4s var(--md-standard) infinite; }
+@keyframes md-golf { 0%, 10% { transform: translate(0, 0); } 18% { transform: translate(23px, -22px); } 25%, 35% { transform: translate(46px, 0); } 45% { transform: translate(115px, -34px); } 55%, 65% { transform: translate(184px, 0); } 72% { transform: translate(207px, -22px); } 80%, 90% { transform: translate(230px, 0); opacity: 1; } 96% { transform: translate(276px, 0); opacity: 0; } 100% { opacity: 0; } }
+[data-theme=material] .md-fall { animation: md-fall 3s var(--md-standard) infinite; }
+@keyframes md-fall { 0% { transform: translate(0, -20px); opacity: 0; } 20%, 45% { transform: translate(0, 0); opacity: 1; } 75%, 92% { transform: translate(-116px, 24px); opacity: 1; } 100% { transform: translate(-116px, 24px); opacity: 0; } }
+[data-theme=material] .md-level { animation: md-level 3.4s var(--md-accelerate) infinite; }
+@keyframes md-level { 0%, 55% { transform: translateY(0); opacity: 1; } 85% { transform: translateY(-46px); opacity: 0; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+    [data-theme=material] .material-diagram *, [data-theme=material] .guide-figure, [data-theme=material] .guide-title, [data-theme=material] .guide-caption,
+    [data-theme=material] #arcade-player .arcade-action::after { animation: none !important; }
+}
