@@ -1,5 +1,5 @@
-import { game } from '../../core/game.js';
-import { METRO, light, header, tile, scaledTile, ripple, addEffect, pruneEffects, addBurst, bursts, pruneBursts, loseLife, poseTile, tilt, settle } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { METRO, light, header, tile, scaledTile, ripple, addEffect, pruneEffects, addBurst, bursts, pruneBursts, loseLife, poseTile, tilt, settle } from './display.js?v=eras-2';
 
 export const TILES = { opening: 2, maxCadence: 1.1, minCadence: .55, stepPoints: 10, livePoints: 20,
     finishPerTile: 10, rest: .9, retry: 1.2, litShare: .62 };

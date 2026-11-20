@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js';
-import { integer } from '../../core/random.js';
-import { METRO, light, header, tile, scaledTile, meter, ripple, pruneBursts, loseLife, poseTile, tilt, settle as easeOut } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { integer } from '../../core/random.js?v=eras-2';
+import { METRO, light, header, tile, scaledTile, meter, ripple, pruneBursts, loseLife, poseTile, tilt, settle as easeOut } from './display.js?v=eras-2';
 
 // Columns are bottom-up stacks, so gravity is implicit. The board never saturates: when the
 // best tile reaches `retire` times the floor, every tile below the doubled floor leaves the board.

@@ -1,5 +1,5 @@
-import { game } from '../../core/game.js';
-import { header, page, write, ink, pencil, blot, tag, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { header, page, write, ink, pencil, blot, tag, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-2';
 
 // Clockwork: a regulator pendulum swings by itself. Each swing carries the bob into the left or the
 // right pallet band; raising that wrist while the bob is in the band strikes the pallet and gives the

@@ -1,7 +1,7 @@
 // First-visit welcome: tracking precision, then gallery or theme. Reopens for precision only.
 import { presetsFor, resolvePreset, isMobileDevice, detectGraphics, recommendedPreset,
-    readPrecision, savePrecision } from '../arcade/mig/precision.js';
-import { isPoseModelReady } from '../arcade/mig/pose-models.js';
+    readPrecision, savePrecision } from '../arcade/mig/precision.js?v=eras-2';
+import { isPoseModelReady } from '../arcade/mig/pose-models.js?v=eras-2';
 
 const RUNTIME = new URL('../vendor/motion-input-grid/runtime/', import.meta.url).href;
 const $ = (root, selector) => root.querySelector(selector);

@@ -1,22 +1,22 @@
-import { engines } from './registry.js?v=eras-1';
-import { GameRunner } from './core/runner.js?v=eras-1';
-import { bindAlternativeControls } from './core/input.js?v=eras-1';
-import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js';
-import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-1';
-import { MotionCamera, visiblePoint } from './mig/camera.js?v=eras-1';
-import { ArcadeAudio } from './core/audio.js?v=eras-1';
-import { MotionNavigation } from './core/motion-navigation.js?v=eras-1';
-import { lessonFor } from './lessons.js?v=eras-1';
-import { MarkerMotion } from './mig/marker-motion.js';
-import { TriggerView } from './mig/trigger-view.js?v=eras-1';
-import { FrameBudget } from './core/frame-budget.js';
-import { gameConfig } from './core/game-config.js?v=eras-1';
-import { ArcadeResults } from './core/results.js?v=eras-1';
-import { localScores } from './core/scores.js?v=eras-1';
-import { GameGuide, greetingHand } from './core/guide.js?v=eras-1';
-import { seededRandom } from './core/random.js';
-import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=eras-1';
-import { PRESETS, readPrecision, resolvePreset, isMobileDevice, meetsLevel, LEVEL_LABELS } from './mig/precision.js';
+import { engines } from './registry.js?v=eras-2';
+import { GameRunner } from './core/runner.js?v=eras-2';
+import { bindAlternativeControls } from './core/input.js?v=eras-2';
+import { WRISTS, DIRECTIONS, ARROWS, decodeGesture, commandLabel } from './core/commands.js?v=eras-2';
+import { Painter, readPalette, loadArtwork, loadTypography } from './core/painter.js?v=eras-2';
+import { MotionCamera, visiblePoint } from './mig/camera.js?v=eras-2';
+import { ArcadeAudio } from './core/audio.js?v=eras-2';
+import { MotionNavigation } from './core/motion-navigation.js?v=eras-2';
+import { lessonFor } from './lessons.js?v=eras-2';
+import { MarkerMotion } from './mig/marker-motion.js?v=eras-2';
+import { TriggerView } from './mig/trigger-view.js?v=eras-2';
+import { FrameBudget } from './core/frame-budget.js?v=eras-2';
+import { gameConfig } from './core/game-config.js?v=eras-2';
+import { ArcadeResults } from './core/results.js?v=eras-2';
+import { localScores } from './core/scores.js?v=eras-2';
+import { GameGuide, greetingHand } from './core/guide.js?v=eras-2';
+import { seededRandom } from './core/random.js?v=eras-2';
+import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=eras-2';
+import { PRESETS, readPrecision, resolvePreset, isMobileDevice, meetsLevel, LEVEL_LABELS } from './mig/precision.js?v=eras-2';
 
 export class GameRoom {
     constructor(dialog, description, opener, {challenge = null} = {}) {

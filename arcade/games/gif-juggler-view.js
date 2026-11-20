@@ -1,7 +1,7 @@
-import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=arcade-28';
-import { drawJugglerSprite } from './gif-juggler-art.js?v=arcade-28';
-import { Painter } from '../core/painter.js?v=arcade-28';
-import { starfield, sparkleBurst, pageColor, hash } from './construction-fx.js';
+import { JUGGLER, CONTACT_Y } from './gif-juggler-config.js?v=eras-2';
+import { drawJugglerSprite } from './gif-juggler-art.js?v=eras-2';
+import { Painter } from '../core/painter.js?v=eras-2';
+import { starfield, sparkleBurst, pageColor, hash } from './construction-fx.js?v=eras-2';
 
 const NAVY = '#100d35', INK = '#fff9e8', GOLD = '#fff16b', CYAN = '#65ffff';
 const laneX = lane => lane ? 525 : 195;

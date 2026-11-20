@@ -1,5 +1,5 @@
-import { game } from '../../core/game.js';
-import { mono, header, rain, cursor, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, GLYPHS } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { mono, header, rain, cursor, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, GLYPHS } from './display.js?v=eras-2';
 
 // Binary Lock: a register of bits must be made equal to the KEY above it. L rotates the whole register
 // one cell left (the head bit wraps to the end); R flips the bit under the cursor at the head. Each lock

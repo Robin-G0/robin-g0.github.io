@@ -1,4 +1,4 @@
-import { WRISTS, decodeGesture } from '../core/commands.js';
+import { WRISTS, decodeGesture } from '../core/commands.js?v=eras-2';
 
 /** Space repeated wrist/direction commands independently. MIG owns physical rearming. */
 export class GestureGate {

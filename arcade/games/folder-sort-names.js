@@ -1,4 +1,4 @@
-import { integer } from '../core/random.js';
+import { integer } from '../core/random.js?v=eras-2';
 
 // Original, local vocabulary: no password dump or external download is needed.
 // Readable combinations keep the game varied without turning names into serial numbers.

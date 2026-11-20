@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js';
-import { integer } from '../../core/random.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { integer } from '../../core/random.js?v=eras-2';
 import { techno, chrome, candy, starburst, flare, backdrop, header, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js';
+    addEffect, pruneEffects, shatter, loseLife, gainLife } from './display.js?v=eras-2';
 
 // Orbital Breaker: a chrome shield orbits a candy-plastic planet in six sectors. Comets fly in along
 // the sector lines on a visible schedule; the shield breaks every comet that reaches its sector.

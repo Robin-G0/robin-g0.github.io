@@ -1,5 +1,5 @@
-export { popups } from './popup-panic.js?v=survival-17';
+export { popups } from './popup-panic.js?v=eras-2';
 
-export { maze } from './link-maze.js?v=traps-20';
+export { maze } from './link-maze.js?v=eras-2';
 
-export { juggle } from './gif-juggler.js?v=arcade-28';
+export { juggle } from './gif-juggler.js?v=eras-2';

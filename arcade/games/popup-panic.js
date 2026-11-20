@@ -1,7 +1,7 @@
-import { game } from '../core/game.js?v=motion-6';
-import { decodeGesture, DIRECTIONS, ARROWS, WRISTS } from '../core/commands.js';
-import { clamp } from '../core/random.js';
-import { starfield, sparkle, sparkleBurst, blinkOn, hazardTape } from './construction-fx.js';
+import { game } from '../core/game.js?v=eras-2';
+import { decodeGesture, DIRECTIONS, ARROWS, WRISTS } from '../core/commands.js?v=eras-2';
+import { clamp } from '../core/random.js?v=eras-2';
+import { starfield, sparkle, sparkleBurst, blinkOn, hazardTape } from './construction-fx.js?v=eras-2';
 
 export const STACK_LIMIT = 9;
 export const CHAIN_SECONDS = 4.5;

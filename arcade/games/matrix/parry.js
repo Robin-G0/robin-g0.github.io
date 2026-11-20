@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js';
-import { decodeGesture } from '../../core/commands.js';
-import { mono, header, rain, constructFloor, cursor, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, loseLife } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { decodeGesture } from '../../core/commands.js?v=eras-2';
+import { mono, header, rain, constructFloor, cursor, addBurst, bursts, pruneBursts, addEffect, pruneEffects, ripple, cells, loseLife } from './display.js?v=eras-2';
 
 // Construct Parry: an Agent throws strikes at the player's left and right side. Each anatomical wrist
 // guards its own side and answers the arrow the strike carries: up blocks, a left or right sweep

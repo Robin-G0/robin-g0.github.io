@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js';
-import { integer } from '../../core/random.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { integer } from '../../core/random.js?v=eras-2';
 import { tone, scene, art, reveal, header, shape, withAlpha, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, ripple, loseLife } from './display.js';
+    addEffect, pruneEffects, ripple, loseLife } from './display.js?v=eras-2';
 
 // Orbital Assist: a probe circles a planet on one of four rings. Raise L to drop to the inner ring (faster),
 // R to climb to the outer ring (slower). Each transfer takes .45 s. A beacon is collected when the probe

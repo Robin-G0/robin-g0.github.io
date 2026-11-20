@@ -1,4 +1,4 @@
 // Theme entry point; each Material game keeps its own rules and rendering in games/material/.
-export { tangram } from './material/tangram.js';
-export { golf } from './material/golf.js';
-export { balance } from './material/balance.js';
+export { tangram } from './material/tangram.js?v=eras-2';
+export { golf } from './material/golf.js?v=eras-2';
+export { balance } from './material/balance.js?v=eras-2';

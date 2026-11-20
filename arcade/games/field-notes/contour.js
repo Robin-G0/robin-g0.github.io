@@ -1,5 +1,5 @@
-import { game } from '../../core/game.js';
-import { header, page, write, ink, pencil, hatch, blot, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { header, page, write, ink, pencil, hatch, blot, addBurst, bursts, pruneBursts, addEffect, pruneEffects, loseLife } from './display.js?v=eras-2';
 
 // Contour Survey: a pencil walks the dot grid of a survey sheet by itself, one segment per step.
 // L and R queue a quarter turn (relative to the pencil) for the next step; the latest raise replaces

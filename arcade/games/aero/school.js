@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js';
-import { decodeGesture } from '../../core/commands.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { decodeGesture } from '../../core/commands.js?v=eras-2';
 import { AERO, linear, water, risingBubbles, glass, orb, bubble, fish, jellyfish, text, header, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, ring, loseLife, isDark, aurora } from './display.js';
+    addEffect, pruneEffects, ring, loseLife, isDark, aurora } from './display.js?v=eras-2';
 
 // School Rescue: guide a school of fish up a three-lane current. Rows drift down toward the school;
 // sweep a wrist sideways to change lane, raise one to spend a pearl on a bubble shield.

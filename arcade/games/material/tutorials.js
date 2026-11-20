@@ -1,6 +1,6 @@
 // Material teaching material: three SVG cards per engine, their captions and the Controls text.
 // Cards are paper sheets on the theme palette (CSS variables), so light and dark appearance follow the room.
-import { SHAPES, transform } from './tangram.js';
+import { SHAPES, transform } from './tangram.js?v=eras-2';
 
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const text = (value, x, y, size = 18, weight = 400, cls = '') => `<text x="${x}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}"${cls ? ` class="${cls}"` : ''}>${escape(value)}</text>`;

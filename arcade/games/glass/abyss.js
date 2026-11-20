@@ -1,8 +1,8 @@
-import { game } from '../../core/game.js';
-import { integer } from '../../core/random.js';
-import { decodeGesture } from '../../core/commands.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { integer } from '../../core/random.js?v=eras-2';
+import { decodeGesture } from '../../core/commands.js?v=eras-2';
 import { tone, text, scene, art, reveal, header, shape, withAlpha, meter, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, ripple, loseLife } from './display.js';
+    addEffect, pruneEffects, ripple, loseLife } from './display.js?v=eras-2';
 
 // Abyss Drift: the jellyfish sinks through four lanes while the deep rises past it.
 // Sweep either wrist sideways to swim one lane (screen direction); raise either wrist to pulse the bell,

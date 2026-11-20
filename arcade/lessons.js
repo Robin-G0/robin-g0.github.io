@@ -1,4 +1,4 @@
-import { themeLessons } from './games/theme-guides.js';
+import { themeLessons } from './games/theme-guides.js?v=eras-2';
 
 // Explain actual rules, not just the two action names. Reworked themes keep theirs in games/<theme>/tutorials.js.
 const instructions = {

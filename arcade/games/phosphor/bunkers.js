@@ -1,4 +1,4 @@
-import {CRT,mix} from './display.js';
+import {CRT,mix} from './display.js?v=eras-2';
 
 const MASK=['.#####.','#######','###.###','##...##'];
 export const BUNKER={top:265,cellWidth:10,cellHeight:6,health:2};

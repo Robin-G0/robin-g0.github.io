@@ -1,7 +1,7 @@
-import { game } from '../../core/game.js';
-import { integer } from '../../core/random.js';
+import { game } from '../../core/game.js?v=eras-2';
+import { integer } from '../../core/random.js?v=eras-2';
 import { SPECTRUM, tone, hue, text, scene, acrylic, reveal, header, shape, withAlpha, addBurst, bursts, pruneBursts,
-    addEffect, pruneEffects, ripple, loseLife } from './display.js';
+    addEffect, pruneEffects, ripple, loseLife } from './display.js?v=eras-2';
 
 // Prisms: a central prism splits white light into three rays (rose, mint, sky) on adjacent spokes.
 // L turns it one spoke anticlockwise, R one spoke clockwise. A crystal shatters into light when the ray of

@@ -1,6 +1,6 @@
-import { game } from '../../core/game.js';
+import { game } from '../../core/game.js?v=eras-2';
 import { AERO, meadow, glass, orb, bubble, glyph, text, header, addBurst, bursts, pruneBursts, addEffect, pruneEffects,
-    ring, timerRing, loseLife, isDark, grass, mix } from './display.js';
+    ring, timerRing, loseLife, isDark, grass, mix } from './display.js?v=eras-2';
 
 // Living Garden: plants ask for rain or sunshine. Raise L to rain on the whole garden, R for sunshine:
 // every plant asking for that weather is served at once, and a batch of n scores 10 x n squared.
