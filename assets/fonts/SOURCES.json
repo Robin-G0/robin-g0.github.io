@@ -49,5 +49,15 @@
     "source": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSGmu1aB.woff2",
     "license": "open-sans-OFL.txt",
     "bytes": 35156
+  },
+  {
+    "family": "Roboto",
+    "designer": "Christian Robertson (The Roboto Project Authors)",
+    "file": "roboto.woff2",
+    "weight": "100 900 (variable, latin subset)",
+    "role": "Material theme typeface for the arcade room, tutorials and canvas",
+    "source": "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+    "license": "roboto-OFL.txt",
+    "bytes": 43136
   }
 ]
