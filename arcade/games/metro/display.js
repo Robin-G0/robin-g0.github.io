@@ -11,17 +11,12 @@ export function light(p, text, x, y, size, color = 'ink', align = 'left', weight
     c.fillStyle = p.color(color); c.fillText(String(text), x, y); c.restore();
 }
 
-/** Start-screen header: a lowercase light title, a right-aligned detail and three square lives. */
-export function header(p, title, detail, lives, slots = 3) {
+/** Canvas header: live status on the left, a secondary figure on the right. The room header already
+ * names the game and the HUD already counts lives, so neither is repeated here. */
+export function header(p, status, detail = '') {
     const compact = p.compact, y = compact ? 44 : 34;
-    light(p, title, 28, y, compact ? 46 : 34, 'ink');
-    light(p, detail, 692, y, compact ? 30 : 23, 'muted', 'right');
-    const size = compact ? 16 : 11, gap = compact ? 10 : 7, top = compact ? 76 : 58;
-    for (let i = 0; i < slots; i++) {
-        const x = 692 - size - i * (size + gap);
-        if (i < lives) p.rect(x, top, size, size, 'ink');
-        else p.outline(x + 1, top + 1, size - 2, size - 2, 'border', 2);
-    }
+    light(p, status, 28, y, compact ? 40 : 30, 'ink');
+    if (detail) light(p, detail, 692, y, compact ? 30 : 23, 'muted', 'right');
 }
 
 /** A live tile: solid colour, white glyph, inverted while lit and outlined while selected. */

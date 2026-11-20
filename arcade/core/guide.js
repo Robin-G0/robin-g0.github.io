@@ -80,7 +80,7 @@ export class GameGuide {
             frame(label('+ SCORE',200,75,37)+label('\u2665 \u2665 \u2665',200,129,34));
         this.$('[data-guide-back]').disabled=this.step===0;
         this.$('[data-guide-next]').textContent=this.step===2?'Ready':'Next';
-        this.$('.guide-heading h3').textContent=`How to play \u00b7 ${this.step+1}/3`;
+        this.$('.guide-heading h3').textContent='How to play'; // The numbered dots below already say which step this is.
         this.element.dataset.step=String(this.step+1);
         [...this.element.querySelectorAll('.guide-progress span')].forEach((dot,i)=>{
             if(i===this.step)dot.setAttribute('aria-current','step');else dot.removeAttribute('aria-current');

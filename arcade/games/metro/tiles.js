@@ -63,7 +63,7 @@ export function memory(env) {
         },
         render(s, p) {
             const compact = p.compact, count = s.sequence.length;
-            header(p, 'live tiles', `round ${s.rounds + 1} · best ${s.best}`, s.lives);
+            header(p, `round ${s.rounds + 1}`, `best ${s.best} tiles`);
             const size = compact ? 300 : 220, top = compact ? 150 : 95, gap = compact ? 40 : 60;
             const cue = s.phase === 'show' && s.time >= s.started ? Math.floor((s.time - s.started) / s.cadence) : -1;
             const flashing = cue >= 0 && cue < count && (s.time - s.started) % s.cadence < s.cadence * TILES.litShare;
@@ -73,7 +73,7 @@ export function memory(env) {
                 const lit = flashing && s.sequence[cue] === side;
                 const press = s.effects.find(e => e.kind === 'press' && e.side === side && s.time - e.at < .6);
                 const scale = press ? ripple(p, x, top, size, size, s.time - press.at, press.live ? 'accent' : color(side), env.reducedMotion) : 1;
-                scaledTile(p, x, top, size, size, scale, color(side), letter(side), { lit, selected: !!press && s.time - press.at < .3, size: size * .5, label: i ? 'purple tile' : 'blue tile' });
+                scaledTile(p, x, top, size, size, scale, color(side), letter(side), { lit, selected: !!press && s.time - press.at < .3, size: size * .5 });
                 if (lit) light(p, `${cue + 1} / ${count}`, x + size / 2, top - (compact ? 26 : 16), compact ? 30 : 22, 'ink', 'center', 400);
             });
             // The slot row is the sequence itself: it fills while tiles flash and empties for the repeat.

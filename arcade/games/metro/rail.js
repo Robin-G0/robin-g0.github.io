@@ -85,7 +85,7 @@ export function rail(env) {
         },
         render(s, p) {
             const compact = p.compact, h = p.h, k = compact ? 1.6 : 1;
-            header(p, 'metro line', `${s.served} arrived · convoy ${s.convoy}`, s.lives);
+            header(p, `${s.served} arrived`, s.convoy ? `convoy ${s.convoy}` : '');
             const stationY = compact ? 150 : 96, radius = 30 * k, childY = compact ? h * .40 : 196, rootY = compact ? h * .56 : 272;
             const depotY = compact ? h * .70 : 334, boardY = compact ? h - 150 : 368, track = 10 * k;
             const slotX = [110, 280, 440, 610], childX = [195, 525], stationPoint = station => [slotX[station.slot], stationY + radius];

@@ -12,7 +12,7 @@ const junction = (active, trunk = 165) => `<path d="M200 ${trunk}V95" style="str
 
 export const metroDiagrams = {
     memory: [
-        frame(tile(45, 22, 120, 120, BLUE, 'L', 52) + tile(235, 22, 120, 120, PURPLE, 'R', 52) + text('blue tile ↑', 105, 156, 21) + text('purple tile ↑', 295, 156, 21)),
+        frame(tile(45, 22, 120, 120, BLUE, 'L', 52) + tile(235, 22, 120, 120, PURPLE, 'R', 52) + text('raise ↑', 105, 156, 21) + text('raise ↑', 295, 156, 21)),
         frame(tile(40, 30, 58, 58, BLUE, 'L', 24, 'metro-flash', 0) + tile(116, 30, 58, 58, PURPLE, 'R', 24, 'metro-flash', .5) + tile(192, 30, 58, 58, PURPLE, 'R', 24, 'metro-flash', 1)
             + text('watch', 145, 114, 21) + '<path d="M275 59h55m-12-10 12 10-12 10"/>' + text('LIVE ×2', 345, 114, 24, 400) + text('repeat after, or follow along', 200, 150, 22)),
         frame(text('+10', 70, 60, 42) + text('per tile', 70, 92, 19) + text('+20', 200, 60, 42) + text('live', 200, 92, 19) + text('+10 × tiles', 330, 60, 30) + text('finish', 330, 92, 19)

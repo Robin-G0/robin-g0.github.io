@@ -122,7 +122,7 @@ export function merge(env) {
         },
         render(s, p) {
             const compact = p.compact;
-            header(p, 'tile drop', `best ${label(s.best)} · min ${label(s.floor)} · chain ${s.longestChain}`, s.lives, 0);
+            header(p, `best ${label(s.best)} · min ${label(s.floor)}`, `longest chain ${s.longestChain}`);
             const cell = compact ? 100 : 43, gap = compact ? 10 : 5, pitch = cell + gap;
             const width = DROP.columns * pitch - gap, height = DROP.rows * pitch - gap, left = 360 - width / 2;
             const top = compact ? 330 : 118, bottom = top + height;
@@ -142,9 +142,9 @@ export function merge(env) {
             const nextX = compact ? left + ghost / 2 : left - side, hintX = compact ? left + width : left + width + side, hintAlign = compact ? 'right' : 'center';
             light(p, 'next', nextX, infoY + (compact ? 0 : 10), compact ? 24 : 15, 'muted', 'center', 400);
             tile(p, nextX - ghost / 2, infoY + (compact ? 18 : 22), ghost, ghost, tileColor(s.next), label(s.next), { size: label(s.next).length > 2 ? ghost * .38 : ghost * .5 });
-            light(p, 'L ←  → R', hintX, infoY + (compact ? 10 : 10), compact ? 26 : 15, 'ink', hintAlign, 400);
-            light(p, 'both: drop now', hintX, infoY + (compact ? 48 : 34), compact ? 24 : 14, 'muted', hintAlign, 400);
-            if (s.lastMove && !s.lastMove.moved && s.time - s.lastMove.at < .5) light(p, 'edge', hintX, infoY + (compact ? 86 : 58), compact ? 24 : 14, 'muted', hintAlign, 400);
+            light(p, 'L + R together', hintX, infoY + (compact ? 10 : 10), compact ? 24 : 14, 'muted', hintAlign, 400);
+            light(p, 'drop now', hintX, infoY + (compact ? 44 : 32), compact ? 26 : 15, 'ink', hintAlign, 400);
+            if (s.lastMove && !s.lastMove.moved && s.time - s.lastMove.at < .5) light(p, 'edge', hintX, infoY + (compact ? 84 : 56), compact ? 24 : 14, 'muted', hintAlign, 400);
             for (const b of s.bursts) {
                 const age = s.time - b.at; if (age < 0 || age > 1.1) continue;
                 // Chain bursts stack upward by step so a long CHAIN label never covers the previous one.
