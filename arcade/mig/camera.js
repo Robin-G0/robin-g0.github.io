@@ -1,6 +1,10 @@
 import { arcadeProfile } from './profile.js?v=targets-25';
 import { GestureGate } from './gesture-gate.js?v=directions-16';
 import { BindingGate } from './bindings.js?v=phosphor-33';
+import { PRESETS } from './precision.js';
+import { precisionModelLoader, isPoseModelReady, POSE_MODELS } from './pose-models.js';
+
+const RUNTIME = new URL('../../vendor/motion-input-grid/runtime/', import.meta.url).href;
 
 export function visiblePoint(point) {
     return Boolean(point && point.confidence >= .5 && Number.isFinite(point.x) && Number.isFinite(point.y)
@@ -10,8 +14,9 @@ export function visiblePoint(point) {
 /** Public npm API only; the application never reconstructs MIG gesture rules. */
 export class MotionCamera {
     constructor({ onInput, onTracking, onStatus, loadPackage = () => import('motion-input-grid'),
-        clock = () => performance.now(), profile = arcadeProfile, cooldownMs = 0, mapped = false }) {
-        Object.assign(this, { onInput, onTracking, onStatus, loadPackage, clock, profile });
+        clock = () => performance.now(), profile = arcadeProfile, cooldownMs = 0, mapped = false,
+        precision = PRESETS.low, onModel = () => {} }) {
+        Object.assign(this, { onInput, onTracking, onStatus, loadPackage, clock, profile, precision, onModel });
         this.session = null;
         this.generation = 0;
         this.pending = [];
@@ -30,9 +35,28 @@ export class MotionCamera {
         try {
             const { MIGSession } = await this.loadPackage();
             if (generation !== this.generation) return;
+            const { model, delegate } = this.precision;
+            this.problem = '';
+            if (!await isPoseModelReady(model, RUNTIME)) {
+                if (generation !== this.generation) return;
+                this.downloading = true;
+                const megabytes = Math.round(POSE_MODELS[model].size / 1e6);
+                this.onStatus(`Downloading the ${this.precision.label} tracking model once (${megabytes} MB). It stays in this browser.`);
+            }
             const session = new MIGSession({
-                assetBase: new URL('../../vendor/motion-input-grid/runtime/', import.meta.url).href,
+                assetBase: RUNTIME,
                 profileMode: true,
+                delegate,
+                // The published 1.2.0 loader only knows Lite: supply the chosen model and delegate.
+                dependencies: {
+                    createTracker: async json => (await import(`${RUNTIME}mig-tracker.mjs`)).MIGTracker.create(json),
+                    loadModels: precisionModelLoader(RUNTIME, { model, delegate,
+                        report: used => {
+                            if (generation !== this.generation) return;
+                            this.downloading = false; this.onModel(used); this.onStatus('Tracking model ready.');
+                        } }),
+                    drawOverlay() {}
+                },
                 maxInferenceFps: this.inferenceFps,
                 drawOverlay: false,
                 videoConstraints: { width: 640, height: 480, frameRate: { ideal: 20, max: 30 } },
@@ -84,6 +108,9 @@ export class MotionCamera {
             await session.start(video, overlay);
             if (generation !== this.generation) return;
             if (!session.state.running) {
+                this.downloading = false;
+                // Model failures carry their own wording; keep them apart from camera permission problems.
+                if (/precision needs|tracking model/i.test(session.state.status ?? '')) this.problem = session.state.status;
                 this.onStatus('Camera unavailable. Allow camera access in your browser, then retry, or play with buttons.');
                 this.stop();
                 return;
@@ -131,6 +158,7 @@ export class MotionCamera {
 
     stop() {
         ++this.generation;
+        this.downloading = false;
         this.pending.length = 0;
         this.gate.reset();
         this.running = false;

@@ -3,7 +3,9 @@ import { WRIST_COMMANDS, commandLabel } from './core/commands.js';
 function entry(theme, engine, title, goal, left, right, options = {}) {
     return Object.freeze({ id: `${theme}-${engine}`, theme, engine, title, goal,
         controls: engine === 'popups' ? Object.fromEntries(WRIST_COMMANDS.map(action => [action, commandLabel(action)])) : { left, right },
-        inputScheme: engine === 'popups' ? 'wrist-directions' : 'wrist-up', duration:60, difficulty: 'gentle', ...options });
+        inputScheme: engine === 'popups' ? 'wrist-directions' : 'wrist-up', duration:60, difficulty: 'gentle',
+        // Recommended tracking precision: sweeps and fine placement read better on larger models.
+        precision: engine === 'popups' ? 'full' : 'low', ...options });
 }
 
 export const games = Object.freeze([

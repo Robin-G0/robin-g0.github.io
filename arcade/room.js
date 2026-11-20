@@ -16,6 +16,7 @@ import { localScores } from './core/scores.js?v=phosphor-33';
 import { GameGuide, greetingHand } from './core/guide.js?v=desktop95-6';
 import { seededRandom } from './core/random.js';
 import { localBindings, compileBindings, bindingName, controlLabels } from './mig/bindings.js?v=phosphor-33';
+import { PRESETS, readPrecision, resolvePreset, isMobileDevice, meetsLevel, LEVEL_LABELS } from './mig/precision.js';
 
 export class GameRoom {
     constructor(dialog, description, opener, {challenge = null} = {}) {
@@ -87,8 +88,10 @@ export class GameRoom {
             profile, mapped:this.bindingPlan.mapped,
             cooldownMs: config.cooldownMs,
             onInput: (action, timestamp, details) => details?.mapped ? this.mappedInput(action,timestamp) : this.motionInput(action, timestamp),
-            onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus()
+            onTracking: frame => this.tracking(frame), onStatus: () => this.cameraStatus(),
+            precision: this.precision(), onModel: used => this.showPrecision(used)
         });
+        this.showPrecision();
         this.bindControls();
         this.cancelCountdown();
         this.showPlacement({ shoulders: false, left: null, right: null });
@@ -162,6 +165,12 @@ export class GameRoom {
             if (this.runner.phase === 'playing') this.runner.pause(); else if (this.runner.phase === 'paused') this.runner.play();
         });
         on('#arcade-camera', () => this.toggleCamera());
+        // Changing precision opens the site's experience dialog; a running round waits as a manual pause.
+        on('#arcade-precision-change', () => { this.cancelCountdown(); if (this.runner.phase === 'playing') this.runner.pause(); });
+        window.addEventListener('precisionchange', () => {
+            this.camera.precision = this.precision(); this.showPrecision();
+            if (this.camera.running || this.cameraStarting) { this.stopCamera(); this.toggleCamera(); }
+        }, { signal });
         on('#arcade-sound', () => {
             const enabled = this.sound.toggle();
             this.$('#arcade-sound').setAttribute('aria-pressed', String(enabled));
@@ -535,10 +544,28 @@ export class GameRoom {
         this.showPlacement({ shoulders: false, left: null, right: null });
     }
 
+    /** The visitor's tracking precision; Low (bundled, offline) until they choose one. */
+    precision() {
+        const mobile = isMobileDevice();
+        return resolvePreset(readPrecision(undefined, mobile), mobile) ?? PRESETS.low;
+    }
+
+    showPrecision(used = null) {
+        const preset = this.camera?.precision ?? this.precision();
+        const processor = (used?.delegate ?? preset.delegate) === 'GPU' ? 'graphics card' : 'processor';
+        const fallback = used && used.delegate !== used.requested ? ' (graphics card unavailable)' : '';
+        const level = this.description.precision ?? 'low';
+        const advice = meetsLevel(preset, level) ? '' : ` · this game recommends ${LEVEL_LABELS[level]}`;
+        this.$('#arcade-precision-label').textContent = `${preset.label} precision · ${processor}${fallback}${advice}`;
+        this.$('.camera-precision').dataset.below = String(Boolean(advice));
+    }
+
     cameraStatus() {
         if (this.closed) return;
         const short = this.camera.running ? (this.visible ? 'Ready' : 'Camera on')
-            : this.cameraStarting ? 'Starting…' : this.dialog.dataset.camera === 'off' ? 'Camera off' : 'Camera unavailable';
+            : this.camera.downloading ? 'Downloading model…'
+            : this.cameraStarting ? 'Starting…' : this.dialog.dataset.camera === 'off' ? 'Camera off'
+            : this.camera.problem ? (/download/.test(this.camera.problem) ? 'Model needs internet' : 'Model rejected') : 'Camera unavailable';
         if (this.$('#arcade-camera-status').textContent !== short) this.$('#arcade-camera-status').textContent = short;
         if (this.dialog.dataset.camera === 'live' && !this.camera.running) {
             this.dialog.dataset.camera = 'unavailable';
