@@ -1,1 +1,237 @@
-/* aero game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="aero"]. */
+/* Frutiger Aero game room (Windows Vista / 7, 2004-2012): glass title bar with a specular band, glossy
+   gel pills, a Windows 7 taskbar strip, sky-to-grass light and Segoe UI (Light for headings).
+   Every rule is scoped to [data-theme=aero]. Colours follow the theme palette in assets/profile.json. */
+:root[data-theme=aero] {
+    --arcade-font: 'Segoe UI', 'Open Sans', Tahoma, sans-serif;
+    --arcade-display: 'Segoe UI Light', 'Segoe UI', 'Open Sans', sans-serif;
+}
+[data-theme=aero] #arcade-player {
+    --bg: #effbff; --ink: #123b50; --muted: #39667b; --border: #85bfcc; --accent: #076ca8; --soft: #c7e8f5; --gold: #41651b; --goldbg: #e1efb4;
+    --aero-glass: rgba(255,255,255,.62); --aero-glass-edge: rgba(255,255,255,.95); --aero-frame: #6fb3cc;
+    --aero-gel-top: #fdfeff; --aero-gel-mid: #e2f4fb; --aero-gel-low: #c4e5f2; --aero-glow: #7fd8ff;
+    --aero-card-top: #e2fbff; --aero-card-mid: #86def3; --aero-card-low: #2aa6d4;
+    --aero-sky-top: #3aa6e6; --aero-sky-low: #e3f7ff; --aero-hill-top: #b6ef6a; --aero-hill-low: #3f9f30;
+    --aero-label: #06405f; --aero-halo: #ffffff;
+    font-family: var(--arcade-font); color: var(--ink);
+    background: linear-gradient(180deg, #d9f3ff 0, #f3fcff 26%, #f6fdff 62%, #e2f6ea 100%);
+    border: 1px solid var(--aero-frame); border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.9), 0 22px 60px rgba(6,62,92,.38);
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player {
+    --bg: #102c40; --ink: #e5faff; --muted: #a3cddc; --border: #407a95; --accent: #83dbff; --soft: #204d65; --gold: #d1f58e; --goldbg: #3b542d;
+    --aero-glass: rgba(120,200,240,.12); --aero-glass-edge: rgba(170,230,255,.35); --aero-frame: #2c6684;
+    --aero-gel-top: #3d7896; --aero-gel-mid: #22536f; --aero-gel-low: #163e57; --aero-glow: #3fc3ff;
+    --aero-card-top: #165b7e; --aero-card-mid: #0c3c5c; --aero-card-low: #06223a;
+    --aero-sky-top: #04162c; --aero-sky-low: #1a5d7c; --aero-hill-top: #3c9a45; --aero-hill-low: #123e22;
+    --aero-label: #e9fbff; --aero-halo: #04223a;
+    background: linear-gradient(180deg, #0b3654 0, #0d2c43 30%, #0b2638 70%, #0f3328 100%);
+    box-shadow: inset 0 0 0 1px rgba(150,220,255,.18), 0 22px 60px rgba(0,0,0,.6);
+}
+[data-theme=aero] #arcade-player::backdrop { background: radial-gradient(circle at 70% 10%, rgba(140,230,255,.35), rgba(8,60,95,.55)); }
+
+/* Title bar: Windows 7 glass with a bright specular band over a hint of sky. */
+[data-theme=aero] #arcade-player .arcade-room-header {
+    position: relative; align-items: center; padding: 14px 18px 14px 24px; color: #0a4566;
+    background: linear-gradient(180deg, rgba(255,255,255,.92) 0, rgba(255,255,255,.55) 48%, rgba(170,222,245,.55) 52%, rgba(214,242,252,.8) 100%),
+        url('../../assets/art/aero-sky-v3.jpg') center 40% / cover;
+    border-bottom: 1px solid rgba(80,160,195,.55); border-radius: 11px 11px 0 0;
+    box-shadow: inset 0 1px #fff, inset 0 -1px rgba(255,255,255,.7);
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player .arcade-room-header {
+    color: #e9fbff;
+    background: linear-gradient(180deg, rgba(120,190,230,.42) 0, rgba(40,100,140,.35) 48%, rgba(8,40,66,.75) 52%, rgba(12,52,80,.85) 100%),
+        url('../../assets/art/aero-sky-v3.jpg') center 40% / cover;
+    border-bottom-color: rgba(130,210,255,.3); box-shadow: inset 0 1px rgba(200,240,255,.45);
+}
+[data-theme=aero] #arcade-player .arcade-room-header h2 {
+    font-family: var(--arcade-display); font-weight: 300; font-size: 30px; letter-spacing: -.02em;
+    text-shadow: 0 0 10px rgba(255,255,255,.95), 0 1px rgba(255,255,255,.9);
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player .arcade-room-header h2 { text-shadow: 0 0 12px rgba(0,30,60,.9); }
+[data-theme=aero] #arcade-player .arcade-room-header p { color: inherit; opacity: .85; font-size: 13px; }
+
+/* Gel pills: every room button is a glossy capsule whose highlight brightens and sweeps on hover. */
+[data-theme=aero] #arcade-player button:not(.arcade-room-close),
+[data-theme=aero] #arcade-player .button {
+    position: relative; overflow: hidden; border-radius: 999px; color: var(--ink);
+    font-family: var(--arcade-font); text-decoration: none;
+    background: linear-gradient(180deg, var(--aero-gel-top) 0, var(--aero-gel-mid) 49%, var(--aero-gel-low) 51%, var(--aero-gel-mid) 100%);
+    border: 1px solid #7db7cf; box-shadow: inset 0 1px rgba(255,255,255,.95), 0 1px 3px rgba(4,70,100,.18);
+    transition: box-shadow .2s, filter .2s;
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player button:not(.arcade-room-close),
+:root[data-mode=dark][data-theme=aero] #arcade-player .button { border-color: #4f93b3; box-shadow: inset 0 1px rgba(190,235,255,.4), 0 1px 3px rgba(0,0,0,.4); }
+[data-theme=aero] #arcade-player button:not(.arcade-room-close)::after,
+[data-theme=aero] #arcade-player .button::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.75), transparent); transform: skewX(-20deg); opacity: 0;
+}
+[data-theme=aero] #arcade-player button:not(.arcade-room-close):hover,
+[data-theme=aero] #arcade-player .button:hover { box-shadow: inset 0 1px #fff, 0 0 12px var(--aero-glow); filter: brightness(1.04); }
+[data-theme=aero] #arcade-player button:not(.arcade-room-close):hover::after,
+[data-theme=aero] #arcade-player .button:hover::after { animation: aero-shine .75s ease-out; }
+[data-theme=aero] #arcade-player button:active { filter: brightness(.95); box-shadow: inset 0 2px 5px rgba(0,60,90,.3); }
+[data-theme=aero] #arcade-player button:focus-visible { outline: 2px solid var(--aero-glow); outline-offset: 2px; }
+[data-theme=aero] #arcade-player button:disabled { opacity: .5; filter: grayscale(.6); }
+@keyframes aero-shine { from { left: -60%; opacity: 1; } to { left: 130%; opacity: 1; } }
+
+/* Primary actions are the Vista blue orb pill; Start and Replay keep the grassy gel key. */
+[data-theme=aero] #arcade-player .button.primary, [data-theme=aero] #arcade-player [data-guide-next] {
+    color: #fff; border-color: #0b62a3; text-shadow: 0 1px 2px rgba(0,50,100,.7);
+    background: linear-gradient(180deg, #c3ecff 0, #5cc0f2 45%, #168ad6 52%, #2aa5e6 80%, #6fd3ff 100%);
+}
+[data-theme=aero] #arcade-player #arcade-begin, [data-theme=aero] #arcade-player #arcade-again {
+    color: #134a0e; text-shadow: 0 1px rgba(255,255,255,.7); border-color: #5e9f2f;
+    background: linear-gradient(180deg, #effcd0 0, #a9e055 38%, #77c42a 50%, #4a9a17 53%, #92d743 100%);
+    box-shadow: inset 0 1px #fff, 0 4px 14px rgba(43,130,60,.3);
+}
+[data-theme=aero] #arcade-player .arcade-room-close {
+    width: 46px; height: 30px; border-radius: 6px; color: #fff; font-size: 20px; line-height: 1; align-self: flex-start;
+    border: 1px solid #7a1d0e; text-shadow: 0 0 4px #000;
+    background: linear-gradient(180deg, #eaa894 0, #d5735c 46%, #bd3a1f 52%, #d4583a 100%);
+    box-shadow: inset 0 1px rgba(255,255,255,.7), 0 0 0 1px rgba(255,255,255,.5);
+}
+[data-theme=aero] #arcade-player .arcade-room-close:hover { background: linear-gradient(180deg, #ffc0a8 0, #ef8566 46%, #db3e1c 52%, #f2754d 100%); box-shadow: inset 0 1px #fff, 0 0 14px #ff8a5c; }
+[data-theme=aero] #arcade-player .arcade-controls-trigger { padding: 8px 18px; font-size: 14px; }
+
+/* HUD: a glass strip; figures in Segoe UI Light, labels small and muted. */
+[data-theme=aero] #arcade-player .arcade-hud {
+    background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.25) 50%, rgba(200,235,248,.3) 51%, rgba(255,255,255,.45));
+    border-block: 1px solid rgba(110,180,210,.45); box-shadow: inset 0 1px #fff;
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player .arcade-hud { background: linear-gradient(180deg, rgba(120,200,240,.18), rgba(60,130,170,.08) 50%, rgba(0,20,40,.25) 51%, rgba(30,80,110,.2)); box-shadow: inset 0 1px rgba(170,230,255,.25); }
+[data-theme=aero] #arcade-player .arcade-hud dt { font-size: 11px; letter-spacing: .04em; color: var(--muted); }
+[data-theme=aero] #arcade-player .arcade-hud dd { font: 300 28px var(--arcade-display); color: var(--accent); }
+[data-theme=aero] #arcade-player #arcade-best { color: var(--gold); }
+
+/* The playfield and its overlays: water behind the canvas, frosted glass over it. */
+[data-theme=aero] #arcade-player .arcade-stage { background: linear-gradient(#bff3ff, #2aa6d4); }
+:root[data-mode=dark][data-theme=aero] #arcade-player .arcade-stage { background: linear-gradient(#0f5476, #041a2b); }
+[data-theme=aero] #arcade-player .arcade-overlay {
+    background: linear-gradient(180deg, rgba(240,251,255,.92), rgba(226,246,252,.9)); color: var(--ink);
+    backdrop-filter: blur(8px);
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player .arcade-overlay { background: linear-gradient(180deg, rgba(14,52,78,.94), rgba(8,32,52,.94)); }
+[data-theme=aero] #arcade-player .arcade-overlay h3, [data-theme=aero] #arcade-player .guide-title {
+    font-family: var(--arcade-display); font-weight: 300; letter-spacing: -.02em; color: var(--accent);
+}
+[data-theme=aero] #arcade-player[data-brief=start] #arcade-tutorial,
+[data-theme=aero] #arcade-player [data-brief=start] #arcade-tutorial { background: linear-gradient(#eaffffb0, #d2f7eecc), url('../../assets/art/aero-sky-v3.jpg') center / cover; }
+:root[data-mode=dark][data-theme=aero] #arcade-player[data-brief=start] #arcade-tutorial,
+:root[data-mode=dark][data-theme=aero] #arcade-player [data-brief=start] #arcade-tutorial { color: #e5faff; background: linear-gradient(#06243ad0, #0b3a40e0), url('../../assets/art/aero-sky-v3.jpg') center / cover; }
+:root[data-mode=dark][data-theme=aero] #arcade-player #arcade-controls-status { color: #e5faff; text-shadow: 0 0 18px rgba(80,200,255,.6); }
+
+/* Walkthrough: orb step markers and the illustrated scenes. */
+[data-theme=aero] #arcade-player .guide-progress span {
+    border-radius: 50%; border: 1px solid #7db7cf; color: var(--muted);
+    background: radial-gradient(circle at 50% 30%, #fff, var(--aero-gel-mid) 60%, var(--aero-gel-low));
+}
+[data-theme=aero] #arcade-player .guide-progress [aria-current=step] {
+    color: #fff; border-color: #0b62a3; text-shadow: 0 1px 2px rgba(0,40,80,.7);
+    background: radial-gradient(circle at 50% 25%, #e6f8ff, #4cbcf2 45%, #0f7fcf 75%, #3fb6ef);
+}
+[data-theme=aero] #arcade-player .guide-heading h3 { font-family: var(--arcade-display); font-weight: 300; }
+[data-theme=aero] #arcade-player .guide-figure { flex: 0 0 auto; }
+[data-theme=aero] #arcade-player .aero-diagram { max-height: 170px; overflow: hidden; border-radius: 18px; color: var(--accent); filter: drop-shadow(0 6px 14px rgba(8,80,120,.25)); }
+[data-theme=aero] #arcade-player .aero-diagram text.aero-label {
+    font-family: var(--arcade-font); fill: var(--aero-label); stroke: var(--aero-halo); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke;
+}
+[data-theme=aero] #arcade-player .arcade-walkthrough .guide-caption { font-weight: 400; color: var(--ink); }
+.aero-sweep { animation: aero-card-sweep 5s ease-in-out infinite; }
+.aero-swim { animation: aero-swim 4s ease-in-out infinite; }
+.aero-shield { animation: aero-shield 4s ease-in-out infinite; }
+.aero-drift { animation: aero-drift 3.2s linear infinite; }
+.aero-rise { animation: aero-rise 2.6s ease-in-out infinite; }
+.aero-pop { animation: aero-pop 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.aero-float { animation: aero-float 3s ease-in-out infinite; }
+.aero-drip { animation: aero-drip 1.4s linear infinite; }
+.aero-ray { animation: aero-ray 2.4s ease-in-out infinite; }
+.aero-sway { animation: aero-sway 3.2s ease-in-out infinite; }
+.aero-bob { animation: aero-bob 2.4s ease-in-out infinite; }
+.aero-stress { animation: aero-ray 1.2s ease-in-out infinite; }
+.aero-bloom { animation: aero-bloom 3s ease-in-out infinite; }
+@keyframes aero-card-sweep { 0%, 55% { transform: skewX(-20deg) translateX(0); } 100% { transform: skewX(-20deg) translateX(620px); } }
+@keyframes aero-swim { 0%, 15%, 100% { transform: translateX(0); } 30%, 45% { transform: translateX(-90px); } 60%, 80% { transform: translateX(90px); } }
+@keyframes aero-shield { 0%, 82%, 100% { opacity: 0; } 86%, 96% { opacity: 1; } }
+@keyframes aero-drift { from { transform: translateY(-6px); } to { transform: translateY(14px); } }
+@keyframes aero-rise { 0%, 20% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(-34px); opacity: 1; } 100% { transform: translateY(-34px); opacity: 0; } }
+@keyframes aero-pop { 0%, 40% { opacity: 1; transform: scale(1); } 50% { opacity: .9; transform: scale(1.18); } 60%, 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes aero-float { 0%, 55% { transform: translateY(0); } 75%, 100% { transform: translateY(-34px); } }
+@keyframes aero-drip { from { transform: translateY(-8px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(14px); opacity: 0; } }
+@keyframes aero-ray { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@keyframes aero-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes aero-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes aero-bloom { 0%, 30% { transform: scale(.2); opacity: 0; } 50%, 90% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+
+/* Motion inputs: big aqua gel keys that glow lime when a wrist command is accepted. */
+[data-theme=aero] #arcade-player .arcade-action { border-radius: 18px; min-height: 60px; }
+[data-theme=aero] #arcade-player .wrist-buttons .arcade-action { border-radius: 16px; }
+[data-theme=aero] #arcade-player .arcade-action .action-key { font: 400 24px var(--arcade-font); color: var(--accent); }
+[data-theme=aero] #arcade-player .arcade-action .action-name { font-size: 15px; }
+[data-theme=aero] #arcade-player .arcade-action[data-pulse] {
+    outline: 0; border-color: #5e9f2f; color: #134a0e;
+    background: linear-gradient(180deg, #f2ffd8 0, #c4ef84 46%, #93d548 52%, #c7f08a 100%);
+    box-shadow: inset 0 1px #fff, 0 0 16px rgba(150,230,80,.85);
+}
+[data-theme=aero] #arcade-player .arcade-action[data-pulse] :is(.action-key, small, kbd) { color: #134a0e; }
+[data-theme=aero] #arcade-player .wrist-title { font-family: var(--arcade-display); font-weight: 300; color: var(--accent); }
+[data-theme=aero] #arcade-player .wrist-title::after { border-color: var(--accent); background: radial-gradient(circle at 40% 30%, #fff, transparent 70%); }
+[data-theme=aero] #arcade-player [data-pulse=true] > .wrist-title::after { background: radial-gradient(circle at 40% 30%, #fff, #93d548); border-color: #5e9f2f; box-shadow: 0 0 12px #9be75a; }
+
+/* Toolbar as a Windows 7 taskbar: smoked glass with small glass buttons. */
+[data-theme=aero] #arcade-player .arcade-toolbar {
+    margin: 12px 18px 16px; padding: 6px 10px; gap: 6px 8px; border-radius: 10px;
+    background: linear-gradient(180deg, rgba(60,120,160,.55) 0, rgba(20,70,105,.62) 50%, rgba(8,45,72,.72) 51%, rgba(20,70,100,.66) 100%);
+    border: 1px solid rgba(10,50,80,.6); box-shadow: inset 0 1px rgba(255,255,255,.45), 0 3px 10px rgba(5,50,80,.2);
+}
+[data-theme=aero] #arcade-player .arcade-toolbar button {
+    min-height: 40px; padding: 6px 14px; font-size: 13px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.6); border-radius: 6px;
+    border: 1px solid rgba(255,255,255,.28);
+    background: linear-gradient(180deg, rgba(255,255,255,.32) 0, rgba(255,255,255,.12) 49%, rgba(255,255,255,.02) 51%, rgba(255,255,255,.1) 100%);
+    box-shadow: inset 0 1px rgba(255,255,255,.4);
+}
+[data-theme=aero] #arcade-player .arcade-toolbar button[aria-pressed=false] { opacity: .6; }
+[data-theme=aero] #arcade-player .arcade-toolbar a { color: #dff6ff; font-size: 12px; }
+[data-theme=aero] #arcade-player #arcade-feedback { margin: 10px 24px 0; color: var(--accent); }
+
+/* Camera dock and results: glass panels. */
+[data-theme=aero] #arcade-player .arcade-camera-dock {
+    margin: 0 18px 18px; border: 1px solid rgba(110,180,210,.5); border-radius: 14px;
+    background: linear-gradient(180deg, var(--aero-glass), rgba(255,255,255,.2)); box-shadow: inset 0 1px var(--aero-glass-edge);
+}
+[data-theme=aero] #arcade-player .camera-view { border-radius: 12px; border-color: rgba(255,255,255,.9); box-shadow: 0 0 0 1px #7db7cf, 0 4px 12px rgba(5,60,90,.2); }
+[data-theme=aero] #arcade-player .camera-wrist { font-family: var(--arcade-font); }
+[data-theme=aero] #arcade-player #arcade-final-score { font: 300 64px var(--arcade-display); color: var(--accent); text-shadow: 0 0 18px rgba(127,216,255,.6); }
+[data-theme=aero] #arcade-player #arcade-name, [data-theme=aero] #arcade-player #arcade-challenge-link {
+    border-radius: 10px; border: 1px solid #7db7cf; background: rgba(255,255,255,.75); box-shadow: inset 0 2px 4px rgba(0,60,90,.15); color: var(--ink);
+}
+:root[data-mode=dark][data-theme=aero] #arcade-player :is(#arcade-name, #arcade-challenge-link) { background: rgba(0,30,50,.6); }
+[data-theme=aero] #arcade-player #arcade-save-score { min-height: 44px; padding: 6px 18px; }
+[data-theme=aero] #arcade-player #arcade-scoreboard { font: 18px var(--arcade-font); }
+[data-theme=aero] #arcade-player #arcade-scoreboard li { border-radius: 999px; }
+[data-theme=aero] #arcade-player #arcade-scoreboard [data-current=true] { background: linear-gradient(180deg, rgba(255,255,255,.8), rgba(190,240,140,.5)); color: #24600f; }
+:root[data-mode=dark][data-theme=aero] #arcade-player #arcade-scoreboard [data-current=true] { background: rgba(120,200,80,.22); color: #d1f58e; }
+[data-theme=aero] #arcade-player .arcade-result-actions { background: transparent; border-top: 1px solid rgba(110,180,210,.45); }
+[data-theme=aero] #arcade-player .friend-target { font-family: var(--arcade-font); }
+
+@media (max-width: 640px) {
+    [data-theme=aero] #arcade-player .arcade-room-header { padding: 10px 10px 10px 14px; gap: 8px; }
+    [data-theme=aero] #arcade-player .arcade-room-header h2 { font-size: 24px; }
+    [data-theme=aero] #arcade-player .arcade-room-header p { display: none; }
+    [data-theme=aero] #arcade-player .arcade-controls-trigger { font-size: 15px; padding: 8px 12px; }
+    [data-theme=aero] #arcade-player .arcade-hud { padding: 6px 12px; }
+    [data-theme=aero] #arcade-player .arcade-hud dd { font-size: 24px; }
+    /* A taller board on phones: the engines draw a portrait layout from the same rules. */
+    [data-theme=aero] #arcade-player .arcade-stage { height: clamp(300px, calc(100dvh - 300px), 480px); min-height: 300px; max-height: none; aspect-ratio: auto; }
+    [data-theme=aero] #arcade-player .arcade-inputs { padding: 10px 10px 0; gap: 8px; }
+    [data-theme=aero] #arcade-player .wrist-controls { gap: 6px; }
+    [data-theme=aero] #arcade-player .wrist-title { font-size: 22px; }
+    [data-theme=aero] #arcade-player .wrist-buttons { gap: 4px; }
+    [data-theme=aero] #arcade-player .wrist-buttons kbd { display: none; }
+    [data-theme=aero] #arcade-player .arcade-toolbar { margin: 10px; gap: 6px; }
+    [data-theme=aero] #arcade-player .arcade-toolbar button { padding: 6px 10px; }
+    [data-theme=aero] #arcade-player .arcade-camera-dock { margin: 0 10px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-theme=aero] #arcade-player .aero-diagram *, [data-theme=aero] #arcade-player button::after { animation: none !important; }
+}
