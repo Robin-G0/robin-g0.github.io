@@ -90,3 +90,15 @@ synthetic cadence checks, not evidence of webcam comfort or fun.
 `tests/browser/aqua.spec.mjs` covers cards, native profiles (two raises / six
 directions), local pulse feedback, canvas-local feedback, phone/landscape fit,
 unattended Game over with v2 scores and a challenge link, and dark appearance.
+
+Phone and cost notes: compact (painter.compact) layouts use logical text of 28 or
+more (about 14 CSS px on a 370 px stage) and objects of 48 or more; tutorial SVG
+labels never go below 15 units. The pinstripe backdrop is one cached pattern per
+appearance; small gel items use an offset shadow instead of shadowBlur and
+hairline streaks are only drawn on bars at least 20 units tall. A simulated
+10 s of play costs about the same browser time as Metro Tile Drop under
+Playwright's fake clock. `themes/aqua.css` is skin only (colours, borders,
+fonts, shadows); the one layout value kept is `flex: 0 0 auto` on
+`.guide-figure`, as in Metro, so a card never overlaps its title. Known shared
+gap: at 320 px the six Dock buttons overflow by a few pixels because
+`arcade.css` narrows the six-button row only for `[data-engine=popups]`.

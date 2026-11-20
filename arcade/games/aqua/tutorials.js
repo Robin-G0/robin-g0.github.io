@@ -20,7 +20,7 @@ const frame = content => `<svg viewBox="0 0 400 160" class="guide-art aqua-diagr
 const gel = (x, y, w, h, tone = 'blue', cls = '', label = '', size = h * .5, ink = '', rx = Math.min(w, h) / 2) =>
     `<g class="${cls}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" style="fill:url(#aqg-${tone});stroke:${TONES[tone][0]};stroke-width:1.2"/>`
     + `<rect x="${x + h * .14}" y="${y + h * .07}" width="${Math.max(0, w - h * .28)}" height="${h * .42}" rx="${Math.min(rx, h * .2)}" style="fill:url(#aqg-gloss);stroke:none"/>`
-    + (label ? `<text x="${x + w / 2}" y="${y + h / 2 + size * .36}" text-anchor="middle" font-size="${size}" font-weight="700" style="fill:${ink || '#fff'};stroke:none">${escape(label)}</text>` : '') + '</g>';
+    + (label ? `<text x="${x + w / 2}" y="${y + h / 2 + size * .36}" text-anchor="middle" font-size="${Math.max(15, size)}" font-weight="700" style="fill:${ink || '#fff'};stroke:none">${escape(label)}</text>` : '') + '</g>';
 const metal = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" style="fill:url(#aqg-metal);stroke:#8b949c;stroke-width:1"/>`;
 const marble = (x, y, r, cls = '') => `<g class="${cls}"><circle cx="${x}" cy="${y}" r="${r}" fill="url(#aqg-marble)" stroke="none"/><ellipse cx="${x - r * .25}" cy="${y - r * .45}" rx="${r * .45}" ry="${r * .28}" fill="#fff" fill-opacity=".8" stroke="none"/></g>`;
 const GLYPH = {
