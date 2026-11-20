@@ -132,7 +132,7 @@ function geometry(p, count) {
     const compact = p.compact, k = compact ? 1.6 : 1;
     const size = Math.min(compact ? 104 : 58, (compact ? 620 : 600) / count), left = 360 - size * count / 2 - (compact ? 20 : 0), y = Math.max(compact ? 230 : 150, p.h * .52);
     return { k, size, center: i => [left + size * (i + .5), y],
-        card: [left - 16 * k, y - size / 2 - 72 * k, size * count + 32 * k, size + 112 * k] };
+        card: [left - 16 * k, y - size / 2 - 112 * k, size * count + 32 * k, size + 152 * k] };
 }
 
 function draw(s, p, reduced) {
@@ -184,7 +184,7 @@ function draw(s, p, reduced) {
         for (const [action, step] of [['left', GOLF.chip], ['right', GOLF.drive]]) {
             const result = landing(cells, s.ball, step), bad = result.kind === 'water' || result.kind === 'out';
             const cell = result.kind === 'out' ? end + 1 : bad ? result.at : result.to;
-            const stacked = placed.includes(cell); placed.push(cell);
+            const stacked = placed.some(other => Math.abs(other - cell) * size < 80 * k); placed.push(cell); // Chips too close to share a row stack.
             const [x, y] = G.center(cell);
             const px = x, py = y - size / 2 - 24 * k - (stacked ? 40 * k : 0);
             chip(p, px, py, `${action === 'left' ? 'L' : 'R'}${bad ? ' ✕' : ''}`,

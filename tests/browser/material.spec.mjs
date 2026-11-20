@@ -47,8 +47,10 @@ test('Material games teach their real rules on paper cards and use their native 
             expect(new Set(actions)).toEqual(new Set(['left_up','left_left','left_right','right_up','right_left','right_right']));
             await expect(page.locator('[data-arcade-input]')).toHaveCount(6);
         }else expect(actions).toEqual(['left_up','right_up']);
-        await page.evaluate(()=>window.motionTest.raw('left_up'));await page.clock.runFor(64);
-        await expect(page.locator(engine==='tangram'?'[data-wrist-controls=left]':'[data-arcade-input=left]')).toHaveAttribute('data-pulse','true');
+        // A native raise lights its own control at once (checked before the frame loop can clear the 180 ms pulse).
+        const pulsed=page.locator(engine==='tangram'?'[data-wrist-controls=left]':'[data-arcade-input=left]');
+        await page.evaluate(()=>window.motionTest.raw('left_up'));
+        await expect(pulsed).toHaveAttribute('data-pulse','true');
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(1200);
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');

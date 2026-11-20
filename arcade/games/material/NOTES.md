@@ -23,8 +23,14 @@ a steady tint, entrances and flights jump to their end); state and scores are id
   recorded in `SOURCES.json`) for room, cards and canvas; buttons use uppercase medium tracking.
 - Room: app bar in the accent colour, dialog at 24 dp, raised buttons that lift 2 → 8 dp with a CSS
   ink ripple when the host pulses an accepted input, flat text buttons for Back/Skip/Challenge,
-  stepper circles, the walkthrough card entering on the decelerate curve. Phones get a taller stage
-  (`clamp(300px, 100dvh − 330px, 500px)`), and the engines lay out by the resulting height.
+  stepper circles, the walkthrough card entering on the decelerate curve. The theme CSS is skin
+  only (colours, fonts, shadows, ripples); the phone shell owns stage, input bar and overlay layout.
+  The only size rules are Paper Tangram's six wrist buttons on narrow screens (as Pop-up Panic) and
+  the walkthrough figure keeping its natural height.
+- Phone legibility (`painter.compact`, below 480 CSS px): canvas text is at least ~28 logical px
+  (≈14 CSS px at the ~0.5 phone scale), chips/labels/pins scaled by 1.6, cards 48 logical px tall,
+  the golf ball about 60% of a cell, HUD-like canvas text kept 28 logical px from the edges.
+  Landscape phones are not `compact`, so they use the desktop sizes (17–20 logical px minimum).
 - Motion vocabulary only: ink ripples at the touched object, elevation lift on press, shared-element
   flights (piece into outline, card into tray), staggered entrances, snackbars for stage unlocks.
 
