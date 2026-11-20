@@ -1,0 +1,136 @@
+/* Frutiger Aero, fully committed: Windows Vista/7 glass, Aurora light ribbons, sky, water and bubbles.
+   Loaded after themes.css; every rule is scoped to the Aero theme. Motion is ambient and stops with reduced motion. */
+
+:root[data-theme=aero] {
+  --font: 'Segoe UI', 'Open Sans', Tahoma, sans-serif;
+  --display: 'Segoe UI Light', 'Segoe UI', 'Open Sans', sans-serif;
+  --glass: linear-gradient(180deg, #ffffffb8 0%, #ffffff66 46%, #ffffff3d 54%, #ffffff70 100%);
+  --glass-edge: #ffffffd9;
+  --glass-shadow: 0 1px 0 #ffffffcc inset, 0 0 0 1px #0f5a8a33, 0 18px 44px #0b4a7533;
+  --title-ink: #0b3550;
+  --aurora-a: #49d7ff; --aurora-b: #74f0b6; --aurora-c: #2d8cff;
+}
+:root[data-theme=aero][data-mode=dark] {
+  --glass: linear-gradient(180deg, #ffffff2e 0%, #ffffff12 46%, #ffffff08 54%, #ffffff17 100%);
+  --glass-edge: #ffffff40;
+  --glass-shadow: 0 1px 0 #ffffff33 inset, 0 0 0 1px #00000066, 0 18px 50px #00000080;
+  --title-ink: #e8faff;
+}
+
+/* ---------- Desktop: sky by day, Aurora by night ---------- */
+:root[data-theme=aero] body { font-family: var(--font); }
+:root[data-theme=aero][data-mode=dark] body {
+  --ink: #e5faff; --muted: #a3cddc; --bg: #0f2a3d; --accent: #83dbff; --border: #3f7a95; --soft: #1d4a62;
+  color: var(--ink); background: radial-gradient(120% 80% at 70% -10%, #1f6f8f 0%, #0b2f4a 45%, #04111d 100%) fixed;
+}
+:root[data-theme=aero] .ambient { overflow: hidden; }
+:root[data-theme=aero] .aurora-layer { display: block; position: absolute; inset: -30% -40%; opacity: .55; mix-blend-mode: screen; filter: blur(28px);
+  background: linear-gradient(100deg, transparent 30%, var(--aurora-a) 42%, transparent 47%, var(--aurora-b) 55%, transparent 62%);
+  animation: aero-ribbon 46s ease-in-out infinite alternate; will-change: transform; }
+:root[data-theme=aero] .aurora-mid { opacity: .4; animation-duration: 61s; animation-delay: -18s;
+  background: linear-gradient(80deg, transparent 35%, var(--aurora-c) 46%, transparent 52%, #b6fff5 58%, transparent 64%); }
+:root[data-theme=aero] .aurora-near { opacity: .32; animation-duration: 38s; animation-delay: -9s; filter: blur(14px);
+  background: linear-gradient(110deg, transparent 44%, #ffffff 49%, transparent 52%); }
+:root[data-theme=aero]:not([data-mode=dark]) .aurora-layer { mix-blend-mode: soft-light; opacity: .7; }
+@keyframes aero-ribbon {
+  from { transform: translate3d(-6%, 4%, 0) rotate(-6deg) scaleY(.9); }
+  to { transform: translate3d(8%, -6%, 0) rotate(5deg) scaleY(1.15); }
+}
+/* A field of soft bubbles rising behind the windows. */
+:root[data-theme=aero] .ambient::before, :root[data-theme=aero] .ambient::after { content: ''; position: absolute; inset: 0 0 -100% 0;
+  background-image: radial-gradient(circle at 30% 30%, #ffffffcc 0 2px, #ffffff40 3px, transparent 7px),
+    radial-gradient(circle at 30% 30%, #ffffffaa 0 1px, #ffffff33 2px, transparent 5px);
+  background-size: 260px 300px, 170px 220px; background-position: 40px 120px, 120px 40px;
+  opacity: .55; animation: aero-bubbles 60s linear infinite; }
+:root[data-theme=aero] .ambient::after { background-size: 380px 420px, 230px 310px; background-position: 200px 0, 10px 200px; opacity: .35; animation-duration: 95s; }
+@keyframes aero-bubbles { to { transform: translate3d(0, -50%, 0); } }
+
+/* ---------- Taskbar header ---------- */
+:root[data-theme=aero] .site-header { position: sticky; top: 10px; z-index: 5; margin-top: 10px; min-height: 58px; padding: 0 12px 0 16px;
+  border: 1px solid var(--glass-edge); border-radius: 14px; background: var(--glass); box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(1.7); -webkit-backdrop-filter: blur(18px) saturate(1.7); }
+:root[data-theme=aero] .wordmark { color: var(--title-ink); font-weight: 600; text-shadow: 0 0 10px #ffffffb0; }
+:root[data-theme=aero][data-mode=dark] .wordmark { text-shadow: 0 0 12px #57d5ff80; }
+:root[data-theme=aero] .site-header nav { gap: 4px; }
+:root[data-theme=aero] .site-header nav a { color: var(--title-ink); padding: 8px 14px; border-radius: 6px; border: 1px solid transparent; transition: background .2s, border-color .2s, box-shadow .2s; }
+:root[data-theme=aero] .site-header nav a:hover, :root[data-theme=aero] .site-header nav a[aria-current] {
+  text-decoration: none; border-color: #6fb6e2; background: linear-gradient(#ffffffd0, #c5ecffb8 48%, #9bdcff9e 52%, #d9f4ffc4);
+  box-shadow: 0 0 10px #8fd8ff99, inset 0 1px #fff; }
+:root[data-theme=aero][data-mode=dark] .site-header nav a:hover, :root[data-theme=aero][data-mode=dark] .site-header nav a[aria-current] {
+  border-color: #6fc9ff99; background: linear-gradient(#ffffff38, #6fc9ff2e 48%, #2a8fd02a 52%, #6fc9ff33); box-shadow: 0 0 14px #57c4ff66, inset 0 1px #ffffff55; }
+/* The theme button is the start orb. */
+:root[data-theme=aero] .theme-trigger { position: relative; overflow: hidden; border-radius: 999px; border: 1px solid #1b6fa8; color: #fff; font-weight: 600;
+  background: radial-gradient(120% 140% at 50% 120%, #73f0ff 0%, #1aa4e8 36%, #0b5e9e 70%, #0b3f74 100%);
+  box-shadow: inset 0 1px 1px #ffffffb0, 0 0 14px #36b9ff88; text-shadow: 0 1px 2px #003b6b; }
+:root[data-theme=aero] .theme-trigger::before { content: ''; position: absolute; inset: 1px 4px 52%; border-radius: 999px 999px 40% 40%; background: linear-gradient(#ffffffd0, #ffffff22); pointer-events: none; }
+:root[data-theme=aero] .theme-trigger:hover { background: radial-gradient(120% 140% at 50% 120%, #a8fbff 0%, #27b8f6 36%, #0f72bd 70%, #0b4a86 100%); box-shadow: inset 0 1px 1px #fff, 0 0 22px #5bd0ffcc; }
+
+/* ---------- Windows: glass title bar, caption buttons, frame ---------- */
+:root[data-theme=aero] .scene { border: 1px solid #0f5a8a55; border-radius: 12px; padding-top: calc(var(--section-padding) + 30px);
+  box-shadow: var(--glass-shadow), inset 0 0 0 6px #ffffff33; }
+:root[data-theme=aero][data-mode=dark] .scene { background-color: #0d2638e6; }
+:root[data-theme=aero] .window-chrome { display: flex; position: absolute; z-index: 3; top: 0; left: 0; right: 0; height: 32px; align-items: center; gap: 8px;
+  padding: 0 6px 0 12px; border-radius: 11px 11px 0 0; color: var(--title-ink); font: 13px/1 var(--font); text-shadow: 0 0 8px #fff, 0 0 2px #fff;
+  background: var(--glass); border-bottom: 1px solid #ffffff80; backdrop-filter: blur(14px) saturate(1.6); -webkit-backdrop-filter: blur(14px) saturate(1.6); }
+:root[data-theme=aero][data-mode=dark] .window-chrome { text-shadow: 0 0 10px #000, 0 0 3px #000; border-bottom-color: #ffffff26; }
+:root[data-theme=aero] .window-lights { width: 16px; height: 16px; border-radius: 4px; background: radial-gradient(circle at 35% 30%, #ffffff 0 18%, #6fd7ff 38%, #1478c8 72%); box-shadow: 0 0 6px #6fd7ff; }
+:root[data-theme=aero] .window-lights i { display: none; }
+:root[data-theme=aero] .window-actions { position: relative; margin-left: auto; width: 104px; height: 20px; font-size: 0; border-radius: 5px; border: 1px solid #ffffffb0;
+  background: linear-gradient(#ffffff9e, #dcefff70 48%, #a9cfe94d 52%, #e9f6ffb0); box-shadow: 0 0 0 1px #0f5a8a33; }
+:root[data-theme=aero] .window-actions::before { content: '–   ▫'; position: absolute; left: 0; width: 60px; top: 0; bottom: 0; display: grid; place-items: center;
+  font: 700 12px/1 var(--font); color: #0b3550; letter-spacing: 2px; border-right: 1px solid #ffffff99; }
+:root[data-theme=aero] .window-actions::after { content: '✕'; position: absolute; right: -1px; top: -1px; bottom: -1px; width: 44px; display: grid; place-items: center;
+  font: 700 12px/1 var(--font); color: #fff; text-shadow: 0 0 3px #6b0000; border-radius: 0 5px 5px 0; border: 1px solid #8f2b1f;
+  background: linear-gradient(#f3a08c, #d9563a 48%, #b8341b 52%, #e3765a); box-shadow: inset 0 1px #ffffffa0; }
+:root[data-theme=aero] .scene:hover .window-actions::after { background: linear-gradient(#ffb7a5, #f0653f 48%, #cf3a1c 52%, #ff9a70); box-shadow: inset 0 1px #fff, 0 0 10px #ff6a3d99; }
+
+/* ---------- Glossy controls with a passing shine ---------- */
+:root[data-theme=aero] :is(.button, .text-link, .project-list a, .arcade-card, .metrics > div) { position: relative; }
+:root[data-theme=aero] :is(.button, .project-list a, .arcade-card, .metrics > div)::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(110deg, transparent 35%, #ffffffb3 50%, transparent 65%) -150% 0 / 220% 100% no-repeat; opacity: 0; transition: opacity .2s; }
+:root[data-theme=aero] :is(.button, .project-list a, .arcade-card, .metrics > div):hover::after { opacity: 1; animation: aero-shine .9s ease-out; }
+@keyframes aero-shine { from { background-position: -150% 0; } to { background-position: 160% 0; } }
+:root[data-theme=aero] .button:not(.primary) { border-radius: 999px; border-color: #7ab9dc; background: linear-gradient(#ffffff, #e5f5fd 48%, #cdeaf9 52%, #eaf8ff); color: #0b3550;
+  box-shadow: inset 0 1px #fff, 0 1px 3px #0b4a7522; }
+
+/* ---------- Content as Windows 7 surfaces ---------- */
+:root[data-theme=aero] :is(h1, h2) { text-shadow: 0 0 18px #ffffffcc, 0 1px 0 #ffffff; }
+:root[data-theme=aero][data-mode=dark] :is(h1, h2) { text-shadow: 0 0 24px #49d7ff66; }
+:root[data-theme=aero] .project-list { column-gap: 14px; row-gap: 8px; }
+:root[data-theme=aero] .project-list li { border: 0; }
+:root[data-theme=aero] .project-list a { padding: 14px 16px; border-radius: 8px; border: 1px solid transparent; transition: background .2s, border-color .2s, box-shadow .2s; }
+:root[data-theme=aero] .project-list a:hover { color: #0b3550; border-color: #7da2ce; background: linear-gradient(#f2f9fe, #d6ecfb 48%, #c2e2f9 52%, #e4f3fd); box-shadow: inset 0 0 0 1px #ffffffc0; }
+:root[data-theme=aero][data-mode=dark] .project-list a:hover { color: #e5faff; border-color: #5aa7d6; background: linear-gradient(#ffffff26, #4fb0e826 48%, #1d79b522 52%, #4fb0e830); }
+/* Statistics as desktop gadgets. */
+:root[data-theme=aero] .metrics { gap: 16px; border: 0; }
+:root[data-theme=aero] .metrics > div { padding: 18px 20px; border-radius: 14px; border: 1px solid var(--glass-edge); background: var(--glass); box-shadow: var(--glass-shadow); overflow: hidden; }
+:root[data-theme=aero] .metrics > div::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 48%; border-radius: 14px 14px 50% 50% / 14px 14px 18px 18px; background: linear-gradient(#ffffff99, #ffffff10); pointer-events: none; }
+:root[data-theme=aero] .metrics dd { color: var(--accent); }
+:root[data-theme=aero] :is(.activity, .projects) { background: var(--glass), linear-gradient(#f4fcff 70%, #def7f5); }
+:root[data-theme=aero][data-mode=dark] :is(.activity, .projects, .arcade) { background: linear-gradient(#0f2c42ee, #0a2032f0); }
+:root[data-theme=aero] .arcade { background: linear-gradient(180deg, #e9f9ffee, #d5f3f0ee); }
+:root[data-theme=aero] .arcade-card { border-radius: 12px; border: 1px solid var(--glass-edge); background: var(--glass); box-shadow: var(--glass-shadow); padding: 10px; overflow: hidden; }
+:root[data-theme=aero] .arcade-card canvas { border-radius: 8px; }
+:root[data-theme=aero] .identity-strip { color: var(--title-ink); }
+
+/* ---------- Night: the same photographs under a dusk veil on the reading side ---------- */
+:root[data-theme=aero][data-mode=dark] .hero { background-image: linear-gradient(90deg, #04192be6 0%, #04192ba6 38%, #04192b26 68%, transparent), url('./art/aero-sky-v3.jpg'); }
+:root[data-theme=aero][data-mode=dark] .about { background-image: linear-gradient(90deg, #031c2ed9 0%, #031c2e99 45%, #031c2e40 75%), url('./art/aero-aquarium-loop-v1.gif'); }
+:root[data-theme=aero][data-mode=dark] .project-feature { background-image: linear-gradient(90deg, #04192be6 0%, #04192ba6 42%, #04192b4d 100%), url('./art/aero-instrument-v3.jpg'); }
+:root[data-theme=aero][data-mode=dark] .gesture-demo { background: #0b2a3ecc; border-color: #ffffff33; }
+:root[data-theme=aero][data-mode=dark] .gesture-grid button { border-color: #5aa7d6; background: linear-gradient(#ffffff26, #57c4ff1f); color: var(--ink); }
+:root[data-theme=aero] .window-actions::before { content: '–    □'; font-size: 11px; }
+:root[data-theme=aero][data-mode=dark] .hero-status { color: var(--ink); border-color: #3f7a95; }
+
+/* ---------- Narrow screens and reduced motion ---------- */
+@media (max-width: 640px) {
+  /* On phones the taskbar scrolls away instead of covering a quarter of the screen. */
+  :root[data-theme=aero] .site-header { position: relative; top: 0; margin: 6px 8px 0; width: auto; padding: 8px 10px; }
+  :root[data-theme=aero] .window-actions { width: 78px; }
+  :root[data-theme=aero] .window-actions::before { width: 44px; letter-spacing: 0; }
+  :root[data-theme=aero] .window-actions::after { width: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme=aero] :is(.aurora-layer, .ambient::before, .ambient::after) { animation: none; }
+  :root[data-theme=aero] :is(.button, .project-list a, .arcade-card, .metrics > div):hover::after { animation: none; opacity: 0; }
+}
