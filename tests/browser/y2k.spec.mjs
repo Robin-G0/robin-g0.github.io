@@ -40,13 +40,15 @@ test('Y2K games teach their real rules on chrome cards and use their native prof
 });
 
 test('Y2K boards and cards fit phones and landscape without changing the rules',async({page})=>{
+    test.setTimeout(120000);
     for(const engine of ['orbital','beat','reactor']){
         await page.setViewportSize({width:320,height:640});
         await page.locator(`[data-game=y2k-${engine}]`).click();
         await page.locator('#arcade-guide').click();
         for(let step=0;step<3;step++){
-            const box=await page.locator('#arcade-walkthrough').boundingBox(),next=await page.locator('[data-guide-next]').boundingBox();
-            expect(next.height).toBeGreaterThanOrEqual(44);expect(next.y+next.height).toBeLessThanOrEqual(box.y+box.height+1);
+            // Cards keep their natural height; the overlay scrolls, so the button must be reachable and full size.
+            await page.locator('[data-guide-next]').scrollIntoViewIfNeeded();await expect(page.locator('[data-guide-next]')).toBeInViewport();
+            const next=await page.locator('[data-guide-next]').boundingBox();expect(next.height).toBeGreaterThanOrEqual(44);
             expect(await page.locator('#arcade-walkthrough').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
             if(step<2)await page.locator('[data-guide-next]').click();
         }

@@ -62,4 +62,12 @@
 
 /* Chrome Beat uses the six-command scheme. Skin only: the phone shell owns sizes and placement. */
 [data-theme=y2k] [data-engine=beat] .gesture-lesson [data-tutorial-action] { font-size: 34px; }
+@media (max-width: 640px) {
+    [data-theme=y2k] [data-engine=beat] .wrist-controls { flex-direction: column; gap: 2px; min-width: 0; }
+    [data-theme=y2k] [data-engine=beat] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
+    [data-theme=y2k] [data-engine=beat] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
+    [data-theme=y2k] [data-engine=beat] .wrist-buttons { width: 100%; gap: 3px; }
+    [data-theme=y2k] [data-engine=beat] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; padding: 2px; }
+    [data-theme=y2k] [data-engine=beat] .wrist-buttons kbd { display: none; }
+}
 @media (prefers-reduced-motion: reduce) { .y2k-diagram * { animation: none !important; } }
