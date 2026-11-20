@@ -1,1 +1,165 @@
-/* field-notes portfolio materials and era animations, loaded after themes.css. Scope every rule to :root[data-theme=field-notes]. */
+/* Field Notes, an original contemporary identity: an explorer's notebook laid on a desk.
+   Loaded after themes.css; every rule is scoped to the Field Notes theme. Light is cream dot-grid paper on a linen desk,
+   dark the same notebook read by lamplight on green-black stock.
+   Craft details: numbered page headers in handwriting, washi tape, rubber stamps, specimen tags, contour and pencil hatching.
+   Motion: pages turning onto the stack as they scroll in, the stamp pressing down, ink underlines drawn on hover,
+   a dog-ear on project entries. Reduced motion keeps every mark and stops the movement. */
+
+:root[data-theme=field-notes] {
+  --font: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --display: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --hand: Caveat, 'Segoe Print', 'Bradley Hand', cursive;
+  --mono: 'Lucida Console', 'Courier New', monospace;
+  --radius: 3px;
+  --fn-desk: #e6e0d1; --fn-page: #fbf9f2; --fn-dot: #d6d0bf; --fn-stamp: #a8432f;
+  --fn-tape-a: #e2c393b8; --fn-tape-b: #a9cbbab8;
+  --fn-ink-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='6' viewBox='0 0 120 6'%3E%3Cpath d='M1 4C14 2 22 5 36 3.4S58 2.2 70 3.6 96 5 119 2.6' fill='none' stroke='%23245e51' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  --fn-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='.07'/%3E%3C/svg%3E");
+  --fn-page-shadow: 0 1px 1px #3b301a14, 3px 4px 0 -1px var(--fn-page), 3px 4px 0 0 #3b301a26, 0 14px 30px -12px #3b301a40;
+  background: var(--fn-desk);
+}
+:root[data-theme=field-notes][data-mode=dark] {
+  --fn-desk: #0b120f; --fn-page: #142019; --fn-dot: #2a3b31; --fn-stamp: #e48a70;
+  --fn-tape-a: #c9a36f4d; --fn-tape-b: #7fb39a40;
+  --fn-ink-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='6' viewBox='0 0 120 6'%3E%3Cpath d='M1 4C14 2 22 5 36 3.4S58 2.2 70 3.6 96 5 119 2.6' fill='none' stroke='%2391d5af' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  --fn-page-shadow: 0 1px 1px #00000060, 3px 4px 0 -1px var(--fn-page), 3px 4px 0 0 #00000080, 0 16px 34px -12px #000000a0;
+}
+:root[data-theme=field-notes] body { font-family: var(--font); counter-reset: fn-page;
+  background: var(--fn-grain), linear-gradient(90deg, #ffffff0a 1px, transparent 1px) 0 0 / 3px 3px, var(--fn-desk); }
+:root[data-theme=field-notes][data-mode=light] body { --bg: var(--fn-page); --ink: #1e2924; --muted: #545e58; --accent: #245e51; --border: #cfcabb; }
+:root[data-theme=field-notes][data-mode=dark] body { background: var(--fn-grain), var(--fn-desk); --bg: var(--fn-page); --ink: #e6ede6; --muted: #a3b5a9; --accent: #91d5af; --border: #33493d; }
+
+/* ---------- Header: the notebook's cover band ---------- */
+:root[data-theme=field-notes] .site-header { border-bottom: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent); }
+:root[data-theme=field-notes] .wordmark { font-family: var(--font); font-style: italic; font-weight: 400; }
+:root[data-theme=field-notes] :is(.site-header nav, .site-nav) a { color: var(--ink); text-decoration: none; background: var(--fn-ink-line) 0 100% / 0 6px no-repeat; padding-bottom: 4px;
+  transition: background-size .45s cubic-bezier(.6, 0, .2, 1); }
+:root[data-theme=field-notes] :is(.site-header nav, .site-nav) a:hover { text-decoration: none; background-size: 100% 6px; }
+:root[data-theme=field-notes] .theme-trigger { border: 1px solid var(--ink); border-radius: 2px; background: var(--fn-page); font-family: var(--font); font-style: italic; box-shadow: 2px 2px 0 color-mix(in srgb, var(--ink) 25%, transparent); }
+:root[data-theme=field-notes] .theme-trigger:hover { background: var(--fn-page); border-color: var(--accent); color: var(--accent); }
+@media (min-width: 641px) {
+  :root[data-theme=field-notes] .site-header nav { font-size: 14px; }
+}
+@media (max-width: 640px) {
+  :root[data-theme=field-notes] .site-header nav { border-top: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent); }
+  :root[data-theme=field-notes] .site-nav { background: var(--fn-grain), var(--fn-page); border-top: 1px dashed color-mix(in srgb, var(--ink) 40%, transparent); box-shadow: 0 -6px 16px #3b301a1f; }
+}
+:root[data-theme=field-notes] .identity-strip strong { font-style: italic; }
+
+/* ---------- Pages: dot-grid paper with a numbered handwritten header ---------- */
+:root[data-theme=field-notes] .scene { counter-increment: fn-page; border: 0; border-radius: 3px; margin-bottom: 36px; padding-inline: var(--section-padding);
+  padding-top: calc(var(--section-padding) + 34px); background: radial-gradient(circle, var(--fn-dot) 1px, transparent 1.3px) 11px 11px / 22px 22px, var(--fn-grain), var(--fn-page);
+  box-shadow: var(--fn-page-shadow); transform-origin: 0 50%; }
+:root[data-theme=field-notes] .window-chrome { display: flex; align-items: baseline; gap: 14px; position: absolute; left: var(--section-padding); right: var(--section-padding); top: 18px;
+  padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent); font: 400 22px/1 var(--hand); color: var(--muted); }
+:root[data-theme=field-notes] .window-chrome::before { content: 'No. ' counter(fn-page, decimal-leading-zero); font: 11px/1 var(--mono); letter-spacing: .14em; color: var(--accent); }
+:root[data-theme=field-notes] .window-lights, :root[data-theme=field-notes] .window-actions { display: none; }
+:root[data-theme=field-notes] .hero { padding-top: calc(var(--section-padding) + 48px); }
+:root[data-theme=field-notes] .hero-status { left: var(--section-padding); right: var(--section-padding); border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); }
+
+/* ---------- Ink: underlines drawn on hover ---------- */
+:root[data-theme=field-notes] .text-link { text-decoration: none; padding-bottom: 3px; color: var(--ink);
+  background: var(--fn-ink-line) 0 100% / 0 6px no-repeat, linear-gradient(color-mix(in srgb, var(--ink) 30%, transparent), color-mix(in srgb, var(--ink) 30%, transparent)) 0 calc(100% - 2px) / 100% 1px no-repeat;
+  transition: background-size .5s cubic-bezier(.6, 0, .2, 1); }
+:root[data-theme=field-notes] .text-link:hover { background-size: 100% 6px, 100% 1px; }
+:root[data-theme=field-notes] .interests strong { text-decoration: none; background: var(--fn-ink-line) 0 100% / 100% 6px no-repeat; padding-bottom: 6px; }
+:root[data-theme=field-notes] .eyebrow { font-family: var(--mono); color: var(--accent); }
+
+/* ---------- Specimen-tag buttons ---------- */
+:root[data-theme=field-notes] .button { font: italic 15px/1.2 var(--font); }
+:root[data-theme=field-notes] .button.primary { padding: 12px 20px 12px 30px; border: 0; color: var(--fn-page); font-style: normal; font-size: 13px; letter-spacing: .06em;
+  background: radial-gradient(circle at 15px 50%, var(--fn-page) 0 3.5px, color-mix(in srgb, var(--fn-page) 40%, var(--accent)) 4px 5px, transparent 5.5px), var(--accent);
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%); transition: transform .2s; }
+:root[data-theme=field-notes] .button.primary:hover { color: var(--fn-page); background: radial-gradient(circle at 15px 50%, var(--fn-page) 0 3.5px, color-mix(in srgb, var(--fn-page) 40%, var(--accent)) 4px 5px, transparent 5.5px), var(--accent); transform: rotate(-2deg); }
+
+/* ---------- Hero: a map sketch held down with washi tape ---------- */
+:root[data-theme=field-notes] .journey { padding: 16px 18px 6px; background: var(--fn-grain), color-mix(in srgb, var(--fn-page) 70%, #fff); box-shadow: 0 1px 2px #3b301a26, 0 8px 20px -8px #3b301a40; transform: rotate(1.2deg); }
+:root[data-theme=field-notes][data-mode=dark] .journey { background: var(--fn-grain), #1a2a22; }
+:root[data-theme=field-notes] :is(.journey, .gesture-demo)::before, :root[data-theme=field-notes] .journey::after { content: ''; position: absolute; z-index: 3; width: 92px; height: 24px; top: -11px; left: 22px;
+  background: repeating-linear-gradient(90deg, #ffffff30 0 6px, transparent 6px 12px), var(--fn-tape-a); transform: rotate(-5deg); pointer-events: none;
+  clip-path: polygon(0 8%, 4% 0, 8% 10%, 12% 0, 100% 0, 96% 12%, 100% 26%, 96% 40%, 100% 56%, 96% 70%, 100% 86%, 97% 100%, 0 100%, 4% 84%, 0 68%, 4% 52%, 0 36%, 4% 20%); }
+:root[data-theme=field-notes] .journey::after { left: auto; right: 22px; transform: rotate(6deg); background: repeating-linear-gradient(45deg, #ffffff35 0 4px, transparent 4px 9px), var(--fn-tape-b); }
+:root[data-theme=field-notes] .journey-art { mask-image: radial-gradient(ellipse, #000 45%, transparent 75%);
+  background: repeating-radial-gradient(ellipse 60% 45% at 62% 55%, transparent 0 14px, color-mix(in srgb, var(--accent) 22%, transparent) 14px 15px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--ink) 16%, transparent) 0 1px, transparent 1px 6px) 18% 70% / 120px 80px no-repeat; }
+:root[data-theme=field-notes] .wire-world { stroke: var(--ink); stroke-dasharray: 3 2; opacity: .45; }
+:root[data-theme=field-notes] .journey figcaption { font: 400 21px/1 var(--hand); color: var(--ink); }
+:root[data-theme=field-notes] .journey figcaption b { font: 12px var(--mono); letter-spacing: .1em; }
+:root[data-theme=field-notes] .route-line { stroke-dasharray: 1 5; stroke-width: 1.6; stroke-linecap: round; opacity: .8; }
+
+/* ---------- About ---------- */
+:root[data-theme=field-notes] .interests { border-left: 1px solid color-mix(in srgb, var(--ink) 20%, transparent); }
+:root[data-theme=field-notes] .project-note { font: 400 19px/1.2 var(--hand); color: var(--muted); }
+
+/* ---------- Motion demo: graph paper taped into the notebook ---------- */
+:root[data-theme=field-notes] .gesture-demo { position: relative; background: linear-gradient(color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px), color-mix(in srgb, var(--fn-page) 65%, #fff);
+  background-size: 18px 18px, 18px 18px, auto; border: 0; box-shadow: 0 1px 2px #3b301a26, 0 10px 22px -10px #3b301a50; transform: rotate(-1.2deg); }
+:root[data-theme=field-notes][data-mode=dark] .gesture-demo { background-color: #1a2a22; }
+:root[data-theme=field-notes] .gesture-demo::before { left: calc(50% - 46px); background: repeating-linear-gradient(90deg, #ffffff30 0 6px, transparent 6px 12px), var(--fn-tape-b); transform: rotate(2deg); }
+:root[data-theme=field-notes] .gesture-grid button { border-color: color-mix(in srgb, var(--ink) 35%, transparent); background: var(--fn-page); }
+:root[data-theme=field-notes] .gesture-grid button.target { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--accent) 22%, transparent) 0 1px, transparent 1px 5px), var(--fn-page); }
+:root[data-theme=field-notes] .gesture-grid button.visited { background: var(--accent); color: var(--fn-page); }
+:root[data-theme=field-notes] .gesture-feedback { font: 400 20px/1 var(--hand); color: var(--accent); }
+
+/* ---------- Projects: index entries with a dog-ear on hover ---------- */
+:root[data-theme=field-notes] .project-list li { border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+:root[data-theme=field-notes] .project-list a { position: relative; padding-inline: 4px; }
+:root[data-theme=field-notes] .project-list a > span:not(.project-arrow) { background: var(--fn-ink-line) 0 1.15em / 0 6px no-repeat; transition: background-size .5s cubic-bezier(.6, 0, .2, 1); }
+:root[data-theme=field-notes] .project-list a:hover > span:not(.project-arrow) { background-size: 100% 6px; }
+:root[data-theme=field-notes] .project-list small { font: 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+:root[data-theme=field-notes] .project-list a::after { content: ''; position: absolute; top: 0; right: 0; width: 0; height: 0;
+  background: linear-gradient(225deg, var(--fn-desk) 0 50%, color-mix(in srgb, var(--fn-page) 82%, var(--ink)) 50% 100%); box-shadow: -2px 2px 3px #3b301a26;
+  transition: width .3s cubic-bezier(.3, 1.4, .5, 1), height .3s cubic-bezier(.3, 1.4, .5, 1); }
+:root[data-theme=field-notes] .project-list a:hover::after { width: 22px; height: 22px; }
+
+/* ---------- Activity: a stamped page with pencil hatching ---------- */
+:root[data-theme=field-notes] .scope-badge { display: inline-block; padding: 6px 10px; border: 2px solid var(--fn-stamp); outline: 1px solid var(--fn-stamp); outline-offset: 2px; border-radius: 3px;
+  color: var(--fn-stamp); font: 700 10px/1.2 var(--mono); letter-spacing: .14em; transform: rotate(-4deg); mix-blend-mode: multiply;
+  -webkit-mask-image: var(--fn-grain), linear-gradient(#000, #000); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='60'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.9'/%3E%3C/filter%3E%3Crect width='90' height='60' filter='url(%23s)'/%3E%3C/svg%3E"); }
+:root[data-theme=field-notes][data-mode=dark] .scope-badge { mix-blend-mode: normal; }
+:root[data-theme=field-notes] .metrics { left: var(--section-padding); top: 262px; width: calc(25% - 10px); }
+:root[data-theme=field-notes] .metrics > div { position: relative; padding-left: 16px; }
+:root[data-theme=field-notes] .metrics > div::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 7px;
+  background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 4px); }
+:root[data-theme=field-notes] .metrics dt { font: 400 19px/1 var(--hand); color: var(--muted); }
+:root[data-theme=field-notes] .language-row { border-bottom-style: dashed; }
+:root[data-theme=field-notes] .language-fill { height: 3px; border-radius: 2px; }
+:root[data-theme=field-notes] .stats-footnote { border-top: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent); }
+
+/* ---------- Picker dialog as a loose notebook page ---------- */
+:root[data-theme=field-notes] dialog#theme-picker { border: 0; background: radial-gradient(circle, var(--fn-dot) 1px, transparent 1.3px) 11px 11px / 22px 22px, var(--fn-page); box-shadow: 0 30px 80px #00000055; }
+
+/* ---------- Motion: pages turning onto the stack and the stamp pressing down ---------- */
+@supports (animation-timeline: view()) {
+  :root[data-theme=field-notes] .page-shell { overflow-x: clip; overflow-clip-margin: 24px; }
+  :root[data-theme=field-notes] .scene:not(.hero) { animation: notes-page-turn linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+  :root[data-theme=field-notes] .scope-badge { animation: notes-stamp linear both; animation-timeline: view(); animation-range: entry 30% entry 70%; }
+}
+@keyframes notes-page-turn { from { opacity: .2; transform: perspective(1600px) rotateY(-16deg) translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes notes-stamp { 0% { opacity: 0; transform: rotate(-12deg) scale(1.9); } 70% { opacity: 1; transform: rotate(-4deg) scale(.94); } 100% { opacity: 1; transform: rotate(-4deg) scale(1); } }
+
+@media (max-width: 900px) {
+  :root[data-theme=field-notes] .metrics { width: calc(25% - 4px); }
+}
+@media (max-width: 640px) {
+  :root[data-theme=field-notes] .scene { padding-inline: 20px; padding-top: calc(var(--section-padding) + 40px); margin-bottom: 26px; }
+  :root[data-theme=field-notes] .window-chrome { left: 20px; right: 20px; top: 14px; font-size: 20px; }
+  :root[data-theme=field-notes] .hero { padding-top: 76px; }
+  :root[data-theme=field-notes] .hero-status { left: 20px; right: 20px; }
+  :root[data-theme=field-notes] .journey { transform: none; margin-top: 22px; }
+  :root[data-theme=field-notes] .journey-art { height: 200px; }
+  :root[data-theme=field-notes] .interests { border-left: 0; border-top: 1px solid color-mix(in srgb, var(--ink) 20%, transparent); }
+  :root[data-theme=field-notes] .gesture-demo { transform: none; }
+  :root[data-theme=field-notes] .metrics { position: static; width: auto; }
+  :root[data-theme=field-notes] .scope-badge { white-space: nowrap; }
+  /* Phone legibility: reading text at 14px or more, labels at 12px, every control at least 44px tall. */
+  :root[data-theme=field-notes] :is(.eyebrow, .project-list small, .language-heading > span, .language-share, .hero-status, .identity-strip strong, .identity-strip time, .identity-strip button, .identity-strip .eyebrow) { font-size: 12px; }
+  :root[data-theme=field-notes] .scope-badge { font-size: 12px; }
+  :root[data-theme=field-notes] :is(.hero-description, .about p, .project-copy > p, .scope-explanation, .stats-footnote p, .arcade-intro, #gesture-help, .language-name) { font-size: 14px; }
+  :root[data-theme=field-notes] :is(.button, .text-link, .demo-heading button, .stats-footnote a, .site-footer a, .identity-strip button, .arcade-imports a, .arcade-imports button) { min-height: 44px; display: inline-flex; align-items: center; font-size: 14px; }
+  :root[data-theme=field-notes] :is(.site-footer) { font-size: 13px; }
+  :root[data-theme=field-notes] .gesture-grid button span { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme=field-notes] :is(.scene, .scope-badge) { animation: none; }
+}
