@@ -108,14 +108,14 @@ export function binary(env) {
         render(s, p) {
             const compact = p.compact, h = p.h, k = compact ? 1.5 : 1, reduced = env.reducedMotion, c = p.c, n = s.bits.length;
             header(p, `lock ${s.lock}`, `par ${s.par} · moves ${s.moves}`, s.time, reduced);
-            rain(p, s.time, { top: 60, bottom: h, columns: 18, alpha: s.solved ? .32 : .12, size: 16 * k, reduced, speed: s.solved ? 3 : 1 });
+            rain(p, s.time, { top: 60, bottom: h, columns: 18, alpha: s.solved ? .32 : .12, size: 16 * k, reduced });
             const pitch = Math.min(compact ? 108 : 96, 640 / n), cw = pitch - (compact ? 16 : 18), left = 360 - (n * pitch) / 2 + (pitch - cw) / 2;
-            const keyY = compact ? h * .26 : 112, regY = compact ? h * .43 : 220, ch = cw * 1.25;
+            const keyY = h * .27, regY = h * .5, ch = cw * 1.25;
             s.burstY = keyY - 48 * k; s.bannerY = regY + ch + 90 * k;
             const xOf = i => left + i * pitch;
             const load = Math.min(1, (s.time - s.loadedAt) / BINARY.loadSeconds);
             // Padlock: the shackle lifts as the lock opens.
-            const lockX = 360, lockY = keyY - (compact ? 120 : 58), lift = s.solved ? Math.min(1, (s.time - s.solvedAt) / .3) * 16 * k : 0;
+            const lockX = 360, lockY = keyY - 58 * k, lift = s.solved ? Math.min(1, (s.time - s.solvedAt) / .3) * 16 * k : 0;
             c.save(); c.strokeStyle = p.color(s.solved ? 'gold' : 'accent'); c.lineWidth = 4 * k; c.beginPath();
             c.arc(lockX, lockY - lift, 12 * k, Math.PI, 0); c.lineTo(lockX + 12 * k, lockY + 6 * k - (s.solved ? lift : 0)); c.moveTo(lockX - 12 * k, lockY - lift); c.lineTo(lockX - 12 * k, lockY + 6 * k); c.stroke(); c.restore();
             p.rect(lockX - 19 * k, lockY + 4 * k, 38 * k, 26 * k, s.solved ? 'gold' : 'accent');
@@ -123,7 +123,7 @@ export function binary(env) {
             mono(p, 'KEY', left - 14, keyY, 20 * k, 'muted', 'right');
             for (let i = 0; i < n; i++) {
                 const x = xOf(i), on = s.target[i] === 1, kh = cw * .7;
-                if (on) p.rect(x, keyY - kh / 2, cw, kh, 'soft'); p.outline(x, keyY - kh / 2, cw, kh, on ? 'ink' : 'border', 2);
+                if (on) p.rect(x, keyY - kh / 2, cw, kh, 'soft'); p.outline(x, keyY - kh / 2, cw, kh, on ? 'ink' : 'muted', 2);
                 mono(p, s.target[i], x + cw / 2, keyY, kh * .62, on ? 'ink' : 'muted', 'center');
             }
             // Register cells: 1 is a lit block, 0 is hollow; a sealed cell is hatched. Code decodes into each cell on load.
@@ -148,12 +148,12 @@ export function binary(env) {
                 mono(p, match ? '|' : 'x', xOf(i) + cw / 2, (keyY + cw * .35 + regY) / 2, 24 * k, match ? 'border' : 'gold', 'center');
             }
             // The head: a blinking block cursor under the first cell. A refused flip flashes the seal.
-            cursor(p, xOf(0), regY + ch + 10 * k, cw, 10 * k, s.time, reduced);
+            p.outline(xOf(0), regY + ch + 10 * k, cw, 10 * k, 'accent', 2); cursor(p, xOf(0), regY + ch + 10 * k, cw, 10 * k, s.time, reduced);
             if (s.time - s.refusedAt < .5) { p.outline(xOf(0) - 6, regY - 6, cw + 12, ch + 12, 'gold', 3); mono(p, 'SEALED', xOf(0) + cw / 2, regY + ch + 40 * k, 20 * k, 'gold', 'center'); }
             const flip = s.effects.find(e => e.kind === 'flip' && s.time - e.at < .5);
             if (flip) ripple(p, xOf(0) + cw / 2, regY + ch / 2, s.time - flip.at, cw * .8, 'accent', reduced, .5);
             if (s.solved) ripple(p, lockX, lockY + 16 * k, s.time - s.solvedAt, 60 * k, 'gold', reduced, .8);
-            const meterY = compact ? h * .62 : 352;
+            const meterY = h * .84;
             mono(p, 'clean run', 360 - 70 * k, meterY + 8 * k, 20 * k, 'muted', 'right');
             cells(p, 360 - 56 * k, meterY, BINARY.cleanRun, s.cleanRun % BINARY.cleanRun, 16 * k, 6 * k);
             bursts(s, p, reduced);

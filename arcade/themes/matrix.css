@@ -1,1 +1,81 @@
-/* matrix game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="matrix"]. */
+/* matrix game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="matrix"].
+   Colours come from the theme palette (assets/profile.json, light and dark) through the site's CSS
+   variables, so the room, cards and canvas read as one terminal in both appearances. Materials follow the
+   site: square corners, 1px phosphor rules, a narrow inset stripe and Share Tech Mono. */
+[data-theme=matrix] #arcade-player { border: 1px solid var(--border); border-radius: 0; box-shadow: inset 12px 0 0 var(--bg), inset 13px 0 0 var(--border); }
+[data-theme=matrix] #arcade-player :is(button, input, select) { border-radius: 0; font-family: var(--arcade-font); }
+[data-theme=matrix] .arcade-room-header h2 { color: var(--ink); letter-spacing: -.02em; }
+[data-theme=matrix] .arcade-room-header .eyebrow { color: var(--accent); letter-spacing: .14em; text-transform: uppercase; }
+[data-theme=matrix] .arcade-hud dt { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+[data-theme=matrix] .arcade-hud dd { color: var(--ink); font-variant-numeric: tabular-nums; }
+[data-theme=matrix] .arcade-stage { border-radius: 0; }
+[data-theme=matrix] #arcade-player .arcade-action { background: var(--soft); color: var(--ink); border: 1px solid var(--border); border-radius: 0; box-shadow: none; }
+[data-theme=matrix] #arcade-player .arcade-action .action-key { color: var(--accent); }
+[data-theme=matrix] #arcade-player .arcade-action:hover { border-color: var(--accent); }
+[data-theme=matrix] #arcade-player .arcade-action[data-pulse=true] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+[data-theme=matrix] #arcade-player .arcade-action[data-pulse=true] .action-key { color: var(--bg); }
+[data-theme=matrix] #arcade-player .wrist-title { color: var(--accent); }
+
+/* Start screen: the shared greeting as a terminal prompt with a phosphor hand. */
+[data-theme=matrix] [data-brief=start] #arcade-controls-status::before { content: '> '; color: var(--accent); }
+[data-theme=matrix] [data-brief=start] #arcade-controls-status::after { content: '\2588'; margin-left: .15em; color: var(--accent); animation: arcade-cursor 1.1s steps(1) infinite; }
+[data-theme=matrix] .start-hand { fill: var(--soft); stroke: var(--accent); }
+[data-theme=matrix] .start-hand .wave-stroke { stroke: var(--ink); }
+
+/* Walkthrough: a terminal page; the card title is a prompt with a blinking block cursor. */
+[data-theme=matrix] .arcade-walkthrough { background: var(--bg); }
+[data-theme=matrix] .guide-heading h3 { text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+[data-theme=matrix] .guide-title { font-family: var(--arcade-display); color: var(--ink); text-transform: uppercase; letter-spacing: .06em; }
+[data-theme=matrix] .guide-title::before { content: '> '; color: var(--accent); }
+[data-theme=matrix] .guide-title::after { content: '\2588'; margin-left: .1em; color: var(--accent); animation: arcade-cursor 1.1s steps(1) infinite; }
+[data-theme=matrix] .guide-caption { color: var(--ink); }
+[data-theme=matrix] .guide-progress span { border-radius: 0; }
+[data-theme=matrix] .guide-progress [aria-current=step] { background: var(--accent); color: var(--bg); }
+[data-theme=matrix] .guide-figure { flex: 0 0 auto; border: 1px solid var(--border); background: var(--bg); padding: 3px; }
+
+/* Card art: phosphor strokes, square ends, ink text and gold for danger. */
+[data-theme=matrix] .matrix-diagram { color: var(--accent); max-height: 132px; }
+[data-theme=matrix] .matrix-diagram path { stroke-linecap: square; stroke-linejoin: miter; }
+[data-theme=matrix] .matrix-diagram :is(rect, circle) { fill: none; stroke: currentColor; }
+[data-theme=matrix] .matrix-diagram text { font-family: var(--arcade-font); fill: var(--ink); }
+[data-theme=matrix] .matrix-diagram .mx-fill { fill: var(--accent); stroke: var(--accent); }
+[data-theme=matrix] .matrix-diagram .mx-soft { fill: var(--soft); stroke: var(--ink); }
+[data-theme=matrix] .matrix-diagram .mx-dim { stroke: var(--border); }
+[data-theme=matrix] .matrix-diagram .mx-gold, [data-theme=matrix] .matrix-diagram .mx-gold rect, [data-theme=matrix] .matrix-diagram .mx-gold path { stroke: var(--gold); }
+[data-theme=matrix] .matrix-diagram .mx-gold-text { fill: var(--gold); }
+[data-theme=matrix] .matrix-diagram .mx-on { fill: var(--bg); }
+
+/* A few deliberate, steps-based animations: a blinking cursor, a strike in flight, a sweep, a wall switch. */
+.matrix-blink { animation: matrix-blink 1.1s steps(1) infinite; }
+.matrix-strike { animation: matrix-strike 2.4s steps(12) infinite; }
+.matrix-sweep-l { animation: matrix-sweep-l 2.4s steps(4) infinite; }
+.matrix-sweep-r { animation: matrix-sweep-r 2.4s steps(4) infinite; }
+.matrix-wrap { stroke-dasharray: 6 5; animation: matrix-wrap 1.6s steps(8) infinite; }
+.matrix-flip { animation: matrix-blink 1.6s steps(1) infinite; }
+.matrix-cross { animation: matrix-cross 3.2s steps(10) infinite; }
+@keyframes matrix-blink { 50% { opacity: .15; } }
+@keyframes matrix-strike { 0% { transform: translate(18px, -14px); } 70%, 100% { transform: translate(-38px, 28px); } }
+@keyframes matrix-sweep-l { 0%, 40% { transform: translateX(0); } 60%, 80% { transform: translateX(-8px); } }
+@keyframes matrix-sweep-r { 0%, 40% { transform: translateX(0); } 60%, 80% { transform: translateX(8px); } }
+@keyframes matrix-wrap { to { stroke-dashoffset: -22px; } }
+@keyframes matrix-cross { 0%, 30% { transform: translateX(0); } 50%, 80% { transform: translateX(128px); } 100% { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) {
+    .matrix-diagram * { animation: none !important; }
+    [data-theme=matrix] .guide-title::after, [data-theme=matrix] [data-brief=start] #arcade-controls-status::after { animation: none !important; }
+}
+
+/* Construct Parry uses the six-command wrist groups: keep both groups inside a phone's width. */
+@media (max-width: 640px) {
+    [data-theme=matrix] [data-engine=parry] .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
+    [data-theme=matrix] [data-engine=parry] .wrist-controls { flex-direction: column; gap: 2px; }
+    [data-theme=matrix] [data-engine=parry] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
+    [data-theme=matrix] [data-engine=parry] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
+    [data-theme=matrix] [data-engine=parry] .wrist-buttons { width: 100%; gap: 2px; }
+    [data-theme=matrix] [data-engine=parry] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; }
+    [data-theme=matrix] [data-engine=parry] .wrist-buttons kbd { display: none; }
+}
+@media (max-width: 480px) { [data-theme=matrix] [data-engine=parry] .arcade-inputs { grid-template-columns: 1fr; } }
+/* Phones: give the portrait board most of the height and keep the touch inputs directly below it. */
+@media (max-width: 640px) {
+    [data-theme=matrix] :is([data-engine=parry], [data-engine=binary], [data-engine=gravity]) .arcade-stage { height: clamp(300px, calc(100dvh - 400px), 460px); min-height: 300px; max-height: none; aspect-ratio: auto; }
+}

@@ -31,17 +31,19 @@ export function header(p, status, detail = '', time = 0, reduced = false) {
     if (detail) mono(p, detail, 696, y, compact ? 28 : 21, 'muted', 'right');
 }
 
-/** Falling code: a few columns of glyph trails drawn between x0 and x1. Deterministic per column. */
-export function rain(p, time, { x0 = 0, x1 = 720, top = 0, bottom = p.h, columns = 12, alpha = .22, size = 16, reduced = false, speed = 1 } = {}) {
-    const c = p.c, height = bottom - top, pitch = (x1 - x0) / columns; c.save(); c.globalAlpha = alpha;
+/** Falling code: a few columns of glyph trails drawn between x0 and x1. Deterministic per column;
+ * the font is set once per call so a full-screen rain stays cheap. */
+export function rain(p, time, { x0 = 0, x1 = 720, top = 0, bottom = p.h, columns = 12, alpha = .22, size = 16, reduced = false } = {}) {
+    const c = p.c, height = bottom - top, pitch = (x1 - x0) / columns, colors = ['ink', 'accent', 'border'].map(name => p.color(name));
+    c.save(); c.globalAlpha = alpha; c.font = `${size}px ${FAMILY}`; c.textAlign = 'center'; c.textBaseline = 'middle';
     for (let col = 0; col < columns; col++) {
-        const rate = (38 + (col * 37) % 41) * speed, length = 6 + (col * 5) % 6, phase = (col * 131) % 997;
-        const head = reduced ? (phase % height) : ((time * rate + phase) % (height + length * size)) ;
+        const rate = 38 + (col * 37) % 41, length = 6 + (col * 5) % 6, phase = (col * 131) % 997;
+        const head = reduced ? phase % height : (time * rate + phase) % (height + length * size);
         const x = x0 + pitch * (col + .5);
         for (let i = 0; i < length; i++) {
             const y = top + head - i * size; if (y < top || y > bottom) continue;
-            const glyph = GLYPHS[(col * 7 + i * 13 + Math.floor((reduced ? 0 : time) * 3 + i)) % GLYPHS.length];
-            mono(p, glyph, x, y, size, i === 0 ? 'ink' : i < 3 ? 'accent' : 'border', 'center', col % 2 === 0);
+            c.fillStyle = colors[i === 0 ? 0 : i < 3 ? 1 : 2];
+            c.fillText(GLYPHS[(col * 7 + i * 13 + Math.floor((reduced ? 0 : time) * 3 + i)) % GLYPHS.length], x, y);
         }
     }
     c.restore();

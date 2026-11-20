@@ -88,14 +88,14 @@ export function gravity(env) {
         render(s, p) {
             const compact = p.compact, h = p.h, k = compact ? 1.45 : 1, reduced = env.reducedMotion, c = p.c;
             header(p, `chain x${s.chain}`, `hardline ${s.pickups % GRAVITY.hardline}/${GRAVITY.hardline}`, s.time, reduced);
-            const wallL = compact ? 120 : 210, wallR = compact ? 600 : 510, top = compact ? 110 : 64, runnerY = h - (compact ? 230 : 70);
+            const wallL = compact ? 130 : 210, wallR = compact ? 590 : 510, top = Math.max(compact ? 96 : 64, h * .15), runnerY = h * .84;
             s.burstY = runnerY - 70 * k; s.bannerY = top + 60 * k;
-            const xOf = x => wallL + 32 * k + x * (wallR - wallL - 64 * k), yOf = d => runnerY - d / GRAVITY.horizon * (runnerY - top);
+            const xOf = x => wallL + 39 * k + x * (wallR - wallL - 78 * k), yOf = d => runnerY - d / GRAVITY.horizon * (runnerY - top);
             cells(p, 24, compact ? 72 : 52, GRAVITY.hardline, s.pickups % GRAVITY.hardline, compact ? 16 : 10, compact ? 6 : 4);
             // Walls of falling code; the code streams down as the runner climbs.
             const flow = s.distance * 90;
-            for (const [x0, x1] of [[wallL - 90 * k, wallL], [wallR, wallR + 90 * k]])
-                rain(p, flow / 60, { x0, x1, top, bottom: h, columns: 3, alpha: .5, size: 18 * k, reduced, speed: 1 });
+            for (const [x0, x1] of [[0, wallL], [wallR, 720]])
+                rain(p, flow / 60, { x0, x1, top, bottom: h, columns: Math.max(2, Math.round((x1 - x0) / 36)), alpha: .32, size: 18 * k, reduced });
             const pulled = s.time - s.switchedAt < .3;
             p.line([[wallL, top], [wallL, h]], s.wall === 0 ? 'accent' : 'border', (s.wall === 0 && pulled ? 6 : 3) * k);
             p.line([[wallR, top], [wallR, h]], s.wall === 1 ? 'accent' : 'border', (s.wall === 1 && pulled ? 6 : 3) * k);
@@ -135,12 +135,14 @@ export function gravity(env) {
             // The runner: head toward the shaft centre, feet on the pulling wall; rotates as it crosses.
             const rx = xOf(s.x), angle = (.5 - s.x) * Math.PI, recovering = s.time < s.recoveryUntil;
             if (!recovering || reduced || Math.floor(s.time * 8) % 2 === 0) {
-                c.save(); c.translate(rx, runnerY); c.rotate(angle);
-                const ink = recovering ? 'gold' : 'ink';
-                c.beginPath(); c.moveTo(-12 * k, 2 * k); c.lineTo(12 * k, 2 * k); c.lineTo(20 * k, 30 * k); c.lineTo(-20 * k, 30 * k); c.closePath();
-                c.fillStyle = p.color('soft'); c.fill(); c.strokeStyle = p.color(ink); c.lineWidth = 2; c.stroke();
-                p.circle(0, -12 * k, 11 * k, ink);
-                p.rect(-8 * k, -15 * k, 7 * k, 4 * k, 'bg'); p.rect(1 * k, -15 * k, 7 * k, 4 * k, 'bg');
+                c.save(); c.translate(rx, runnerY); c.rotate(angle); c.scale(1.25 * k, 1.25 * k);
+                const ink = p.color(recovering ? 'gold' : 'ink');
+                // A long coat flaring towards the wall, two boots planted on it, a head with dark glasses.
+                c.beginPath(); c.moveTo(-9, -2); c.lineTo(9, -2); c.lineTo(16, 24); c.lineTo(-16, 24); c.closePath();
+                c.fillStyle = p.color('soft'); c.fill(); c.strokeStyle = ink; c.lineWidth = 2; c.stroke();
+                c.beginPath(); c.moveTo(-5, 24); c.lineTo(-5, 31); c.moveTo(5, 24); c.lineTo(5, 31); c.lineWidth = 3; c.stroke();
+                c.beginPath(); c.arc(0, -11, 8, 0, Math.PI * 2); c.fillStyle = p.color('soft'); c.fill(); c.lineWidth = 2; c.stroke();
+                c.fillStyle = ink; c.fillRect(-7, -14, 14, 4);
                 c.restore();
             }
             for (const effect of s.effects) {

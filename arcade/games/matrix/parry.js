@@ -107,10 +107,10 @@ export function parry(env) {
             const compact = p.compact, h = p.h, k = compact ? 1.45 : 1, reduced = env.reducedMotion, c = p.c;
             const focus = s.time < s.focusUntil;
             header(p, `streak ${s.streak}`, focus ? `bullet time ${Math.ceil(s.focusUntil - s.time)}s` : `best ${s.longest}`, s.time, reduced);
-            const agentY = compact ? 190 : 104, horizon = agentY + 76 * k, handY = h - (compact ? 250 : 92);
+            const agentY = h * .25, horizon = agentY + 76 * k, handY = h * .78;
             s.burstY = handY - 92 * k; s.bannerY = horizon + 30 * k;
-            rain(p, s.time, { x0: 0, x1: 150, top: 60, bottom: h, columns: 5, alpha: .2, size: 16 * k, reduced, speed: focus ? .25 : 1 });
-            rain(p, s.time + 7, { x0: 570, x1: 720, top: 60, bottom: h, columns: 5, alpha: .2, size: 16 * k, reduced, speed: focus ? .25 : 1 });
+            rain(p, s.world, { x0: 0, x1: 150, top: 60, bottom: h, columns: 5, alpha: .2, size: 16 * k, reduced });
+            rain(p, s.world + 7, { x0: 570, x1: 720, top: 60, bottom: h, columns: 5, alpha: .2, size: 16 * k, reduced });
             constructFloor(p, horizon, h);
             cells(p, 24, compact ? 72 : 52, PARRY.focusEvery, focus ? PARRY.focusEvery : s.streak % PARRY.focusEvery, compact ? 16 : 10, compact ? 6 : 4, focus ? 'gold' : 'accent');
             const hands = { left: [250, handY], right: [470, handY], center: [360, handY + 10 * k] };

@@ -1,7 +1,7 @@
 // Original synthesized cues. No audio files, microphone, network or copied OS sounds.
 const voices = {
     phosphor: ['square', 147], desktop95: ['triangle', 262], construction: ['square', 220],
-    matrix: ['triangle', 110], y2k: ['sawtooth', 165], aqua: ['sine', 392], aero: ['sine', 440],
+    matrix: ['triangle', 196], y2k: ['sawtooth', 165], aqua: ['sine', 392], aero: ['sine', 440],
     metro: ['triangle', 330], material: ['sine', 523], glass: ['sine', 659], 'field-notes': ['triangle', 349]
 };
 
