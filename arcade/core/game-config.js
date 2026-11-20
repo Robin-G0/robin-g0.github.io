@@ -14,7 +14,8 @@ export function livesLabel(engine) {
 export function gameConfig(description) {
     const directional = description.inputScheme==='wrist-directions';
     const lifts = ['maze','juggle'].includes(description.engine);
-    const illustrated = ['invaders','lander','snake','sort','stack','ski','memory','merge','rail'].includes(description.engine);
+    // Reworked engines draw their own outcome feedback and use the two-raise profile (catalog flag).
+    const illustrated = description.illustrated === true;
     return {
         directional,
         profile: directional ? popupProfile : lifts ? constructionLiftProfile : illustrated ? wristRaiseProfile : arcadeProfile,

@@ -1,4 +1,6 @@
-// Explain actual rules, not just the two action names. Keep new engines here too.
+import { themeLessons } from './games/theme-guides.js';
+
+// Explain actual rules, not just the two action names. Reworked themes keep theirs in games/<theme>/tutorials.js.
 const instructions = {
     invaders: ['Raise L to move one lane left.', 'Raise R to move one lane right.', 'Fire is automatic. Both friendly and enemy shots chip the bunkers; fire through the gaps or drill a tunnel. Cover stays damaged between waves. Amber ! warns of incoming fire. Quick kills chain to x4; a clean fleet adds a wave bonus and one personal shield.'],
     lander: ['Raise L to fire the left engine: brake and step right.', 'Raise R to fire the right engine: brake and step left.', 'Both together fire centrally: stronger braking, no sideways move. Every burn slows descent. Impulses are fixed; lower a wrist to fire it again. Line up over the broad pad and land at 32 or less. Centered landings at 8 or less earn x2. Fuel refills at the next pad.'],
@@ -36,7 +38,7 @@ const instructions = {
 };
 
 export function lessonFor(engine) {
-    const [left, right, tip] = instructions[engine] || [];
+    const [left, right, tip] = themeLessons[engine] || instructions[engine] || [];
     if (!tip) throw new Error(`Missing tutorial for ${engine}`);
     return { left, right, tip };
 }
