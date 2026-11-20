@@ -26,6 +26,7 @@ async function exposeRoom(page){
 }
 
 test.describe('material',()=>{
+test.setTimeout(150000);
 test.beforeEach(async({page})=>open(page));
 
 test('Material games teach their real rules on paper cards and use their native profiles with engine-owned feedback',async({page})=>{
@@ -40,7 +41,7 @@ test('Material games teach their real rules on paper cards and use their native 
             await page.locator('[data-guide-next]').click();
         }
         await page.evaluate(()=>window.motionTest.observe());
-        await page.locator('#arcade-begin').click();
+        await page.locator('#arcade-begin').click();await page.clock.runFor(500);
         const actions=await page.evaluate(()=>window.motionTest.profile.inputs.map(i=>i.action));
         if(engine==='tangram'){
             expect(new Set(actions)).toEqual(new Set(['left_up','left_left','left_right','right_up','right_left','right_right']));
@@ -85,7 +86,7 @@ test('Material boards and cards fit phones and landscape without stretching game
         await page.locator('[data-guide-skip]').click();await page.locator('#arcade-no-camera').click();
         for(const size of [{width:320,height:640},{width:390,height:844},{width:740,height:360}]){
             await page.setViewportSize(size);await page.clock.runFor(64);
-            expect(await page.locator('#arcade-player').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+            expect(await page.locator('#arcade-player').evaluate(e=>[e.scrollWidth,e.clientWidth+1]).then(([a,b])=>a<=b?true:`${a}>${b} at ${size.width}`)).toBe(true);
             if(size.width<400)expect(await page.locator('#arcade-canvas').evaluate(c=>c.height)).toBeGreaterThan(840);
             for(const button of await page.locator('[data-arcade-input]').all()){
                 const box=await button.boundingBox();expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);

@@ -84,7 +84,7 @@ export function holePoints(strokes, par, streak) {
 }
 
 export function golf(env) {
-    const s = { time: 0, hole: null, ball: 0, strokes: 0, holes: 0, stage: 0, parStreak: 0, sinkUntil: -1, solved: false, shot: null,
+    const s = { time: 0, hole: null, ball: 0, strokes: 0, holes: 0, cards: [], stage: 0, parStreak: 0, sinkUntil: -1, solved: false, shot: null,
         bursts: [], effects: [], snacks: [], ended: false };
     function newHole() { s.hole = makeHole(env.random, s.holes); s.ball = 0; s.strokes = 0; s.shot = null; s.solved = false; s.holeAt = s.time; }
     newHole();
@@ -111,6 +111,7 @@ export function golf(env) {
                 const atPar = s.strokes <= s.hole.par;
                 s.parStreak = atPar ? s.parStreak + 1 : 0;
                 const points = holePoints(s.strokes, s.hole.par, s.parStreak);
+                s.cards.push(s.strokes - s.hole.par); s.cards = s.cards.slice(-6);
                 s.score += points; s.holes++; s.solved = true; s.sinkUntil = s.time + shotTime(result) + GOLF.sink;
                 addBurst(s, `${atPar ? (s.parStreak > 1 ? `par ×${s.parStreak}` : 'par') : s.strokes === s.hole.par + 1 ? 'bogey' : 'holed'} +${points}`, 0, 0, true);
                 s.bursts.at(-1).cell = result.to; s.bursts.at(-1).at = s.time + shotTime(result);
@@ -191,6 +192,11 @@ function draw(s, p, reduced) {
         }
     }
     ball(s, p, G, reduced);
+    // Scorecard: the last six holes as chips under the sheet, par filled, over par outlined.
+    if (s.cards.length) {
+        const pitch = 64 * k, x0 = 360 - (s.cards.length - 1) * pitch / 2, y = cy0 + ch + 34 * k;
+        s.cards.forEach((over, i) => chip(p, x0 + i * pitch, y, over <= 0 ? 'par' : `+${over}`, { size: 13 * k, filled: over <= 0, color: over <= 0 ? 'accent' : 'muted', minWidth: 54 * k }));
+    }
     drawBursts(s, p, reduced, b => { const [x, y] = G.center(b.cell ?? end); return { ...b, x, y: y - size / 2 - 60 * k }; });
     drawSnacks(s, p, reduced);
 }
@@ -216,6 +222,6 @@ function ball(s, p, G, reduced) {
     const c = p.c; c.save(); c.globalAlpha = Math.max(0, alpha);
     const dp = 2 + lift / (G.size * .55) * 10;
     elevated(p, dp, cc => { cc.beginPath(); cc.arc(x, y - lift, r * (1 + lift / G.size * .4), 0, Math.PI * 2); }, surface(p, 8) === '#ffffff' ? '#ffffff' : '#f3edff');
-    c.lineWidth = 1.5; c.strokeStyle = p.color('border'); c.beginPath(); c.arc(x, y - lift, r * (1 + lift / G.size * .4), 0, Math.PI * 2); c.stroke();
+    c.lineWidth = 1.5 * k; c.strokeStyle = p.color('muted'); c.beginPath(); c.arc(x, y - lift, r * (1 + lift / G.size * .4), 0, Math.PI * 2); c.stroke();
     c.restore();
 }

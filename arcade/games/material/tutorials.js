@@ -40,27 +40,27 @@ export const diagrams = {
             + `<rect x="44" y="122" width="118" height="4" rx="2" class="md-track"/><rect x="44" y="122" width="70" height="4" rx="2" class="md-bar"/>`
             + `<g class="md-tangram-turn">${piece('ell', 0, false, 300, 66, 22)}</g>`
             + text('it drops in when it matches', 200, 154, 15)),
-        frame(text('+10', 50, 38, 30, 300) + text('fit', 50, 58, 14) + text('+10', 140, 38, 30, 300) + text('clean', 140, 58, 14) + text('fewest moves', 140, 74, 11, 400, 'md-muted')
-            + text('×4', 228, 38, 30, 300) + text('combo', 228, 58, 14) + text('+1 every 4 fits', 228, 74, 11, 400, 'md-muted')
-            + chip(318, 30, 'L', 'var(--accent)', 30) + chip(356, 30, 'R', 'var(--accent)', 30) + text('from 12 fits:', 337, 60, 12) + text('a piece per wrist', 337, 75, 12)
+        frame(text('+10', 50, 38, 30, 300) + text('fit', 50, 58, 14) + text('+10', 140, 38, 30, 300) + text('clean', 140, 58, 14) + text('fewest moves', 140, 74, 13, 400, 'md-muted')
+            + text('×4', 228, 38, 30, 300) + text('combo', 228, 58, 14) + text('+1 every 4 fits', 228, 74, 13, 400, 'md-muted')
+            + chip(318, 30, 'L', 'var(--accent)', 30) + chip(356, 30, 'R', 'var(--accent)', 30) + text('from 12 fits:', 337, 60, 13) + text('a piece per wrist', 337, 75, 13)
             + `<rect x="40" y="104" width="190" height="5" rx="2.5" class="md-track"/><rect x="40" y="104" width="40" height="5" rx="2.5" style="fill:${SW.red}"/>`
-            + text('clock runs out = −1 ♥', 135, 132, 16, 500) + text('wrong turns cost nothing', 318, 110, 12, 400, 'md-muted') + text('just time', 318, 125, 12, 400, 'md-muted'))
+            + text('clock runs out = −1 ♥', 135, 132, 16, 500) + text('wrong turns are free', 318, 117, 14, 400, 'md-muted'))
     ],
     golf: [
-        frame(sheet(20, 78, 360, 52) + cells(36, 88, 8, 41)
-            + `<circle cx="56" cy="108" r="8" class="md-ball"/>`
-            + `<path d="M56 98 Q76 66 97 98" class="md-arc"/><path d="M56 98 Q118 26 179 98" class="md-arc md-arc-r"/>`
-            + chip(97, 144, 'L', 'var(--accent)', 32) + chip(179, 144, 'R', SW.pink, 32) + text('chip 1', 136, 149, 13) + text('drive 3', 225, 149, 13)
-            + fab(300, 36, 22, 'L', 0, 18) + fab(352, 36, 22, 'R', .08, 18)),
+        frame(sheet(20, 56, 360, 58) + cells(36, 64, 8, 41)
+            + `<circle cx="56" cy="84" r="8" class="md-ball"/>`
+            + `<path d="M58 74 Q78 40 97 66" class="md-arc"/><path d="M58 74 Q120 0 179 66" class="md-arc md-arc-r"/>`
+            + chip(97, 36, 'L', 'var(--accent)', 30) + chip(179, 18, 'R', '#d81b60', 30)
+            + text('L  chip: 1 cell', 110, 142, 17, 500) + text('R  drive: 3 cells', 290, 142, 17, 500)),
         frame(sheet(18, 36, 364, 76) + cells(40, 52, 7, 46, { 3: 'water', 6: 'cup' }) + flag(339, 75)
             + `<g class="md-golf-ball"><circle cx="63" cy="75" r="8" class="md-ball"/></g>`
             + chip(109, 20, 'L', 'var(--accent)', 30) + chip(201, 20, 'R ✕', SW.red, 42)
             + text('chips show where L and R land', 200, 134, 15) + text('stop exactly in the cup', 200, 154, 15, 500)),
-        frame(text('+50', 54, 36, 30, 300) + text('par', 54, 56, 14) + text('+10 per par streak', 54, 72, 11, 400, 'md-muted') + text('+30', 150, 36, 30, 300) + text('one over', 150, 56, 14)
+        frame(text('+50', 54, 36, 30, 300) + text('par', 54, 56, 14) + text('+10 per par streak', 54, 72, 13, 400, 'md-muted') + text('+30', 150, 36, 30, 300) + text('one over', 150, 56, 14)
             + text('+10', 236, 36, 30, 300) + text('more', 236, 56, 14)
-            + `<rect x="306" y="14" width="44" height="44" rx="2" class="md-cell"/><circle cx="328" cy="36" r="8" class="md-ring"/><circle cx="328" cy="36" r="15" class="md-ring"/>` + text('pad: +1 cell', 328, 74, 12)
+            + `<rect x="306" y="14" width="44" height="44" rx="2" class="md-cell"/><circle cx="328" cy="36" r="8" class="md-ring"/><circle cx="328" cy="36" r="15" class="md-ring"/>` + text('pad: +1 cell', 328, 74, 13)
             + `<rect x="34" y="92" width="40" height="40" rx="2" class="md-cell md-water"/>` + text('water or off the end:', 228, 106, 15) + text('+1 stroke, back to the tee', 228, 126, 15, 500)
-            + text('holing out refills the clock', 200, 154, 12, 400, 'md-muted'))
+            + text('holing out refills the clock', 200, 154, 13, 400, 'md-muted'))
     ],
     balance: [
         frame(mobile() + trays(100) + `<g class="md-fall">${card(200, 66, 64, 2)}</g>`
@@ -71,7 +71,7 @@ export const diagrams = {
         frame(mobile(12, 'md-danger')
             + `<rect x="80" y="84" width="240" height="4" rx="2" class="md-track"/><rect x="80" y="84" width="24" height="4" rx="2" style="fill:${SW.red}"/><rect x="296" y="84" width="24" height="4" rx="2" style="fill:${SW.red}"/><circle cx="300" cy="86" r="7" style="fill:${SW.red}"/>`
             + text('more than 4 apart, or a 6th card', 200, 112, 15, 500) + text('in one tray: it tips, −1 ♥', 200, 130, 15, 500)
-            + card(76, 152, 60, 2, true) + text('gold doubles a level', 170, 156, 12) + text('idle cards drop low', 318, 156, 12, 400, 'md-muted'))
+            + card(76, 152, 60, 2, true) + text('gold doubles a level', 170, 156, 13) + text('idle cards drop low', 318, 156, 13, 400, 'md-muted'))
     ]
 };
 export const captions = {
