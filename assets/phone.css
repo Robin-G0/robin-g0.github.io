@@ -31,7 +31,7 @@
     }
     .tab-bar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
     .tab-bar svg .fill, .tab-bar svg circle[r=".6"] { fill: currentColor; }
-    .tab-bar [aria-current], .tab-bar [aria-expanded=true] { color: var(--accent); }
+    :root .tab-bar.site-nav > :is([aria-current], [aria-expanded=true]) { color: var(--accent); font-weight: 600; }
     .tab-bar [aria-current] svg { transform: translateY(-1px) scale(1.08); }
     .tab-bar > :active svg { transform: scale(.92); }
     .tab-bar > :focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
