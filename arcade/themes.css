@@ -239,3 +239,17 @@
 @keyframes construction-marquee { from { text-indent: 100%; } to { text-indent: -120%; } }
 @keyframes construction-blink { 70% { opacity: .15; } }
 @media(prefers-reduced-motion:reduce) { [data-theme=construction] #arcade-result h3::after, [data-theme=construction] #arcade-score-note { animation: none; } [data-theme=construction] #arcade-result h3::after { text-indent: 0; text-align: center; } }
+
+/* Metro motion: pressed tiles tilt (Windows 8 pointer tilt), each tutorial card and the result slide in like a
+   panorama section, all on Metro's exponential ease. Transforms only; reduced motion keeps them still. */
+[data-theme=metro] #arcade-player .arcade-action { transition: transform .32s cubic-bezier(.1,.9,.2,1); transform-origin: 50% 50%; }
+[data-theme=metro] #arcade-player .arcade-action:active, [data-theme=metro] #arcade-player .arcade-action[data-pulse=true] { transform: perspective(500px) rotateX(7deg) scale(.97); transition-duration: .08s; }
+[data-theme=metro] #arcade-player .arcade-action[data-arcade-input=left]:active { transform: perspective(500px) rotateY(-7deg) scale(.97); }
+[data-theme=metro] #arcade-player .arcade-action[data-arcade-input=right]:active { transform: perspective(500px) rotateY(7deg) scale(.97); }
+[data-theme=metro] .guide-figure > svg, [data-theme=metro] .guide-title, [data-theme=metro] .guide-caption { animation: metro-panorama .55s cubic-bezier(.1,.9,.2,1) both; }
+[data-theme=metro] .guide-title { animation-delay: .04s; } [data-theme=metro] .guide-caption { animation-delay: .08s; }
+[data-theme=metro] #arcade-result:not([hidden]) > * { animation: metro-panorama .6s cubic-bezier(.1,.9,.2,1) both; }
+[data-theme=metro] #arcade-result:not([hidden]) > :nth-child(2) { animation-delay: .05s; } [data-theme=metro] #arcade-result:not([hidden]) > :nth-child(n+3) { animation-delay: .1s; }
+[data-theme=metro] #arcade-result h3 { font-family: var(--arcade-display); font-weight: 300; text-transform: lowercase; letter-spacing: -.02em; }
+@keyframes metro-panorama { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media(prefers-reduced-motion:reduce) { [data-theme=metro] #arcade-player .arcade-action, [data-theme=metro] .guide-figure > svg, [data-theme=metro] .guide-title, [data-theme=metro] .guide-caption, [data-theme=metro] #arcade-result:not([hidden]) > * { animation: none !important; transition: none; transform: none !important; } }

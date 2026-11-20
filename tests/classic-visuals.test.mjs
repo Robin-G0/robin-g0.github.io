@@ -57,3 +57,29 @@ test('Construction canvases do not repeat the room title',()=>{
         assert.ok(!p.c.fills.some(fill=>fill[0]==='label'&&fill[2].toUpperCase().includes(title)),`${title} repeated`);
     }
 });
+
+import {memory} from '../arcade/games/metro/tiles.js';
+import {merge} from '../arcade/games/metro/drop.js';
+import {rail} from '../arcade/games/metro/rail.js';
+import {settle,tilt} from '../arcade/games/metro/display.js';
+
+test('Metro flips, tilts, panorama slides and route fills leave rules, scores and RNG identical',()=>{
+    for(const factory of [memory,merge,rail])
+        assert.deepEqual(playRendered(factory,{reducedMotion:true,every:29}).state,playRendered(factory,{every:29}).state);
+});
+
+test('Metro motion eases out exponentially and reduced motion keeps tiles still',()=>{
+    assert.equal(settle(0),1);assert.ok(settle(.1)<.35&&settle(.1)>settle(.2));
+    assert.deepEqual(tilt(.05,1,true),{});assert.deepEqual(tilt(.6,1),{});
+    const pressed=tilt(0,-1);assert.ok(pressed.scaleY<1&&pressed.skewY<0);
+});
+
+test('Metro phone boards fit a 370 x 380 stage with legible labels',()=>{
+    for(const factory of [memory,merge,rail]){
+        const g=factory({pace:1,random:seededRandom(9),message(){},sound(){},finish(){}});g.start();g.update(2);
+        const p=recordingPainter({},740,true);
+        const rects=[];p.rect=(x,y,w,h)=>rects.push([x,y,w,h]);
+        g.render(p);
+        for(const [x,y,w,h] of rects)assert.ok(y+h<=740.5&&x>=-1&&x+w<=721,`rect ${[x,y,w,h]} leaves the phone board`);
+    }
+});

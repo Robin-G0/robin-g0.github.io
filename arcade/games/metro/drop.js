@@ -1,6 +1,6 @@
 import { game } from '../../core/game.js';
 import { integer } from '../../core/random.js';
-import { METRO, light, header, tile, scaledTile, meter, ripple, pruneBursts, loseLife } from './display.js';
+import { METRO, light, header, tile, scaledTile, meter, ripple, pruneBursts, loseLife, poseTile, tilt, settle as easeOut } from './display.js';
 
 // Columns are bottom-up stacks, so gravity is implicit. The board never saturates: when the
 // best tile reaches `retire` times the floor, every tile below the doubled floor leaves the board.
@@ -165,9 +165,11 @@ export function merge(env) {
             // Clear-outs and chain totals take the header detail for 1.6 s: they are news, not status.
             const note = s.notes.findLast(note => s.time >= note.at);
             header(p, `best ${label(s.best)} · min ${label(s.floor)}`, note ? note.text : `longest chain ${s.longestChain}`);
-            const cell = compact ? 100 : 43, gap = compact ? 10 : 5, pitch = cell + gap;
+            // Phone boards size their cells to the stage height so the whole well, waiting tile and preview fit.
+            const cell = compact ? Math.max(52, Math.min(100, Math.floor((p.h - 250) / 7.8))) : 43, gap = compact ? (cell > 80 ? 10 : 8) : 5, pitch = cell + gap;
             const width = DROP.columns * pitch - gap, height = DROP.rows * pitch - gap, left = 360 - width / 2;
-            const top = compact ? 330 : 118, bottom = top + height;
+            const top = compact ? Math.min(330, p.h - 24 - height) : 118, bottom = top + height;
+            const reduced = env.reducedMotion;
             const colX = column => left + column * pitch, rowY = row => bottom - (row + 1) * cell - row * gap;
             for (let column = 0; column < DROP.columns; column++) for (let row = 0; row < DROP.rows; row++) p.rect(colX(column), rowY(row), cell, cell, 'soft');
             p.outline(colX(s.column) + 1, top + 1, cell - 2, height - 2, 'border', 2);
@@ -189,18 +191,25 @@ export function merge(env) {
                 const merged = merges.find(f => f.column === column && f.row === row);
                 const scale = merged ? ripple(p, colX(column), rowY(row), cell, cell, s.time - merged.at, merged.step > 1 || merged.joined > 1 ? 'accent' : tileColor(value), env.reducedMotion) : 1;
                 const landed = frame?.kind === 'land' && frame.column === column && frame.row === row && age < .3;
-                scaledTile(p, colX(column), rowY(row), cell, cell, scale, tileColor(value), label(value), { size: label(value).length > 2 ? cell * .38 : cell * .5, selected: landed });
+                // The landing tile drops in from the waiting slot with Metro's exponential settle.
+                const fall = landed && !reduced && scale === 1 ? -(rowY(row) - (top - cell - (compact ? 20 : 14))) * easeOut(age, 22) : 0;
+                if (fall) poseTile(p, colX(column), rowY(row), cell, cell, { dy: fall }, tileColor(value), label(value), { size: label(value).length > 2 ? cell * .38 : cell * .5, selected: true });
+                else scaledTile(p, colX(column), rowY(row), cell, cell, scale, tileColor(value), label(value), { size: label(value).length > 2 ? cell * .38 : cell * .5, selected: landed });
             }));
-            const waitY = top - cell - (compact ? 28 : 14), moved = s.lastMove && s.lastMove.moved && s.time - s.lastMove.at < .3;
-            tile(p, colX(s.column), waitY, cell, cell, tileColor(s.value), label(s.value), { size: label(s.value).length > 2 ? cell * .38 : cell * .5, selected: moved });
+            const waitY = top - cell - (compact ? 20 : 14), moved = s.lastMove && s.lastMove.moved && s.time - s.lastMove.at < .3;
+            // The waiting tile glides to its new column and tilts toward the move; an edge bump only tilts.
+            const moveAge = s.lastMove ? s.time - s.lastMove.at : 1, direction = s.lastMove?.action === 'left' ? -1 : 1;
+            const glide = moved && !reduced ? -direction * pitch * easeOut(moveAge, 18) : 0;
+            const lean = s.lastMove && !reduced ? tilt(moveAge, direction, reduced) : {};
+            poseTile(p, colX(s.column), waitY, cell, cell, { ...lean, dx: glide }, tileColor(s.value), label(s.value), { size: label(s.value).length > 2 ? cell * .38 : cell * .5, selected: moved });
             if (s.deadline != null) meter(p, colX(s.column), waitY + cell + (compact ? 6 : 3), cell, (s.deadline - s.time) / (s.budget + DROP.refund * (DROP.columns - 1)), 'accent', compact ? 6 : 3);
             const ghost = compact ? 62 : 34, side = 50, infoY = compact ? 118 : waitY;
             const nextX = compact ? left + ghost / 2 : left - side, hintX = compact ? left + width : left + width + side, hintAlign = compact ? 'right' : 'center';
-            light(p, 'next', nextX, infoY + (compact ? 0 : 10), compact ? 24 : 15, 'muted', 'center', 400);
+            light(p, 'next', nextX, infoY + (compact ? 0 : 10), compact ? 28 : 15, 'muted', 'center', 400);
             tile(p, nextX - ghost / 2, infoY + (compact ? 18 : 22), ghost, ghost, tileColor(s.next), label(s.next), { size: label(s.next).length > 2 ? ghost * .38 : ghost * .5 });
-            light(p, 'L + R together', hintX, infoY + (compact ? 10 : 10), compact ? 24 : 14, 'muted', hintAlign, 400);
-            light(p, 'drop now', hintX, infoY + (compact ? 44 : 32), compact ? 26 : 15, 'ink', hintAlign, 400);
-            if (s.lastMove && !s.lastMove.moved && s.time - s.lastMove.at < .5) light(p, 'edge', hintX, infoY + (compact ? 84 : 56), compact ? 24 : 14, 'muted', hintAlign, 400);
+            light(p, 'L + R together', hintX, infoY + (compact ? 10 : 10), compact ? 28 : 14, 'muted', hintAlign, 400);
+            light(p, 'drop now', hintX, infoY + (compact ? 44 : 32), compact ? 30 : 15, 'ink', hintAlign, 400);
+            if (s.lastMove && !s.lastMove.moved && s.time - s.lastMove.at < .5) light(p, 'edge', hintX, infoY + (compact ? 80 : 56), compact ? 28 : 14, 'muted', hintAlign, 400);
             for (const b of s.bursts) {
                 const burstAge = s.time - b.at; if (burstAge < 0 || burstAge > 1.1) continue;
                 // Bursts sit just above their tile and stack upward by step, so a chain never covers its earlier labels; long labels shrink to stay on the canvas.
