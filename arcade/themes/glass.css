@@ -1,1 +1,63 @@
-/* glass game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="glass"]. */
+/* Glass / Fluent game room, tutorial and canvas-adjacent materials. Every rule is scoped to [data-theme=glass].
+   The site's glass identity is a dark acrylic in both appearances, so the room keeps the profile's dark chart
+   (bg #1a2035, ink #f0f2ff, muted #b4bfdc, border #4a557c, accent #b2bfff, soft #303d61, gold #f3d392). */
+:root[data-theme=glass] {
+    --arcade-font: 'Segoe UI Variable Text', 'Segoe UI', 'Open Sans', Arial, sans-serif;
+    --arcade-display: 'Segoe UI Variable Display', 'Segoe UI', 'Open Sans', sans-serif;
+}
+[data-theme=glass] #arcade-player {
+    --ink: #f0f2ff; --muted: #b4bfdc; --border: #4a557c; --accent: #b2bfff; --soft: #303d61; --gold: #f3d392;
+    border: 1px solid #e4f0ff40; border-radius: 28px;
+    background: linear-gradient(160deg, #1d2742f2, #121a30f5 60%, #16203af5);
+    box-shadow: inset 0 1px #ffffff26, 0 30px 80px #02061a80;
+}
+[data-theme=glass] #arcade-player .arcade-room-header h2 { font-family: var(--arcade-display); font-weight: 600; letter-spacing: -.02em; }
+[data-theme=glass] #arcade-player .arcade-hud dd { font-family: var(--arcade-display); font-weight: 300; }
+[data-theme=glass] .arcade-stage { background: #1a2035; }
+
+/* Action buttons: acrylic pills with a reveal light that rises from below on press, and on hover. */
+[data-theme=glass] .arcade-action {
+    border-radius: 22px; border: 1px solid #d1eaff55; color: #f0f2ff;
+    background: radial-gradient(120% 140% at 50% 130%, #b2bfff00 40%, transparent 70%), linear-gradient(#ffffff14, #ffffff06);
+    box-shadow: inset 0 1px #ffffff30, 0 6px 18px #02061a40; transition: background .25s ease, border-color .25s ease;
+}
+[data-theme=glass] .arcade-action:hover { background: radial-gradient(120% 140% at 50% 130%, #b2bfff40, transparent 70%), linear-gradient(#ffffff18, #ffffff08); border-color: #e8f0ffaa; }
+[data-theme=glass] .arcade-action[data-pulse] { outline: 0; border-color: #e8f0ff; background: radial-gradient(120% 140% at 50% 120%, #b2bfff80, transparent 75%), linear-gradient(#ffffff22, #ffffff0a); }
+[data-theme=glass] .arcade-action .action-key { font-family: var(--arcade-display); color: #b2bfff; }
+[data-theme=glass] .wrist-controls[data-pulse=true] .wrist-title { color: #b2bfff; text-shadow: 0 0 14px #b2bfffaa; }
+
+/* Walkthrough: one large acrylic card with rounded progress pills. */
+[data-theme=glass] .arcade-walkthrough {
+    border-radius: 24px; border: 1px solid #e4f0ff38;
+    background: linear-gradient(150deg, #243050, #161e36); box-shadow: inset 0 1px #ffffff26;
+}
+[data-theme=glass] .guide-title { font-family: var(--arcade-display); font-weight: 600; letter-spacing: -.02em; }
+[data-theme=glass] .guide-caption { font-weight: 400; color: #e3e8ff; }
+[data-theme=glass] .guide-progress span { border-radius: 999px; border-color: #b2bfff66; }
+[data-theme=glass] .guide-progress [aria-current=step] { background: #b2bfff; color: #1a2035; border-color: #b2bfff; box-shadow: 0 0 16px #b2bfff66; }
+[data-theme=glass] .glass-diagram text { font-family: var(--arcade-font); }
+[data-theme=glass] .glass-diagram { filter: drop-shadow(0 4px 12px #02061a55); }
+
+/* Diagram motion: refraction turns, light catches, depth hops. A few slow loops, none on reduced motion. */
+.glass-spin { animation: glass-spin 4s cubic-bezier(.3,.7,.2,1) infinite; transform-box: view-box; }
+.glass-lit { animation: glass-lit 2.4s ease-in-out infinite; transform-box: fill-box; }
+.glass-swim { animation: glass-swim 4.8s cubic-bezier(.4,0,.2,1) infinite; }
+.glass-pulse { animation: glass-pulse 4.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.glass-mote { animation: glass-mote 2.6s ease-in infinite; }
+.glass-glow, .glass-clock { animation: glass-drain 6s linear infinite; transform-box: fill-box; transform-origin: left center; }
+.glass-hop { animation: glass-hop 4s cubic-bezier(.4,0,.2,1) infinite; }
+.glass-orbit-a { animation: glass-orbit 6s linear infinite; transform-box: view-box; }
+.glass-orbit-b { animation: glass-orbit 12s linear infinite; transform-box: view-box; }
+@keyframes glass-spin { 0%, 20% { transform: rotate(0); } 30%, 55% { transform: rotate(45deg); } 65%, 90% { transform: rotate(-45deg); } 100% { transform: rotate(0); } }
+@keyframes glass-lit { 0%, 100% { transform: scale(1); filter: none; } 50% { transform: scale(1.12); filter: drop-shadow(0 0 8px #ffffffaa); } }
+@keyframes glass-swim { 0%, 15% { transform: translateX(0); } 30%, 55% { transform: translateX(80px); } 70%, 100% { transform: translateX(0); } }
+@keyframes glass-pulse { 0%, 80% { opacity: 0; transform: translateX(0) scale(.6); } 84% { opacity: 1; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes glass-mote { 0% { transform: translateY(56px); opacity: 0; } 15% { opacity: 1; } 70% { transform: translateY(0); opacity: 1; } 78% { transform: translateY(-4px) scale(1.6); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glass-drain { 0% { transform: scaleX(1); } 100% { transform: scaleX(.2); } }
+@keyframes glass-hop { 0%, 20% { transform: translate(0, 0); } 30%, 55% { transform: translate(-16px, 0); } 65%, 90% { transform: translate(16px, 0); } 100% { transform: translate(0, 0); } }
+@keyframes glass-orbit { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .glass-diagram * { animation: none !important; } }
+[data-theme=glass] .guide-nav button { border-radius: 999px; border: 1px solid #d1eaff55; background: linear-gradient(#ffffff18, #ffffff08); color: #f0f2ff; box-shadow: inset 0 1px #ffffff30; }
+[data-theme=glass] .guide-nav button:disabled { opacity: .45; }
+[data-theme=glass] :is(#arcade-name, #arcade-save-score) { border-radius: 12px; }
+[data-theme=glass] #arcade-save-score { background: linear-gradient(#ffffff22, #ffffff0a); border: 1px solid #d1eaff77; color: #f0f2ff; }
