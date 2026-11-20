@@ -1,1 +1,221 @@
-/* phosphor portfolio materials and era animations, loaded after themes.css. Scope every rule to :root[data-theme=phosphor]. */
+/* Phosphor, 1970-1989: every section is a green P1 phosphor tube set in a terminal case.
+   By day the cases are beige plastic on an office desk; by night the room goes dark and only the glow remains.
+   Era motion: CRT power-on (the raster opens from a bright centre line), a slow scanline roll, typed headings,
+   a blinking block cursor, and phosphor persistence: highlights light up at once and decay slowly.
+   Loaded after themes.css; every rule is scoped to the Phosphor theme. Reduced motion stops all of it. */
+
+:root[data-theme=phosphor] {
+  --font: 'Lucida Console', Consolas, monospace;
+  --display: 'VT323', 'Lucida Console', monospace;
+  --radius: 0px;
+  --bezel: #d8d0b9; --bezel-hi: #efe9d8; --bezel-lo: #9e957c; --case-ink: #3a362a; --led: #8dff5a;
+  --screen-hi: #182613; --screen-lo: #050904;
+  --glow: 0 0 1px currentColor, 0 0 9px color-mix(in srgb, currentColor 40%, transparent);
+}
+:root[data-theme=phosphor][data-mode=dark] {
+  --bezel: #1a1e19; --bezel-hi: #2b3229; --bezel-lo: #050605; --case-ink: #6f8a6a; --led: #6dff7f;
+  --screen-hi: #0d1a0e; --screen-lo: #010301;
+}
+:root[data-theme=phosphor] ::selection { background: var(--accent); color: var(--bg); text-shadow: none; }
+
+/* ---------- The room: an office desk by day, a dark lab at night ---------- */
+:root[data-theme=phosphor] { background: radial-gradient(160% 1400px at 50% 0%, #e2dbc8 0%, #cbc3ab 60%, #b9b199 100%) #b9b199; }
+:root[data-theme=phosphor][data-mode=dark] { background: radial-gradient(140% 1200px at 50% -5%, #0f1a0f 0%, #050805 60%, #020302 100%) #020302; }
+:root[data-theme=phosphor] body { background: transparent; }
+/* Outside the tubes, text is printed on the case, not emitted by phosphor. */
+:root[data-theme=phosphor]:not([data-mode=dark]) :is(.site-header, .identity-strip, .site-footer) {
+  --ink: #2b281f; --muted: #575140; --accent: #35601a; --border: #9e957c; --soft: #e6dfcc; --bg: #ddd5c0; color: var(--ink);
+}
+:root[data-theme=phosphor]:not([data-mode=dark]) .identity-strip button { color: var(--accent); }
+:root[data-theme=phosphor] .identity-strip strong { font: 22px/1 var(--display); }
+:root[data-theme=phosphor][data-mode=dark] :is(.identity-strip, .site-footer) { text-shadow: var(--glow); }
+
+/* ---------- Header: the keyboard deck, keys travel when pressed ---------- */
+:root[data-theme=phosphor] .site-header { margin-top: 14px; min-height: 64px; padding: 0 14px 0 18px; border: 1px solid var(--bezel-lo); border-radius: 10px;
+  background: linear-gradient(#e9e2cf, #d3cbb4); box-shadow: inset 0 1px #f7f2e4, 0 3px 0 #988f75, 0 12px 22px #3a362a2e; color: var(--ink); }
+:root[data-theme=phosphor][data-mode=dark] .site-header { background: linear-gradient(#141913, #0b0f0b); border-color: #263224;
+  box-shadow: inset 0 1px #2c3529, 0 3px 0 #000, 0 12px 26px #0009; }
+:root[data-theme=phosphor] .wordmark { font: 26px/1 var(--display); letter-spacing: .02em; }
+:root[data-theme=phosphor] .wordmark img { filter: grayscale(1) sepia(1) hue-rotate(50deg) saturate(2.4) brightness(.9); }
+:root[data-theme=phosphor][data-mode=dark] .wordmark { color: var(--accent); text-shadow: var(--glow); }
+:root[data-theme=phosphor] .wordmark-cursor { display: inline-block; width: .5em; height: .82em; margin-left: .08em; vertical-align: -.04em; color: transparent;
+  background: var(--accent); animation: phos-blink 1.06s steps(1) infinite; }
+:root[data-theme=phosphor] .site-header nav { gap: 8px; }
+:root[data-theme=phosphor] :is(.site-header nav a, .theme-trigger) { min-height: 34px; display: inline-flex; align-items: center; padding: 6px 12px;
+  font: 12px/1 var(--font); letter-spacing: .04em; color: var(--ink); text-decoration: none; border-radius: 5px;
+  border: 1px solid #a1987e; border-bottom-width: 4px; background: linear-gradient(#f6f1e3, #ddd5bf); box-shadow: 0 1px 2px #3a362a33;
+  transition: transform .06s, border-bottom-width .06s; }
+:root[data-theme=phosphor] .theme-trigger { color: #f1ebda; border-color: #4e4a3d; background: linear-gradient(#8d8670, #6f6955); }
+:root[data-theme=phosphor] :is(.site-header nav a, .theme-trigger):hover { text-decoration: none; filter: brightness(1.04); }
+:root[data-theme=phosphor] :is(.site-header nav a, .theme-trigger):active { transform: translateY(3px); border-bottom-width: 1px; }
+:root[data-theme=phosphor][data-mode=dark] :is(.site-header nav a, .theme-trigger) { color: var(--accent); border-color: #2c3a29; background: linear-gradient(#1c241b, #111711);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 50%, transparent); box-shadow: 0 1px 2px #000; }
+:root[data-theme=phosphor][data-mode=dark] .theme-trigger { color: var(--bg); background: linear-gradient(#7ee88a, #4fbf62); border-color: #275f2f; text-shadow: none; }
+
+/* ---------- Each section is a tube in a terminal case ---------- */
+:root[data-theme=phosphor] .scene { overflow: visible; border: 14px solid var(--bezel); border-bottom-width: 30px; border-radius: 30px 30px 34px 34px;
+  padding-top: calc(var(--section-padding) + 26px); margin-bottom: 36px;
+  background: radial-gradient(120% 95% at 50% 42%, var(--screen-hi) 0%, var(--bg) 62%, var(--screen-lo) 100%);
+  box-shadow: inset 0 0 0 2px #000, inset 0 0 50px #000c, inset 0 0 130px #0007,
+    0 0 0 1px var(--bezel-lo), 0 2px 0 1px var(--bezel-lo), 0 18px 34px #2b281f40;
+  text-shadow: 0 0 7px color-mix(in srgb, currentColor 32%, transparent); }
+:root[data-theme=phosphor][data-mode=dark] .scene { box-shadow: inset 0 0 0 2px #000, inset 0 0 50px #000e, inset 0 0 130px #000a,
+    0 0 0 1px #000, 0 0 0 2px var(--bezel-hi), 0 0 60px color-mix(in srgb, var(--accent) 7%, transparent); }
+/* Case badge and power LED, printed into the bottom of the bezel. */
+:root[data-theme=phosphor] .scene::before { content: 'ROBIN-G0 \00B7  VDT-80'; position: absolute; left: 4px; right: 4px; bottom: -24px; height: 18px; z-index: 6;
+  font: 9px/18px var(--font); letter-spacing: .32em; color: var(--case-ink); opacity: .75; pointer-events: none; text-shadow: none;
+  background: radial-gradient(circle at calc(100% - 9px) 50%, var(--led) 0 2.6px, color-mix(in srgb, var(--led) 40%, transparent) 3.6px, transparent 7px); }
+/* Glass: power-on shutters, the bright raster line, the rolling refresh band, a soft glare and scanlines. */
+:root[data-theme=phosphor] .scene::after { content: ''; position: absolute; inset: 0; z-index: 5; border-radius: 16px 16px 4px 4px; pointer-events: none;
+  background:
+    linear-gradient(var(--screen-lo), var(--screen-lo)) top / 100% 0% no-repeat,
+    linear-gradient(var(--screen-lo), var(--screen-lo)) bottom / 100% 0% no-repeat,
+    linear-gradient(transparent calc(50% - 1px), #eaffd6 50%, transparent calc(50% + 1px)) center / 0% 100% no-repeat,
+    linear-gradient(transparent, color-mix(in srgb, var(--accent) 6%, transparent) 70%, transparent) 0 -140px / 100% 140px no-repeat,
+    radial-gradient(130% 90% at 22% -8%, #ffffff12, transparent 42%),
+    repeating-linear-gradient(transparent 0 2px, #00000042 2px 3px);
+  animation: phos-power 1.05s cubic-bezier(.2,.7,.2,1) both, phos-roll 11s linear 1.2s infinite; }
+:root[data-theme=phosphor] .about::after { animation-delay: .12s, 2.6s; }
+:root[data-theme=phosphor] .project-feature::after { animation-delay: .24s, 5.1s; }
+:root[data-theme=phosphor] .projects::after { animation-delay: .36s, 1.9s; }
+:root[data-theme=phosphor] .activity::after { animation-delay: .48s, 7.3s; }
+:root[data-theme=phosphor] .arcade::after { animation-delay: .6s, 3.8s; }
+@keyframes phos-power {
+  0% { background-size: 100% 50%, 100% 50%, 0% 100%, 100% 140px, 100% 100%, auto; }
+  30% { background-size: 100% calc(50% - 1px), 100% calc(50% - 1px), 100% 100%, 100% 140px, 100% 100%, auto; }
+  62% { background-size: 100% 0%, 100% 0%, 100% 100%, 100% 140px, 100% 100%, auto; }
+  100% { background-size: 100% 0%, 100% 0%, 0% 100%, 100% 140px, 100% 100%, auto; }
+}
+@keyframes phos-roll {
+  from { background-position: top, bottom, center, 0 -140px, 0 0, 0 0; }
+  to { background-position: top, bottom, center, 0 calc(100% + 140px), 0 0, 0 0; }
+}
+/* Status line in reverse video along the top of the tube, with keyboard LEDs. */
+:root[data-theme=phosphor] .window-chrome { display: flex; position: absolute; z-index: 4; top: 0; left: 0; right: 0; height: 26px; align-items: center; gap: 14px;
+  padding: 0 18px; border-radius: 16px 16px 0 0; font: 11px/1 var(--font); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bg); background: var(--accent); text-shadow: none; box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); }
+:root[data-theme=phosphor] .window-lights { display: flex; gap: 4px; }
+:root[data-theme=phosphor] .window-lights i { width: 8px; height: 8px; background: var(--bg); opacity: .3; }
+:root[data-theme=phosphor] .window-lights i:first-child { opacity: 1; }
+:root[data-theme=phosphor] .window-lights i:nth-child(2) { animation: phos-led 2.8s steps(1) infinite; }
+:root[data-theme=phosphor] .window-actions { margin-left: auto; font-size: 0; }
+:root[data-theme=phosphor] .window-actions::before { content: 'ON LINE'; font-size: 11px; }
+
+/* ---------- Type: VT323 raster headings, typed in, with a resting block cursor ---------- */
+:root[data-theme=phosphor] :is(h1, h2, h3) { font-family: var(--display); font-weight: 400; letter-spacing: .01em; color: var(--ink); text-shadow: var(--glow); }
+:root[data-theme=phosphor] h1 { font-size: clamp(76px, 10vw, 136px); line-height: .9; animation: phos-type 1s steps(8, jump-none) .95s both; }
+:root[data-theme=phosphor] h1::after { content: ''; display: inline-block; width: .42em; height: .7em; margin-left: .06em; vertical-align: -.02em;
+  background: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent); animation: phos-blink 1.06s steps(1) 2s infinite; }
+:root[data-theme=phosphor] h2 { font-size: clamp(42px, 5.4vw, 66px); line-height: .95; }
+:root[data-theme=phosphor] .project-feature h2 { font-size: clamp(52px, 7vw, 92px); }
+:root[data-theme=phosphor] .section-heading h2 { font-size: clamp(42px, 5vw, 62px); }
+:root[data-theme=phosphor] h3 { font-size: 24px; }
+:root[data-theme=phosphor] .hero-subtitle { font: clamp(26px, 3vw, 36px)/1.1 var(--display); color: var(--ink); }
+:root[data-theme=phosphor] .interests > p { font: clamp(26px, 3vw, 34px)/1.25 var(--display); }
+:root[data-theme=phosphor] .project-lead { font: 28px/1.2 var(--display); }
+:root[data-theme=phosphor] .scene .eyebrow { font-size: 11px; letter-spacing: .16em; }
+:root[data-theme=phosphor] .scene .eyebrow::before { content: '> '; color: var(--ink); }
+@keyframes phos-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes phos-blink { 50% { opacity: 0; } }
+@keyframes phos-led { 0%, 64% { opacity: .3; } 65%, 72% { opacity: 1; } 73%, 80% { opacity: .3; } 81%, 86% { opacity: 1; } }
+/* Single-line section titles are typed when they scroll onto the tube. */
+@supports (animation-timeline: view()) {
+  :root[data-theme=phosphor] .section-heading h2 { animation: phos-type linear both; animation-timing-function: steps(16, jump-none);
+    animation-timeline: view(); animation-range: entry 20% cover 32%; }
+}
+
+/* ---------- Controls: reverse video, with phosphor persistence on release ---------- */
+:root[data-theme=phosphor] :is(.button, .project-list a, .text-link, .arcade-play-label, .gesture-grid button, .demo-heading button, .arcade-imports button) {
+  transition: background-color 1.3s cubic-bezier(.1,.8,.3,1), color 1.3s cubic-bezier(.1,.8,.3,1), box-shadow 1.3s ease-out, border-color 1.3s; }
+:root[data-theme=phosphor] :is(.button, .project-list a, .text-link, .arcade-play-label, .gesture-grid button, .demo-heading button, .arcade-imports button):hover { transition-duration: 0s; }
+:root[data-theme=phosphor] .button, :root[data-theme=phosphor] .button.primary { border-radius: 0; border: 1px solid var(--accent); background: transparent; color: var(--accent);
+  font: 12px/1.2 var(--font); text-transform: uppercase; letter-spacing: .12em; padding: 12px 16px; }
+:root[data-theme=phosphor] .button.primary::before { content: '['; margin-right: -4px; }
+:root[data-theme=phosphor] .button.primary::after { content: ']'; margin-left: -4px; }
+:root[data-theme=phosphor] .button:hover { transform: none; background: var(--accent); color: var(--bg); text-shadow: none; box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-theme=phosphor] .text-link { color: var(--accent); text-decoration-style: dotted; }
+:root[data-theme=phosphor] .text-link:hover { background: var(--accent); color: var(--bg); text-decoration: none; text-shadow: none; }
+:root[data-theme=phosphor] .site-footer a:hover { background: transparent; color: var(--ink); }
+:root[data-theme=phosphor] a:focus-visible, :root[data-theme=phosphor] button:focus-visible { outline: 2px dashed var(--accent); outline-offset: 4px; }
+
+/* ---------- Hero: vector globe drawn like a 1979 vector display ---------- */
+:root[data-theme=phosphor] .wire-world { opacity: .8; stroke-width: 1; filter: drop-shadow(0 0 3px var(--accent)); }
+:root[data-theme=phosphor] .journey-route { filter: drop-shadow(0 0 4px var(--accent)); }
+:root[data-theme=phosphor] .aircraft { animation-timing-function: steps(44); }
+:root[data-theme=phosphor] .journey figcaption b { font: 26px var(--display); }
+:root[data-theme=phosphor] .hero-status { border-top: 1px dashed var(--border); font-family: var(--font); }
+:root[data-theme=phosphor] .status-light { border-radius: 0; width: 7px; height: 7px; box-shadow: 0 0 8px var(--accent); }
+:root[data-theme=phosphor] .status-blocks i { height: 8px; width: 9px; }
+:root[data-theme=phosphor] .interest-diagram { opacity: .9; filter: drop-shadow(0 0 3px var(--accent)); }
+:root[data-theme=phosphor] .interest-trace { animation-timing-function: steps(30); }
+:root[data-theme=phosphor] .interests strong { text-decoration-color: var(--accent); text-decoration-style: dotted; }
+
+/* ---------- Motion Input Grid demo: a character-cell keypad ---------- */
+:root[data-theme=phosphor] .gesture-demo { padding: 18px; border: 1px solid var(--border); background: color-mix(in srgb, var(--screen-lo) 55%, transparent); }
+:root[data-theme=phosphor] .gesture-grid { gap: 6px; }
+:root[data-theme=phosphor] .gesture-grid button { border-radius: 0; border: 1px solid var(--border); background: transparent; }
+:root[data-theme=phosphor] .gesture-grid button.target { background: color-mix(in srgb, var(--accent) 12%, transparent); border-style: dashed; border-color: var(--accent); }
+:root[data-theme=phosphor] .gesture-grid button.target::after { border-radius: 0; width: 10px; height: 14px; top: calc(50% - 7px); left: calc(50% - 5px); animation: phos-blink 1.06s steps(1) infinite; }
+:root[data-theme=phosphor] .gesture-grid button:hover { transform: none; border-color: var(--accent); box-shadow: inset 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent); }
+:root[data-theme=phosphor] .gesture-grid button.visited { background: var(--accent); color: var(--bg); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 50%, transparent); }
+:root[data-theme=phosphor] .gesture-grid button.visited::after { animation: none; }
+:root[data-theme=phosphor] .gesture-feedback::before { content: '$ '; }
+
+/* ---------- Projects: a directory listing ---------- */
+:root[data-theme=phosphor] .project-list { column-gap: 28px; }
+:root[data-theme=phosphor] .project-list li { border-bottom: 1px dashed var(--border); }
+:root[data-theme=phosphor] .project-list a { padding: 16px 12px; font: 22px/1 var(--display); }
+:root[data-theme=phosphor] .project-list small { font: 11px var(--font); letter-spacing: .1em; text-transform: uppercase; }
+:root[data-theme=phosphor] .project-list img { filter: grayscale(1) sepia(1) hue-rotate(50deg) saturate(3) brightness(1.1); }
+:root[data-theme=phosphor] .project-list a:hover { background: var(--accent); color: var(--bg); text-shadow: none; }
+:root[data-theme=phosphor] .project-list a:hover :is(small, .project-arrow) { color: var(--bg); }
+:root[data-theme=phosphor] .project-list a:hover img { filter: brightness(0); }
+
+/* ---------- Activity: statistics as a report printout on the tube ---------- */
+:root[data-theme=phosphor] .scope-badge { border: 1px dashed var(--accent); border-radius: 0; font-family: var(--font); }
+:root[data-theme=phosphor] .metrics { gap: 18px; border-bottom: 1px dashed var(--border); }
+:root[data-theme=phosphor] .metrics > div { padding: 16px 18px 14px; border: 1px solid var(--border); position: relative; }
+:root[data-theme=phosphor] .metrics > div::before { content: ''; position: absolute; top: -1px; left: 12px; width: 26px; height: 3px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+:root[data-theme=phosphor] .metrics dd { font: clamp(48px, 6vw, 80px)/.9 var(--display); color: var(--accent); text-shadow: var(--glow); letter-spacing: 0; }
+:root[data-theme=phosphor] .metrics dt { text-transform: uppercase; letter-spacing: .12em; font-size: 10px; }
+:root[data-theme=phosphor] .language-heading h3 { font-size: 26px; }
+:root[data-theme=phosphor] .language-track { height: 12px; border-radius: 0; background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent) 0 5px, transparent 5px 7px); }
+:root[data-theme=phosphor] .language-fill { border-radius: 0; background: repeating-linear-gradient(90deg, var(--accent) 0 5px, transparent 5px 7px);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 70%, transparent)); }
+:root[data-theme=phosphor] .language-fill::after { display: none; }
+:root[data-theme=phosphor] .language-name img { filter: grayscale(1) sepia(1) hue-rotate(50deg) saturate(3) brightness(1.1); }
+:root[data-theme=phosphor] .stats-footnote { border-top: 1px dashed var(--border); }
+
+/* ---------- Arcade: cartridges on the same tube ---------- */
+:root[data-theme=phosphor] .arcade-play { border: 1px solid var(--border); border-radius: 0; background: var(--screen-lo); }
+:root[data-theme=phosphor] .arcade-play:hover { border-color: var(--accent); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 25%, transparent); }
+:root[data-theme=phosphor] .arcade-play-label { font: 11px var(--font); letter-spacing: .12em; text-transform: uppercase; border-top: 1px dashed var(--border); }
+:root[data-theme=phosphor] .arcade-play-label::before { content: 'RUN '; }
+:root[data-theme=phosphor] .arcade-play:hover .arcade-play-label { background: var(--accent); color: var(--bg); text-shadow: none; }
+:root[data-theme=phosphor] .arcade-card h3 { font-size: 30px; }
+
+/* ---------- Picker: the terminal's menu ---------- */
+:root[data-theme=phosphor] dialog#theme-picker { border: 2px solid var(--accent); border-radius: 0; box-shadow: 0 0 0 6px var(--bg), 0 0 0 7px var(--border), 0 30px 90px #000a; }
+:root[data-theme=phosphor] #theme-picker .picker-heading h2 { font: 40px/1 var(--display); }
+:root[data-theme=phosphor] .close-picker { border-radius: 0; }
+
+/* ---------- Phone ---------- */
+@media (max-width: 640px) {
+  :root[data-theme=phosphor] .site-header { margin-top: 8px; padding: 10px 12px; }
+  :root[data-theme=phosphor] .site-header nav { gap: 6px; border-top-color: #a1987e80; }
+  :root[data-theme=phosphor] .site-header nav a { padding: 6px 8px; font-size: 11px; min-height: 32px; }
+  :root[data-theme=phosphor] .scene { border-width: 8px 8px 22px; border-radius: 20px 20px 24px 24px; margin-bottom: 24px; padding-top: calc(var(--section-padding) + 24px); }
+  :root[data-theme=phosphor] .scene::after { border-radius: 12px 12px 3px 3px; }
+  :root[data-theme=phosphor] .scene::before { bottom: -19px; height: 16px; line-height: 16px; font-size: 8px; letter-spacing: .24em; }
+  :root[data-theme=phosphor] .window-chrome { height: 24px; padding: 0 12px; font-size: 9px; gap: 10px; border-radius: 12px 12px 0 0; }
+  :root[data-theme=phosphor] .window-actions::before { font-size: 9px; }
+  :root[data-theme=phosphor] h1 { font-size: clamp(64px, 20vw, 92px); }
+  :root[data-theme=phosphor] .hero { padding-top: calc(var(--section-padding) + 30px); }
+  :root[data-theme=phosphor] .project-feature h2 { font-size: 58px; }
+  :root[data-theme=phosphor] .project-list a { font-size: 20px; padding: 14px 6px; }
+  :root[data-theme=phosphor] .metrics dd, :root[data-theme=phosphor] .metrics > div:last-child dd { font-size: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme=phosphor] :is(h1, .section-heading h2, .wordmark-cursor, .window-lights i) { animation: none; }
+  :root[data-theme=phosphor] .scene::after, :root[data-theme=phosphor] h1::after, :root[data-theme=phosphor] .gesture-grid button.target::after { animation: none; }
+}
