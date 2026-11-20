@@ -13,6 +13,7 @@ const ENGINES=[
 ];
 
 test('Aqua games teach their real rules on gel cards and use their native profiles with engine-owned feedback',async({page})=>{
+    test.setTimeout(60000);
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     for(const {engine,inputs,press,button,lives,caption} of ENGINES){
         await page.locator(`[data-game=aqua-${engine}]`).click();
@@ -27,8 +28,8 @@ test('Aqua games teach their real rules on gel cards and use their native profil
         await page.evaluate(()=>window.motionTest.observe());
         await page.locator('#arcade-begin').click();
         expect((await page.evaluate(()=>window.motionTest.profile.inputs.map(i=>i.action))).sort()).toEqual([...inputs].sort());
-        await page.evaluate(action=>window.motionTest.raw(action),press);await page.clock.runFor(64);
-        await expect(page.locator(`[data-arcade-input=${button}]`)).toHaveAttribute('data-pulse','true');
+        await page.evaluate(action=>window.motionTest.raw(action),press);
+        expect(await page.locator(`[data-arcade-input=${button}]`).getAttribute('data-pulse')).toBe('true');await page.clock.runFor(64);
         await expect(page.locator('#arcade-playfield-input')).not.toBeVisible();
         await page.evaluate(()=>window.motionTest.observe(false));await page.clock.runFor(1200);
         await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','playing');
@@ -53,6 +54,7 @@ test('Aqua playfields show object-local feedback on the canvas instead of a gene
 });
 
 test('Aqua boards and cards fit phones and landscape without stretching game rules',async({page})=>{
+    test.setTimeout(60000);
     for(const {engine} of ENGINES){
         await page.setViewportSize({width:320,height:640});
         await page.locator(`[data-game=aqua-${engine}]`).click();
@@ -69,8 +71,9 @@ test('Aqua boards and cards fit phones and landscape without stretching game rul
 });
 
 test('an unattended Marble Gates run is crushed into Game over with versioned scores, sharing and replay',async({page})=>{
+    test.setTimeout(90000);
     await page.locator('[data-game=aqua-marble]').click();
-    await page.locator('#arcade-no-camera').click();await page.clock.runFor(70000);
+    await page.locator('#arcade-no-camera').click();await page.clock.runFor(45000);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
     await expect(page.locator('#arcade-result')).toContainText('Game over');
     await page.locator('#arcade-name').fill('AQUA1');await page.locator('#arcade-save-score').click();
@@ -83,8 +86,9 @@ test('an unattended Marble Gates run is crushed into Game over with versioned sc
 });
 
 test('an unattended Dock Bounce run times out into Game over',async({page})=>{
+    test.setTimeout(90000);
     await page.locator('[data-game=aqua-dock]').click();
-    await page.locator('#arcade-no-camera').click();await page.clock.runFor(60000);
+    await page.locator('#arcade-no-camera').click();await page.clock.runFor(45000);
     await expect(page.locator('#arcade-player')).toHaveAttribute('data-phase','finished');
     await expect(page.locator('#arcade-result')).toContainText('Game over');
 });

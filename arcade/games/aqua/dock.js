@@ -133,7 +133,7 @@ export function dock(env) {
                 }
                 if (request) {
                     const left = (request.due - s.time) / (request.due - request.born);
-                    progress(p, centers[i] - size * .45, iconBottom + (compact ? 10 : 6), size * .9, compact ? 12 : 9, left, s.time, reduced, left < .35 ? 'red' : request.kind === 'hang' ? 'graphite' : 'blue');
+                    progress(p, centers[i] - size * .45, iconBottom + (compact ? 10 : 6), size * .9, compact ? 16 : 10, left, s.time, reduced, left < .35 ? 'red' : request.kind === 'hang' ? 'graphite' : 'blue');
                 }
                 const fail = fx('fail', i, .9);
                 if (fail) { c.save(); c.globalAlpha = 1 - (s.time - fail.at) / .9; beachball(p, centers[i], iy - size * .1, size * .3, reduced ? 0 : (s.time - fail.at) * 9); c.restore(); }
@@ -144,10 +144,10 @@ export function dock(env) {
             c.save(); c.fillStyle = dark ? '#e6f5ff' : '#10263c'; c.beginPath();
             const ty = iconBottom + (compact ? 30 : 22);
             c.moveTo(cx - 9, ty + 9); c.lineTo(cx + 9, ty + 9); c.lineTo(cx, ty); c.closePath(); c.fill(); c.restore();
-            const name = APPS[s.cursor].name, tagW = name.length * (compact ? 15 : 10) + 28, tagH = compact ? 38 : 26;
+            const name = APPS[s.cursor].name, tagW = name.length * (compact ? 18 : 11) + 30, tagH = compact ? 44 : 28;
             const tagY = iconBottom - cs - (compact ? 74 : 52);
             p.rect(cx - tagW / 2, tagY, tagW, tagH, '#0b1a28cc', tagH / 2);
-            text(p, name, cx, tagY + tagH / 2, compact ? 22 : 15, '#ffffff', 'center', 700);
+            text(p, name, cx, tagY + tagH / 2, compact ? 28 : 17, '#ffffff', 'center', 700);
             if (s.time - s.bumpAt < .3 && !reduced) p.rect(s.cursor ? 360 + slabW / 2 - 6 : 360 - slabW / 2, dockY - slabH * .55, 6, slabH, '#4aa8ff', 3);
             // Answered apps: a window genies out of its icon (open) and back down again, or a poof (quit).
             for (const e of s.effects) {

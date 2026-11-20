@@ -139,7 +139,7 @@ export function marble(env) {
             const avail = p.h - ceil - (compact ? 30 : 10), row = Math.min(avail / 5.45, compact ? 230 : 120);
             const y0 = ceil + Math.max(0, (avail - row * 5.45) * .3), Y = rowY => y0 + rowY * row;
             const left = compact ? 60 : 90, pitch = compact ? 100 : 90, X = lane => left + lane * pitch;
-            const thick = compact ? 26 : 16, gapW = pitch * .74, r = Math.min(compact ? 34 : 19, row * .3);
+            const thick = compact ? 32 : 16, gapW = pitch * .74, r = Math.min(compact ? 34 : 19, row * .3);
             const ballShelf = shelfOf(s.ball.shelf), danger = ballShelf && !s.ball.falling && ballShelf.y < 1.2;
             const ceilY = y0 - barH - 6 + (compact ? 4 : 2);
             const gateFx = s.effects.filter(e => e.kind === 'gate');

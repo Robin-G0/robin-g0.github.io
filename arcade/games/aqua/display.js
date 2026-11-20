@@ -54,10 +54,21 @@ function capsulePath(c, x, y, w, h, r = Math.min(h, w) / 2) {
 }
 
 /** Pinstripe backdrop: the Aqua window body, two-pixel stripes. Dark appearance keeps it as graphite. */
+const stripeCache = new Map();
+/** Pinstripe backdrop: the Aqua window body, two-pixel stripes. Dark appearance keeps it as graphite.
+ * In a browser the stripes are one cached pattern per appearance; elsewhere they are drawn directly. */
 export function pinstripes(p, top = 0, bottom = p.h) {
-    const c = p.c, dark = isDark(p);
-    c.fillStyle = dark ? '#1b2834' : '#eef2f6'; c.fillRect(0, top, 720, bottom - top);
-    c.fillStyle = dark ? '#21303d' : '#f7f9fb';
+    const c = p.c, dark = isDark(p), colors = dark ? ['#1b2834', '#21303d'] : ['#eef2f6', '#f7f9fb'];
+    if (!stripeCache.has(dark) && globalThis.document?.createElement) {
+        const tile = document.createElement('canvas'); tile.width = 8; tile.height = 8;
+        const t = tile.getContext('2d');
+        if (t) { t.fillStyle = colors[0]; t.fillRect(0, 0, 8, 8); t.fillStyle = colors[1]; t.fillRect(0, 0, 8, 2); t.fillRect(0, 4, 8, 2); }
+        stripeCache.set(dark, tile);
+    }
+    const pattern = stripeCache.has(dark) ? c.createPattern?.(stripeCache.get(dark), 'repeat') : null;
+    if (pattern) { c.fillStyle = pattern; c.fillRect(0, top, 720, bottom - top); return; }
+    c.fillStyle = colors[0]; c.fillRect(0, top, 720, bottom - top);
+    c.fillStyle = colors[1];
     for (let y = top; y < bottom; y += 4) c.fillRect(0, y, 720, 2);
 }
 
@@ -70,7 +81,7 @@ export function brushed(p, x, y, w, h, radius = 0) {
         : [[0, '#f4f5f6'], [.45, '#d4d8dc'], [1, '#b7bec5']]);
     c.fillRect(x, y, w, h);
     c.globalAlpha = dark ? .12 : .22; c.fillStyle = dark ? '#ffffff' : '#7d8790';
-    for (let i = 0; i < Math.min(60, h / 2); i++) {
+    for (let i = 0; i < (h >= 20 ? Math.min(40, h / 2) : 0); i++) { // Hairlines only where they can be seen.
         const sy = y + ((i * 37) % Math.max(1, h)), sx = x + ((i * 151) % Math.max(1, w)) * .6;
         c.fillRect(sx, sy, w * (.25 + ((i * 13) % 7) / 10), 1);
     }
@@ -85,7 +96,8 @@ export function gel(p, x, y, w, h, tone = 'blue', { radius, alpha = 1, glow = 0 
     if (w <= 0 || h <= 0) return;
     c.save(); c.globalAlpha *= alpha;
     if (glow > 0) { c.shadowColor = '#4aa8ff'; c.shadowBlur = 18 * glow; }
-    else { c.shadowColor = '#0a284633'; c.shadowBlur = Math.min(10, h * .25); c.shadowOffsetY = Math.min(4, h * .08); }
+    else if (h >= 30) { c.shadowColor = '#0a284633'; c.shadowBlur = Math.min(10, h * .25); c.shadowOffsetY = Math.min(4, h * .08); }
+    else { capsulePath(c, x, y + Math.max(1, h * .1), w, h, r); c.fillStyle = '#0a284626'; c.fill(); } // Small gel: a cheap offset shadow.
     capsulePath(c, x, y, w, h, r);
     c.fillStyle = linear(p, 0, y, 0, y + h, [[0, top], [.5, middle], [.52, middle], [1, bottom]]); c.fill();
     c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetY = 0;
@@ -136,18 +148,18 @@ export function gatePill(p, x, y, w, h, kind) {
 
 /** The brushed-metal toolbar with an iTunes-style status display. It never repeats the room title or lives. */
 export function toolbar(p, status, detail = '') {
-    const compact = p.compact, h = compact ? 84 : 52, dark = isDark(p);
+    const compact = p.compact, h = compact ? 100 : 56, dark = isDark(p);
     brushed(p, 0, 0, 720, h);
-    const w = compact ? 560 : 380, x = 360 - w / 2, y = compact ? 12 : 8, lh = h - y * 2;
+    const w = compact ? 600 : 400, x = 360 - w / 2, y = compact ? 10 : 6, lh = h - y * 2;
     const c = p.c; c.save();
     capsulePath(c, x, y, w, lh, lh * .35);
     c.fillStyle = linear(p, 0, y, 0, y + lh, dark ? [[0, '#2f3d29'], [1, '#43543a']] : [[0, '#e9f2d2'], [1, '#f9fbef']]); c.fill();
     c.strokeStyle = dark ? '#151b12' : '#8d9a7c'; c.lineWidth = 1; c.stroke(); c.restore();
     const ink = dark ? '#d8ecc0' : '#2b3622';
     if (detail) {
-        text(p, status, 360, y + lh * .34, compact ? 30 : 17, ink, 'center', 700);
-        text(p, detail, 360, y + lh * .74, compact ? 24 : 13, ink, 'center', 400);
-    } else text(p, status, 360, y + lh / 2, compact ? 32 : 19, ink, 'center', 700);
+        text(p, status, 360, y + lh * .32, compact ? 32 : 19, ink, 'center', 700);
+        text(p, detail, 360, y + lh * .74, compact ? 28 : 16, ink, 'center', 400);
+    } else text(p, status, 360, y + lh / 2, compact ? 34 : 20, ink, 'center', 700);
     return h;
 }
 
@@ -229,7 +241,7 @@ export function pruneBursts(s) { s.bursts = s.bursts.filter(b => s.time - b.at <
 export function bursts(s, p, reduced = false) {
     for (const b of s.bursts) {
         const age = s.time - b.at; if (age < 0 || age > 1.1) continue;
-        const size = (p.compact ? 34 : 24) * (b.text.length > 14 ? .8 : 1), y = b.y - (reduced ? 0 : age * 24);
+        const size = (p.compact ? 36 : 24) * (b.text.length > 14 ? .85 : 1), y = b.y - (reduced ? 0 : age * 24);
         const c = p.c; c.save(); c.globalAlpha = age > .8 ? (1.1 - age) / .3 : 1;
         c.shadowColor = isDark(p) ? '#000000' : '#ffffff'; c.shadowBlur = 6;
         text(p, b.text, Math.max(90, Math.min(630, b.x)), y, size, b.good ? 'accent' : (isDark(p) ? '#ff9c86' : '#b2302a'), 'center', 700);

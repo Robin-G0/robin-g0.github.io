@@ -85,10 +85,10 @@ export function gel(env) {
             // Buttons are drawn at true size everywhere: the slot on the sheet is exactly the width to reach.
             const extW = compact ? 250 : 240, bh = compact ? 64 : 40, gap = compact ? 12 : 16;
             // A document window; the order hangs from its title bar as an Aqua sheet.
-            const winX = 16, winW = 688, titleY = top + (compact ? 22 : 10), titleH = compact ? 40 : 24, sheetH = bh + (compact ? 96 : 56);
+            const winX = 16, winW = 688, titleY = top + (compact ? 22 : 10), titleH = compact ? 48 : 26, sheetH = bh + (compact ? 100 : 58);
             brushed(p, winX, titleY, winW, titleH, 8);
             ['close', 'minimise', 'zoom'].forEach((kind, i) => light(p, winX + 20 + i * titleH * .8, titleY + titleH / 2, titleH * .26, kind));
-            etched(p, 'Untitled Order', 360, titleY + titleH / 2, compact ? 22 : 13, dark ? '#e6f5ff' : '#25455f', 'center', 700);
+            etched(p, 'Untitled Order', 360, titleY + titleH / 2, compact ? 28 : 15, dark ? '#e6f5ff' : '#25455f', 'center', 700);
             const sheet = s.sheet, since = s.time - sheet.at, shipT = s.ship ? (s.time - s.ship.at) / GEL.ship : 0;
             // Sheets slide down out of the title bar and back up into it when they ship.
             const drop = reduced ? (s.ship && shipT >= .5 ? 0 : 1) : s.ship ? Math.max(0, 1 - shipT * 1.4) : Math.min(1, since / .35);
@@ -114,7 +114,7 @@ export function gel(env) {
                     c.beginPath(); c.roundRect(x, slotY, widths[i], bh, bh / 2); c.stroke(); c.restore();
                     text(p, slot.size, x + widths[i] / 2, slotY + bh / 2, bh * .42, 'muted', 'center', 700);
                     const owner = i === nextL && i === nextR ? 'L or R' : i === nextL ? 'L' : i === nextR ? 'R' : '';
-                    if (owner) text(p, owner, x + widths[i] / 2, slotY + bh + (compact ? 30 : 18), compact ? 24 : 14, 'accent', 'center', 700);
+                    if (owner) text(p, owner, x + widths[i] / 2, slotY + bh + (compact ? 30 : 18), compact ? 28 : 16, 'accent', 'center', 700);
                 }
                 x += widths[i] + gap;
             });
@@ -143,7 +143,7 @@ export function gel(env) {
                     p.line([[tx, cy - bh * .8], [tx, cy + bh * .8]], near ? 'accent' : 'muted', near ? (compact ? 5 : 3) : 2, near ? [] : [5, 4]);
                 }
                 const lower = targets.size > 1 && t === widest;
-                text(p, `${target.who.join(' or ')} · ${target.size}`, 360 + half, cy + bh * .8 + (compact ? 28 : 16) + (lower ? (compact ? 32 : 18) : 0), compact ? 24 : 14, near ? 'accent' : 'muted', 'center', 700);
+                text(p, `${target.who.join(' or ')} · ${target.size}`, 360 + half, cy + bh * .8 + (compact ? 28 : 16) + (lower ? (compact ? 34 : 20) : 0), compact ? 28 : 16, near ? 'accent' : 'muted', 'center', 700);
             }
             // Gel wobble: the extruded button breathes a little as it grows (decoration only).
             const wob = reduced ? 0 : Math.sin(s.time * 11) * .04;

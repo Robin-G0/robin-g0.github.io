@@ -3,8 +3,9 @@
 // animates them with era motions (default-button throb, Dock bounce and magnification, gel growth)
 // and freezes them for reduced motion.
 const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+// Labels never go below 15 units: a 400-wide card is about 340 CSS px on a phone.
 const text = (value, x, y, size = 16, weight = 400, cls = '') =>
-    `<text x="${x}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}"${cls ? ` class="${cls}"` : ''}>${escape(value)}</text>`;
+    `<text x="${x}" y="${y}" text-anchor="middle" font-size="${Math.max(15, size)}" font-weight="${weight}"${cls ? ` class="${cls}"` : ''}>${escape(value)}</text>`;
 const TONES = { blue: ['#1d5ea8', '#a9d8ff', '#2f87dc', '#7fd0ff'], clear: ['#8ea4b8', '#ffffff', '#e4edf5', '#ffffff'],
     red: ['#a2342a', '#ffc2b4', '#e0503c', '#ff9c86'], yellow: ['#a07d1c', '#fff4b8', '#e8b52e', '#ffe48a'],
     green: ['#3d7f2e', '#d4f8bf', '#5cae46', '#b3ec92'], graphite: ['#59636e', '#e6ebf0', '#8d98a4', '#d0d8e0'],
