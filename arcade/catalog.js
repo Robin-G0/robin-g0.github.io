@@ -39,9 +39,10 @@ export const games = Object.freeze([
     entry('glass', 'prisms', 'Prisms', 'Turn the selected mirror and guide the light to its target.', 'Rotate mirror', 'Next mirror'),
     entry('glass', 'abyss', 'Abyss Drift', 'Guide the jellyfish through the opening in each reef.', 'Swim up', 'Gentle dive'),
     entry('glass', 'orbit', 'Orbital Assist', 'Launch a probe through the planet’s gravitational field.', 'Change angle', 'Launch probe'),
-    entry('field-notes', 'clockwork', 'Clockwork', 'Align both hands with the marks on the mechanism.', 'First gear', 'Second gear'),
-    entry('field-notes', 'contour', 'Contour Survey', 'Draw a closed boundary around the survey point.', 'Turn pencil', 'Draw segment'),
-    entry('field-notes', 'stars', 'Constellations', 'Connect the stars in the order shown in the reference.', 'Next star', 'Draw connection')
+    entry('field-notes', 'clockwork', 'Clockwork', 'Keep the pendulum swinging. Strike each pallet as the bob arrives; the jewel at the turn counts double.', 'Left pallet', 'Right pallet', {scoreVersion:2,illustrated:true,precision:'low'}),
+    entry('field-notes', 'contour', 'Contour Survey', 'Steer the pencil. Close a loop around the summits. Keep the marsh out and stay on the sheet.', 'Turn left', 'Turn right', {scoreVersion:2,illustrated:true,precision:'medium'}),
+    entry('field-notes', 'stars', 'Constellations', 'Watch the figure being inked, then retrace it from memory, pointing toward each next star.', 'Left star', 'Right star', {scoreVersion:2,illustrated:true,precision:'full',inputScheme:'wrist-directions',
+        controls:Object.fromEntries(WRIST_COMMANDS.map(action => [action, {left:'Left star', up:'Star above', right:'Right star'}[action.split('_')[1]]]))})
 ]);
 
 export const gamesForTheme = theme => games.filter(game => game.theme === theme);

@@ -1,1 +1,67 @@
-/* field-notes game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="field-notes"]. */
+/* field-notes game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme="field-notes"].
+   A naturalist's notebook in the site palette: paper (--bg), pen ink (--accent), pencil (--muted), grid (--border),
+   brass (--gold); Caveat for handwritten notes and headings, Georgia for print. */
+[data-theme=field-notes] #arcade-player { border-radius: 2px; }
+:root[data-theme=field-notes][data-mode=dark] [data-brief=start] #arcade-tutorial {
+    background: linear-gradient(90deg,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,
+        linear-gradient(color-mix(in srgb,var(--border) 55%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,var(--bg); color: var(--ink); }
+:root[data-theme=field-notes][data-mode=dark] [data-brief=start] #arcade-controls-status,
+:root[data-theme=field-notes][data-mode=dark] #arcade-begin { color: var(--accent); border-color: var(--accent); }
+
+/* The walkthrough is a notebook page: grid paper and the red margin rule. */
+[data-theme=field-notes] .arcade-walkthrough {
+    background: linear-gradient(90deg,color-mix(in srgb,var(--border) 60%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,
+        linear-gradient(color-mix(in srgb,var(--border) 45%,transparent) 1px,transparent 1px) 0 0 / 22px 22px,var(--bg);
+    border-left: 2px solid #b4625366; }
+[data-theme=field-notes] .guide-heading h3 { font-family: Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: .04em; }
+[data-theme=field-notes] .guide-title { font-family: 'Caveat', 'Segoe Print', cursive; font-weight: 700; font-size: clamp(28px, 3.4vw, 36px); color: var(--accent); transform: rotate(-1deg); }
+[data-theme=field-notes] .guide-caption { font-family: Georgia, serif; }
+@media (max-width: 480px) { [data-theme=field-notes] .arcade-walkthrough .guide-caption { font-size: 17px; } [data-theme=field-notes] .guide-title { font-size: 26px; } }
+[data-theme=field-notes] .guide-progress span { border-radius: 50%; background: transparent; border: 1.5px solid var(--muted); color: var(--muted); font-family: Georgia, serif; }
+[data-theme=field-notes] .guide-progress [aria-current=step] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+[data-theme=field-notes] .guide-nav button { font-family: Georgia, serif; font-style: italic; border-radius: 0; }
+[data-theme=field-notes] .guide-nav .primary { background: transparent; color: var(--accent); border: 0; border-bottom: 3px solid var(--accent); box-shadow: none; }
+[data-theme=field-notes] #arcade-player .arcade-action[data-pulse=true] { background: color-mix(in srgb,var(--accent) 18%,transparent); }
+[data-theme=field-notes] #arcade-player .arcade-hud dd { font-family: Georgia, serif; }
+[data-theme=field-notes] #arcade-result { font-family: 'Caveat', 'Segoe Print', cursive; font-weight: 700; }
+
+/* Card sketches. */
+.field-notes-diagram text { font-family: 'Caveat', 'Segoe Print', cursive; font-weight: 600; fill: var(--ink); }
+.field-notes-diagram .fn-serif { font-family: Georgia, serif; font-weight: 700; letter-spacing: .08em; fill: var(--accent); }
+.field-notes-diagram .fn-muted { fill: var(--muted); }
+.field-notes-diagram path, .field-notes-diagram rect { stroke-linecap: round; stroke-linejoin: round; }
+.field-notes-diagram .fn-ink { stroke: var(--accent); stroke-width: 4; fill: none; }
+.field-notes-diagram .fn-pencil, .field-notes-diagram .fn-arc { stroke: var(--muted); stroke-width: 2; fill: none; }
+.field-notes-diagram .fn-arc { stroke-dasharray: 3 6; }
+.field-notes-diagram .fn-pencil-line { stroke: var(--ink); stroke-width: 3; opacity: .8; }
+.field-notes-diagram .fn-pencil-tip, .field-notes-diagram .fn-bob, .field-notes-diagram .fn-jewel.fn-gold { fill: var(--gold); stroke: var(--ink); stroke-width: 1.5; }
+.field-notes-diagram .fn-jewel { fill: var(--accent); stroke: var(--ink); stroke-width: 1.5; }
+.field-notes-diagram .fn-rod { stroke: var(--ink); stroke-width: 3; }
+.field-notes-diagram .fn-pallet { stroke: var(--gold); stroke-width: 10; fill: none; }
+.field-notes-diagram .fn-pallet.fn-grit { stroke: var(--muted); }
+.field-notes-diagram .fn-tag { fill: var(--accent); stroke: none; }
+.field-notes-diagram .fn-tag-text { fill: var(--bg); font-family: Georgia, serif; font-weight: 700; }
+.field-notes-diagram .fn-star, .field-notes-diagram .fn-summit { fill: var(--ink); stroke: none; }
+.field-notes-diagram .fn-ring { fill: none; stroke: var(--accent); stroke-width: 2; }
+.field-notes-diagram .fn-dot { fill: var(--muted); stroke: none; }
+.field-notes-diagram .fn-hatch { fill: color-mix(in srgb,var(--accent) 22%,transparent); stroke: none; }
+.field-notes-diagram .fn-marsh rect { fill: var(--border); stroke: none; }
+.field-notes-diagram .fn-marsh path { stroke: var(--ink); stroke-width: 1.6; fill: none; }
+.field-notes-diagram .fn-stamp-box { fill: var(--bg); stroke: var(--accent); stroke-width: 3; }
+.field-notes-diagram .fn-blot { fill: var(--ink); stroke: none; opacity: .8; }
+
+/* A few deliberate motions from the notebook: a pendulum swing, ink drawn stroke by stroke, a stamp thud. */
+.fn-swing { transform-box: view-box; transform-origin: 200px 14px; animation: fn-swing 1.25s ease-in-out infinite alternate; }
+.fn-still { transform-box: view-box; transform-origin: 200px 14px; transform: rotate(-40deg); }
+.fn-draw { stroke-dasharray: 520; stroke-dashoffset: 520; animation: fn-draw 3.6s ease-out infinite; }
+.fn-show { animation: fn-show 3.6s linear infinite; }
+.fn-stamp { transform-box: fill-box; transform-origin: center; animation: fn-stamp 3s ease-out infinite; }
+@keyframes fn-swing { from { transform: rotate(40deg); } to { transform: rotate(-40deg); } }
+@keyframes fn-draw { 0% { stroke-dashoffset: 520; } 55%, 100% { stroke-dashoffset: 0; } }
+@keyframes fn-show { 0%, 70% { opacity: 1; } 85%, 100% { opacity: .15; } }
+@keyframes fn-stamp { 0%, 12% { opacity: 0; transform: scale(1.4) rotate(-6deg); } 18% { opacity: 1; transform: scale(1) rotate(-6deg); } 100% { opacity: 1; transform: scale(1) rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .field-notes-diagram * { animation: none !important; }
+    .fn-draw { stroke-dashoffset: 0; } .fn-stamp { opacity: 1; transform: rotate(-6deg); }
+}
+
