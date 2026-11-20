@@ -96,10 +96,10 @@ test('early and delayed rhythm recognition uses a broad explicit window', () => 
     for (const offset of [-.35, .25]) {
         const { game: g } = create('beat');
         g.update(3);
-        g.input({ action: 'left', at: 3 + offset });
+        g.input({ action: 'left_up', at: 3 + offset });
         assert.ok(g.state.score > 0);
     }
     const { game: g } = create('beat');
-    g.update(3); g.input({ action: 'left', at: 2.3 });
+    g.update(3); g.input({ action: 'left_up', at: 2.3 });
     assert.equal(g.state.score, 0);
 });
