@@ -4,8 +4,8 @@ export function pressureMultiplier(seconds) {
 }
 
 const survival = ['invaders', 'lander', 'snake', 'sort', 'ski', 'juggle', 'parry', 'rail', 'merge',
-    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'balance', 'abyss'];
-const rounds = { stack: 18, golf: 24, orbit: 24, binary: 24, gel: 18,
+    'gravity', 'orbital', 'beat', 'reactor', 'marble', 'school', 'garden', 'balance', 'abyss', 'orbit'];
+const rounds = { stack: 18, golf: 24, binary: 24, gel: 18,
     dock: 18, memory: 24, tangram: 20, prisms: 32, clockwork: 24,
     contour: 36, stars: 24, bubbles: 18 };
 

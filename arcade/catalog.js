@@ -34,9 +34,9 @@ export const games = Object.freeze([
     entry('material', 'tangram', 'Paper Tangram', 'Rotate and stamp each shape into its matching outline.', 'Rotate shape', 'Stamp shape'),
     entry('material', 'golf', 'Ripple Golf', 'Send the paper ball into the cup using a measured stroke.', 'Change power', 'Take stroke'),
     entry('material', 'balance', 'Paper Balance', 'Keep the hanging mobile balanced as paper pieces arrive.', 'Weight left', 'Weight right'),
-    entry('glass', 'prisms', 'Prisms', 'Turn the selected mirror and guide the light to its target.', 'Rotate mirror', 'Next mirror'),
-    entry('glass', 'abyss', 'Abyss Drift', 'Guide the jellyfish through the opening in each reef.', 'Swim up', 'Gentle dive'),
-    entry('glass', 'orbit', 'Orbital Assist', 'Launch a probe through the planet’s gravitational field.', 'Change angle', 'Launch probe'),
+    entry('glass', 'prisms', 'Prisms', 'Turn the prism so each crystal catches the ray of its own colour. Light several at once.', 'Turn left', 'Turn right', {scoreVersion:2,illustrated:true,precision:'low'}),
+    entry('glass', 'abyss', 'Abyss Drift', 'Swim between lanes and pulse to catch the light. Keep glowing; slip past the reefs.', 'Swim / pulse', 'Swim / pulse', {scoreVersion:2,illustrated:true,precision:'full',inputScheme:'wrist-directions',controls:{left_left:'Swim left',left_up:'Pulse',left_right:'Swim right',right_left:'Swim left',right_up:'Pulse',right_right:'Swim right'}}),
+    entry('glass', 'orbit', 'Orbital Assist', 'Change orbit to meet each beacon. Inner rings are faster. Dodge the debris.', 'Inner orbit', 'Outer orbit', {scoreVersion:2,illustrated:true,precision:'low'}),
     entry('field-notes', 'clockwork', 'Clockwork', 'Align both hands with the marks on the mechanism.', 'First gear', 'Second gear'),
     entry('field-notes', 'contour', 'Contour Survey', 'Draw a closed boundary around the survey point.', 'Turn pencil', 'Draw segment'),
     entry('field-notes', 'stars', 'Constellations', 'Connect the stars in the order shown in the reference.', 'Next star', 'Draw connection')
