@@ -8,14 +8,16 @@ import { SCORE_KEY, scoreKey } from './arcade/core/scores.js';
 const returningPlayer = { version: 1, name: 'TESTS', games: Object.fromEntries(games.map(game =>
     [scoreKey(game), [{id:'fixture',name:'TESTS',score:1,at:0}]])) };
 
+// PORT lets several checkouts run their own server side by side.
+const port = Number(process.env.PORT || 8765), origin = `http://127.0.0.1:${port}`;
 const edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const executablePath = process.env.MIG_BROWSER || (existsSync(edge) ? edge : undefined);
 export default defineConfig({
     testDir: './tests/browser', timeout: 30000, workers: 2,
-    use: { baseURL: 'http://127.0.0.1:8765', viewport: { width: 1365, height: 1000 },
-        storageState: { cookies: [], origins: [{ origin:'http://127.0.0.1:8765',
+    use: { baseURL: origin, viewport: { width: 1365, height: 1000 },
+        storageState: { cookies: [], origins: [{ origin,
             localStorage:[{name:SCORE_KEY,value:JSON.stringify(returningPlayer)}] }] },
         launchOptions: { executablePath }, trace: 'retain-on-failure' },
-    webServer: { command: 'node scripts/serve.mjs', url: 'http://127.0.0.1:8765',
+    webServer: { command: 'node scripts/serve.mjs', url: origin,
         reuseExistingServer: true, timeout: 15000 }
 });

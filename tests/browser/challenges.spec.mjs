@@ -51,7 +51,7 @@ test('results share the best score and name; friend receives a separate target, 
 
 test('friend links choose the right theme and game, retain difficulty, and fit mobile results',async({page})=>{
     await setup(page);await page.setViewportSize({width:320,height:640});
-    const link=challengeLink('http://127.0.0.1:8765/',{...game,difficulty:'standard'},{name:'BOBBY',score:0});
+    const link=challengeLink(`http://127.0.0.1:${process.env.PORT || 8765}/`,{...game,difficulty:'standard'},{name:'BOBBY',score:0});
     await page.goto(link);await page.locator('#arcade-play-challenge').click();await ready(page);
     await page.locator('#arcade-no-camera').click();await page.clock.runFor(16000);
     await expect(page.locator('#arcade-challenge-result')).toHaveText('Matched BOBBY: 0');
@@ -65,7 +65,7 @@ test('friend links choose the right theme and game, retain difficulty, and fit m
     const shared=await page.locator('#arcade-challenge-link').inputValue();expect(decodeURIComponent(shared)).toContain('standard');
     await page.locator('#arcade-close').click();
     const other=games.find(game=>game.theme==='phosphor');
-    await page.goto(challengeLink('http://127.0.0.1:8765/',other,{name:'ALICE',score:12}));
+    await page.goto(challengeLink(`http://127.0.0.1:${process.env.PORT || 8765}/`,other,{name:'ALICE',score:12}));
     await expect(page.locator('html')).toHaveAttribute('data-theme','phosphor');
     await page.locator('#arcade-play-challenge').click();
     await expect(page.locator('#arcade-game-title')).toHaveText(other.title);
