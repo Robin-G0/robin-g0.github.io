@@ -77,3 +77,13 @@ Orbital run ends in Game over with v2 scores and a challenge link; Orbitron and 
 
 These are synthetic cadence checks. They do not establish webcam comfort, sweep reliability on real
 cameras or fun; the Beat scratch timing in particular needs real-player testing.
+
+## Phone sizing
+
+`arcade/themes/y2k.css` is skin only (colours, borders, fonts, shadows, card animations); the phone shell
+owns stage, inputs, toolbar, camera and overlay layout. On compact boards (`painter.compact`, under 480 px
+wide) canvas labels are at least 28 logical px (about 14 CSS px on a 370 px stage) and key objects (comets,
+shield chips, notes, orbs, vents) at least 48 logical px; boards size themselves from `p.h`, so a taller
+or shorter stage changes layout only. Checked with 390×844 isMobile and 844×390 captures (tutorial,
+playing and result phases) in light and dark; the 844×390 shell at the time cropped the canvas header,
+which the new phone shell is meant to replace.

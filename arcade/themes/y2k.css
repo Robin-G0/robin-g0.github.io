@@ -30,7 +30,7 @@
 [data-theme=y2k] .guide-heading h3 { font-family: var(--arcade-display); font-style: italic; text-transform: uppercase; letter-spacing: .12em; font-size: 13px; color: var(--muted); }
 [data-theme=y2k] .guide-progress span { border-radius: 0; clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); background: linear-gradient(#f9fcff, #c7d2e8); color: #182b57; }
 [data-theme=y2k] .guide-progress [aria-current=step] { background: var(--accent); color: var(--bg); }
-[data-theme=y2k] .guide-figure { border-top: 3px solid transparent;
+[data-theme=y2k] .guide-figure { flex: 0 0 auto; border-top: 3px solid transparent;
     border-image: linear-gradient(90deg, #fff, #a4b3d0 48%, #fff 50%, #657596 53%, #dce3f1) 1; }
 [data-theme=y2k] .y2k-diagram text { font-family: var(--arcade-font); }
 [data-theme=y2k] .y2k-diagram .y2k-display { font-family: var(--arcade-display); font-style: italic; }
