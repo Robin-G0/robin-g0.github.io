@@ -2,7 +2,7 @@
    Real four-tone bevels (raised, pressed, sunken fields, etched group boxes), a 98-style title gradient,
    active and inactive windows, a taskbar with a Start button, status bars, progress blocks and chunky scrollbars.
    Era motion: windows open with "zoom rectangles", the hourglass appears while the desktop starts or a link is pressed,
-   and pressed controls sink by one pixel. By night the scheme switches to a dark classic palette.
+   and pressed controls sink by one pixel. The classic scheme stays the same by night.
    Loaded after themes.css; every rule is scoped to the Desktop 95 theme. Reduced motion stops all animation. */
 
 :root[data-theme=desktop95] {
@@ -18,26 +18,7 @@
   --etched: inset 1px 1px var(--sh), inset -1px -1px var(--hi), 1px 1px 0 var(--hi) inset;
   background: var(--desk);
 }
-/* Night: a dark classic scheme, same bevel logic with deeper tones. */
-:root[data-theme=desktop95][data-mode=dark] {
-  color-scheme: dark;
-  --face: #2c2c2c; --hi: #6e6e6e; --lt: #474747; --sh: #161616; --dk: #000000;
-  --client: #0e0e0e; --client-ink: #f0f0f0; --sel: #1a4fc4; --desk: #0b3434;
-  --title-a: #0a1f6e; --title-b: #2a6fc0; --title-off-a: #3c3c3c; --title-off-b: #555555; --title-off-ink: #a8a8a8;
-}
-:root[data-theme=desktop95][data-mode=dark] body { --bg: #2c2c2c; --ink: #f0f0f0; --muted: #cfcfcf; --border: #6e6e6e; --accent: #7ec8ff; --soft: #0e0e0e; color: var(--ink); }
-/* The game room keeps the classic scheme its boards are drawn with, by day and by night. */
-:root[data-theme=desktop95][data-mode=dark] #arcade-player {
-  color-scheme: light;
-  --face: #c0c0c0; --hi: #ffffff; --lt: #dfdfdf; --sh: #808080; --dk: #000000;
-  --client: #ffffff; --client-ink: #000000; --sel: #000080; --sel-ink: #ffffff;
-  --title-a: #000080; --title-b: #1084d0; --title-off-a: #808080; --title-off-b: #b5b5b5; --title-off-ink: #d4d0c8;
-  --raised: inset -1px -1px var(--dk), inset 1px 1px var(--hi), inset -2px -2px var(--sh), inset 2px 2px var(--lt);
-  --frame: inset -1px -1px var(--dk), inset 1px 1px var(--lt), inset -2px -2px var(--sh), inset 2px 2px var(--hi);
-  --pressed: inset 1px 1px var(--dk), inset -1px -1px var(--hi), inset 2px 2px var(--sh), inset -2px -2px var(--lt);
-  --sunken: inset 1px 1px var(--sh), inset -1px -1px var(--hi), inset 2px 2px var(--dk), inset -2px -2px var(--lt);
-  --etched: inset 1px 1px var(--sh), inset -1px -1px var(--hi), 1px 1px 0 var(--hi) inset;
-}
+/* No night scheme: Desktop 95 keeps the classic system grey by day and by night, like its games. */
 :root[data-theme=desktop95] body { background: var(--desk); }
 :root[data-theme=desktop95] ::selection { background: var(--sel); color: var(--sel-ink); }
 :root[data-theme=desktop95] :is(.hero h1, .scene h2, .scene h3, .scene .eyebrow, .hero-status, .scope-badge, .metrics dd, .language-share, .gesture-feedback) { font-family: var(--font); letter-spacing: normal; }
@@ -67,7 +48,6 @@
 /* The wordmark is the active task: a pressed taskbar button with a dithered face. */
 :root[data-theme=desktop95] .wordmark { font-family: var(--font); font-weight: 700; color: var(--ink);
   box-shadow: var(--pressed); background: repeating-conic-gradient(var(--face) 0 25%, var(--hi) 0 50%) 0 0 / 2px 2px; }
-:root[data-theme=desktop95][data-mode=dark] .wordmark { background: repeating-conic-gradient(var(--face) 0 25%, #3b3b3b 0 50%) 0 0 / 2px 2px; }
 :root[data-theme=desktop95] .wordmark img { width: 20px; height: 20px; border-radius: 0; }
 /* Links sit in the sunken notification tray, flat until pointed at. */
 :root[data-theme=desktop95] .site-header nav { box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
@@ -147,20 +127,18 @@
 :root[data-theme=desktop95] .arcade-imports button { padding: 6px 12px; text-decoration: none; font-size: 12px; }
 :root[data-theme=desktop95] .identity-strip button#daily-shortcut { padding: 5px 10px; text-decoration: none; font-size: 12px; }
 :root[data-theme=desktop95] .scene .text-link { color: var(--accent); }
-:root[data-theme=desktop95][data-mode=dark] .scene .text-link, :root[data-theme=desktop95][data-mode=dark] :is(.scene, .identity-strip) .eyebrow { color: var(--accent); }
 :root[data-theme=desktop95] .scene .text-link:active { color: #800000; cursor: progress; }
 :root[data-theme=desktop95] .site-footer a { color: #fff; }
 
 /* ---------- Hero: a white client area and a real status bar ---------- */
 :root[data-theme=desktop95] .journey { background: var(--client); color: var(--sel); border: 0; padding: 16px; box-shadow: var(--sunken); }
-:root[data-theme=desktop95][data-mode=dark] .journey { color: #7ec8ff; }
 :root[data-theme=desktop95] .journey figcaption { color: var(--client-ink); }
 :root[data-theme=desktop95] .wire-world { opacity: .55; }
 :root[data-theme=desktop95] .aircraft { animation-timing-function: steps(30); }
 :root[data-theme=desktop95] .hero-status { left: 3px; right: 3px; bottom: 3px; gap: 2px; padding: 2px; border: 0; font-size: 12px; color: var(--ink); background: var(--face); box-shadow: inset 0 1px var(--hi); }
 :root[data-theme=desktop95] .hero-status > span:nth-child(2) { flex: 1; padding: 3px 6px; box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
 :root[data-theme=desktop95] .hero-status .status-light { width: 22px; height: 22px; border-radius: 0; background: var(--face) url('../favicon.svg') center / 14px 14px no-repeat; box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
-:root[data-theme=desktop95] .status-blocks { width: 150px; height: 22px; margin: 0; padding: 3px; gap: 2px; box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
+:root[data-theme=desktop95] .status-blocks { width: max-content; height: 22px; margin: 0; padding: 3px; gap: 2px; box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
 :root[data-theme=desktop95] .status-blocks i { width: 12px; height: 100%; background: var(--sel); animation-name: w95-progress; animation-timing-function: steps(1); }
 @keyframes w95-progress { 0%, 30% { opacity: 0; } 31%, 100% { opacity: 1; } }
 
@@ -169,7 +147,6 @@
 :root[data-theme=desktop95] .interests > .eyebrow { position: absolute; top: -9px; left: 10px; padding: 0 4px; background: var(--face); color: var(--ink); }
 :root[data-theme=desktop95] .interests > p { color: var(--ink); }
 :root[data-theme=desktop95] .interest-diagram svg { stroke: var(--sel); }
-:root[data-theme=desktop95][data-mode=dark] .interest-diagram svg { stroke: var(--accent); }
 
 /* ---------- Motion Input Grid: a dialog with push buttons ---------- */
 :root[data-theme=desktop95] .gesture-demo { background: var(--face); color: var(--ink); border: 0; padding: 22px 18px 16px; position: relative;
@@ -181,7 +158,6 @@
 :root[data-theme=desktop95] .gesture-grid button:hover { transform: none; }
 :root[data-theme=desktop95] .gesture-grid button:focus-visible { outline: 1px dotted var(--ink); outline-offset: -6px; }
 :root[data-theme=desktop95] .gesture-grid button.target::after { background: var(--sel); opacity: 1; border-radius: 0; }
-:root[data-theme=desktop95][data-mode=dark] .gesture-grid button.target::after { background: var(--accent); }
 :root[data-theme=desktop95] .gesture-grid button.visited { background: var(--sel); color: #fff; box-shadow: var(--pressed); }
 :root[data-theme=desktop95] .gesture-grid button.visited::after { background: #fff; }
 :root[data-theme=desktop95] .gesture-feedback { color: var(--ink); }
@@ -192,7 +168,6 @@
 :root[data-theme=desktop95] .project-list li { border: 0; }
 :root[data-theme=desktop95] .project-list a { padding: 10px 10px; gap: 12px; font-size: 15px; outline-offset: -2px; }
 :root[data-theme=desktop95] .project-list small { color: var(--sh); }
-:root[data-theme=desktop95][data-mode=dark] .project-list small { color: #a8a8a8; }
 :root[data-theme=desktop95] .project-arrow { color: var(--client-ink); }
 :root[data-theme=desktop95] .project-list a:hover, :root[data-theme=desktop95] .project-list a:focus-visible { background: var(--sel); color: var(--sel-ink); outline: 1px dotted #ffff80; }
 :root[data-theme=desktop95] .project-list a:hover :is(small, .project-arrow), :root[data-theme=desktop95] .project-list a:focus-visible :is(small, .project-arrow) { color: #dcdcff; }
@@ -206,7 +181,6 @@
 :root[data-theme=desktop95] .metrics dd { font-size: clamp(32px, 4vw, 52px); padding: 6px 10px; text-align: right; background: var(--client); color: var(--client-ink); box-shadow: var(--sunken); }
 :root[data-theme=desktop95] .language-track { height: 18px; padding: 3px; border-radius: 0; background: var(--client); box-shadow: inset 1px 1px var(--sh), inset -1px -1px var(--hi); }
 :root[data-theme=desktop95] .language-fill { border-radius: 0; background: repeating-linear-gradient(90deg, var(--sel) 0 8px, transparent 8px 10px); }
-:root[data-theme=desktop95][data-mode=dark] .language-fill { background: repeating-linear-gradient(90deg, #3a7ae0 0 8px, transparent 8px 10px); }
 :root[data-theme=desktop95] .language-fill::after { display: none; }
 :root[data-theme=desktop95] .stats-footnote { border-top: 0; box-shadow: inset 0 1px var(--sh), inset 0 2px var(--hi); }
 
@@ -233,7 +207,6 @@
   :root[data-theme=desktop95] .hero { padding-top: calc(var(--section-padding) + 30px); padding-bottom: calc(var(--section-padding) + 44px); }
   :root[data-theme=desktop95] #profile-title { font-size: clamp(50px, 15vw, 76px); }
   :root[data-theme=desktop95] .journey { padding: 10px; }
-  :root[data-theme=desktop95] .status-blocks { width: 96px; }
   :root[data-theme=desktop95] .metrics dd, :root[data-theme=desktop95] .metrics > div:last-child dd { font-size: 34px; }
   :root[data-theme=desktop95] .project-list a { padding: 10px 8px; }
 }
