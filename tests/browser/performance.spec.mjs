@@ -40,14 +40,18 @@ test('the memorisation tree is cached while its sprites animate and inference st
     await page.clock.runFor(8500);await expect(page.locator('#arcade-player')).toHaveAttribute('data-maze-stage','navigate');
     expect(await page.evaluate(()=>window.motionTest.fps)).toBe(20);
 });
-test('covered Glass effects stop during play and restore when the game closes',async({page})=>{
-    await page.emulateMedia({colorScheme:'dark'});await page.addInitScript(()=>localStorage.setItem('appearance','dark')); // the ocean loop is the night Glass portfolio
+test('the live Glass field stops during play and resumes when the game closes',async({page})=>{
     await page.goto('/?theme=glass#arcade');
-    const background=()=>page.locator('.about').evaluate(e=>getComputedStyle(e).backgroundImage);
-    const before=await background();expect(before).toContain('glass-ocean-water-loop');
+    const field=page.locator('.glass-field');
+    // Without WebGL the CSS gradient stays and there is nothing to pause.
+    test.skip(await page.evaluate(()=>!document.createElement('canvas').getContext('webgl')),'no WebGL');
+    await expect(field).toHaveAttribute('data-running','true');
+    expect(await page.locator('.scene-backdrop, .about').evaluateAll(els=>els.map(e=>getComputedStyle(e).backgroundImage).join(' '))).not.toMatch(/\.(gif|jpg|png)/);
     await page.locator('.arcade-play').first().click();
-    await expect(page.locator('html')).toHaveAttribute('data-arcade-open','true');expect(await background()).toBe('none');
-    expect(await page.locator('.aurora-layer').first().evaluate(e=>getComputedStyle(e).animationPlayState)).toBe('paused');
+    await expect(page.locator('html')).toHaveAttribute('data-arcade-open','true');
+    await expect(field).toHaveAttribute('data-running','false');
     await page.locator('#arcade-close').click();await expect(page.locator('html')).not.toHaveAttribute('data-arcade-open','true');
-    expect(await background()).toBe(before);
+    await expect(field).toHaveAttribute('data-running','true');
+    await page.locator('#open-themes').click();await page.locator('[data-theme-choice=metro]').click();
+    await expect(field).toHaveCount(0);
 });

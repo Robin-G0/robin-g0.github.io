@@ -1,5 +1,5 @@
-import { Experience } from './experience.js';
-import { readPrecision, resolvePreset, isMobileDevice } from '../arcade/mig/precision.js';
+import { Experience } from './experience.js?v=eras-2';
+import { readPrecision, resolvePreset, isMobileDevice } from '../arcade/mig/precision.js?v=eras-2';
 
 const $ = (selector) => document.querySelector(selector);
 const THEME_KEY = 'robin-g0-theme';
@@ -8,7 +8,7 @@ const profileBase = 'https://raw.githubusercontent.com/Robin-G0/Robin-G0/main/as
 const defaultTheme = 'construction';
 const colorList = ['#5bb7c8', '#b59bdb', '#dcb368', '#9dbd82', '#dd8e8e', '#7d9ed0'];
 const icons = {'C++':'cplusplus', C:'c', Python:'python', JavaScript:'javascript', TypeScript:'typescript', CMake:'cmake', CSS:'css3', HTML:'html5', PowerShell:'powershell', Luau:'lua', Shell:'bash', 'C#':'csharp', Java:'java', Dockerfile:'docker', GLSL:'opengl', GDScript:'godot'};
-const objects = {y2k:'y2k-chrome-orbit-v1.png', aqua:'aqua-glass-compass-v1.png', aero:'aero-globe.png', glass:'glass-space-earth-v1.png'};
+const objects = {y2k:'y2k-chrome-orbit-v1.png', aqua:'aqua-glass-compass-v1.png', aero:'aero-globe.png'};
 let catalog = [], daily = null, active = null, explicit = false, lastRefresh = 0;
 let appearance;
 try { appearance = localStorage.getItem('appearance'); } catch { /* Storage is optional. */ }
@@ -29,7 +29,7 @@ function applyTheme(id, manual = false, updateURL = true) {
   if (manual && updateURL) { try { localStorage.setItem(THEME_KEY, id); } catch { /* Optional. */ } }
   else if (!manual && updateURL) { try { localStorage.removeItem(THEME_KEY); } catch { /* Optional. */ } }
   root.dataset.theme = id; root.dataset.mode = appearance;
-  if (id==='glass') document.querySelectorAll('.scene-backdrop img[data-src]').forEach(image=> { image.src=image.dataset.src; delete image.dataset.src; });
+  syncGlassField(id);
   Object.entries(theme[appearance]).forEach(([name,value]) => { root.style.setProperty(`--${name}`, value); root.style.setProperty(`--profile-${name}`, value); });
   $('meta[name="theme-color"]').content = theme[appearance].bg;
   $('#theme-name').textContent = theme.name;
@@ -99,12 +99,17 @@ function buildPicker() {
     const column=document.createElement('span'); column.textContent=Array.from({length:24},(_,j) => (i*7+j*3)%10).join('\n'); column.style.setProperty('--delay',`${-i*.61}s`); column.style.setProperty('--duration',`${9+i%5}s`); rain.append(column);
   }
   $('#digital-rain').append(rain);
-  for (const [selector,file] of [['.hero','glass-space-sky-v1.jpg'],['.project-feature','glass-abyss-depths-v1.jpg'],['.activity','glass-lunar-horizon-v1.jpg']]) {
-    const backdrop=document.createElement('div'); backdrop.className='scene-backdrop'; backdrop.setAttribute('aria-hidden','true');
-    const track=document.createElement('div'); track.className='parallax-track';
-    for (let i=0;i<3;i++) { const image=document.createElement('img'); image.dataset.src=`./assets/art/${file}`; image.alt=''; image.width=1100; image.height=550; track.append(image); }
-    backdrop.append(track); $(selector).append(backdrop);
-  }
+}
+
+// Glass draws a live shader field instead of photographs; it loads only when the era is chosen.
+let glassField = null, glassLoading = null;
+function syncGlassField(id) {
+  if (id === 'glass' && !glassField && !glassLoading) {
+    glassLoading = import('./glass-field.js?v=eras-2').then(module => {
+      glassLoading = null;
+      if (root.dataset.theme === 'glass' && !glassField) glassField = module.mountGlassField(root);
+    }).catch(() => { glassLoading = null; });
+  } else if (id !== 'glass' && glassField) { glassField.dispose(); glassField = null; }
 }
 
 const picker = $('#theme-picker');
