@@ -2,11 +2,10 @@ const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '
 const text = (value, x, y, size = 25, weight = 300, fill = '') => `<text x="${x}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}"${fill ? ` style="fill:${fill}"` : ''}>${escape(value)}</text>`;
 const frame = content => `<svg viewBox="0 0 400 160" class="guide-art metro-diagram" aria-hidden="true">${content}</svg>`;
 const BLUE = '#087aa5', PURPLE = '#7434a6', GREEN = '#347c62', ORANGE = '#d86924';
-const tile = (x, y, w, h, color, glyph = '', size = 28, css = '', delay = 0) =>
-    `<g class="${css}" style="--delay:${delay}s"><rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${color};stroke:none"/>${glyph === '' ? '' : text(glyph, x + w / 2, y + h / 2 + size * .36, size, 300, '#fff')}</g>`;
+const tile = (x, y, w, h, color, glyph = '', size = 28, css = '', delay = 0, style = '') =>
+    `<g class="${css}" style="--delay:${delay}s;${style}"><rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${color};stroke:none"/>${glyph === '' ? '' : text(glyph, x + w / 2, y + h / 2 + size * .36, size, 300, '#fff')}</g>`;
 const station = (x, y, letter, color, r = 22) => `<circle cx="${x}" cy="${y}" r="${r}" style="fill:${color};stroke:none"/>${text(letter, x, y + 9, 26, 400, '#fff')}`;
-const grid = filled => { let out = ''; for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) out += `<rect x="${118 + c * 34}" y="${104 - r * 34}" width="30" height="30" style="fill:none;stroke:currentColor;opacity:.35"/>`;
-    return out + (filled ? tile(118, 104, 30, 30, BLUE, '2', 16) + tile(186, 104, 30, 30, BLUE, '2', 16) + tile(186, 70, 30, 30, PURPLE, '4', 16) + tile(220, 104, 30, 30, GREEN, '8', 16) : tile(152, 104, 30, 30, BLUE, '2', 16) + tile(220, 104, 30, 30, PURPLE, '4', 16)); };
+const cells = () => { let out = ''; for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) out += `<rect x="${118 + c * 34}" y="${104 - r * 34}" width="30" height="30" style="fill:none;stroke:currentColor;opacity:.35"/>`; return out; };
 const network = () => `<path d="M200 130V96" style="stroke-width:6"/><path d="M200 96L110 66" style="stroke-width:6;opacity:.35"/><path d="M200 96L290 66" style="stroke-width:6;stroke:${PURPLE}"/><path d="M110 66L80 34" style="stroke-width:6;opacity:.35"/><path d="M290 66L250 34" style="stroke-width:6;stroke:${PURPLE}"/><path d="M290 66L330 34" style="stroke-width:6;opacity:.35"/><circle cx="200" cy="96" r="7" style="fill:currentColor;stroke:none"/><circle cx="290" cy="66" r="6" style="fill:currentColor;stroke:none"/>` + text('1', 218, 101, 14, 400) + text('2', 308, 71, 14, 400) + station(80, 30, 'A', BLUE) + station(250, 30, 'B', PURPLE) + station(330, 30, 'C', GREEN) + tile(187, 108, 26, 30, PURPLE, 'B', 14, 'metro-train');
 const board = () => `<path d="M60 148H340" style="stroke-width:2;opacity:.5"/><path d="M78 128V150" style="stroke-width:3"/>` + tile(96, 124, 22, 22, GREEN, 'C', 12) + tile(166, 124, 22, 22, BLUE, 'A', 12) + tile(256, 124, 22, 22, PURPLE, 'B', 12) + text('now', 78, 160, 11) + text('departures', 335, 136, 12);
 const junction = (active, trunk = 165) => `<path d="M200 ${trunk}V95" style="stroke-width:7"/><path d="M200 95L110 45" style="stroke-width:7;stroke:${active === 0 ? BLUE : 'currentColor'};opacity:${active === 0 ? 1 : .35}"/><path d="M200 95L290 45" style="stroke-width:7;stroke:${active === 1 ? PURPLE : 'currentColor'};opacity:${active === 1 ? 1 : .35}"/>`;
@@ -20,8 +19,12 @@ export const metroDiagrams = {
             + `<rect x="125" y="114" width="150" height="36" style="fill:${ORANGE};stroke:none"/>` + text('3 wrong = over', 200, 138, 17, 400, '#fff'))
     ],
     merge: [
-        frame(grid(false) + tile(187, 2, 32, 32, PURPLE, '4', 18, 'metro-drop') + text('L ←', 60, 70, 30) + text('→ R', 340, 70, 30) + text('both ↑ = drop now', 200, 152, 20)),
-        frame(grid(true) + tile(187, 2, 32, 32, BLUE, '2', 18, 'metro-drop') + text('lands on equals: below, left, right · 2 + 2 + 2 → 8', 200, 152, 16)),
+        // Card 1: the waiting tile slides across the columns; nothing drops yet.
+        frame(cells() + tile(152, 104, 30, 30, BLUE, '2', 16) + tile(220, 104, 30, 30, PURPLE, '4', 16) + tile(186, 2, 30, 30, PURPLE, '4', 16, 'metro-slide') + text('L ←', 60, 70, 30) + text('→ R', 340, 70, 30) + text('both ↑ = drop now', 200, 152, 20)),
+        // Card 2: a 2 lands on a 2 (→ 4), which then touches the 4 beside it (→ 8): a two-step chain. Results stay hidden until their keyframe.
+        frame(cells() + tile(118, 104, 30, 30, GREEN, '8', 16) + tile(186, 104, 30, 30, BLUE, '2', 16, 'metro-base') + tile(220, 104, 30, 30, PURPLE, '4', 16, 'metro-side')
+            + tile(186, 2, 30, 30, BLUE, '2', 16, 'metro-fall') + tile(186, 104, 30, 30, PURPLE, '4', 16, 'metro-result-a', 0, 'opacity:0') + tile(186, 104, 30, 30, GREEN, '8', 16, 'metro-result-b', 0, 'opacity:0')
+            + text('2 on 2 → 4 · touches 4 → 8 · chain ×2', 200, 152, 16)),
         frame(text('+ value', 65, 52, 28) + text('× chain step', 65, 82, 16) + text('128 × min', 200, 52, 26) + text('small tiles retire', 200, 82, 16) + `<rect x="292" y="28" width="96" height="64" style="fill:${ORANGE};stroke:none"/>` + text('full column', 340, 54, 15, 400, '#fff') + text('= over', 340, 80, 18, 400, '#fff') + text('the bar is the deadline · each move adds .2 s', 200, 140, 18))
     ],
     rail: [
