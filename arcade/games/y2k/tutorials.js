@@ -4,7 +4,7 @@ const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '
 // Headings (18 and up) use Orbitron; smaller labels use the narrower room font, enlarged for phones.
 const text = (value, x, y, size = 18, weight = 700, fill = 'var(--ink)', anchor = 'middle') => size >= 18
     ? `<text class="y2k-display" x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="${weight}" style="fill:${fill};stroke:none">${escape(value)}</text>`
-    : `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${Math.round(size * 1.3)}" font-weight="${Math.min(weight, 700)}" style="fill:${fill};stroke:none">${escape(value)}</text>`;
+    : `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${Math.max(16, Math.round(size * 1.35))}" font-weight="${Math.min(weight, 700)}" style="fill:${fill};stroke:none">${escape(value)}</text>`;
 const DEFS = '<defs><linearGradient id="y2k-chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#c9d3ea"/><stop offset=".48" stop-color="#8394b6"/><stop offset=".5" stop-color="#fff"/><stop offset=".53" stop-color="#657596"/><stop offset="1" stop-color="#dce3f1"/></linearGradient>'
     + '<radialGradient id="y2k-candy" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent)"/></radialGradient>'
     + '<radialGradient id="y2k-candy-gold" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="var(--gold)"/><stop offset="1" stop-color="var(--gold)"/></radialGradient></defs>';

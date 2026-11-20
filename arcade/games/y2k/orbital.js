@@ -133,8 +133,8 @@ export function orbital(env) {
             c.restore();
             for (const [end, letter] of [[-1, 'L'], [1, 'R']]) {
                 const a = angle + end * (ORBIT.span + .2), x = cx + Math.cos(a) * ring, y = cy + Math.sin(a) * ring;
-                p.circle(x, y, 13 * k, 'bg'); p.circle(x, y, 13 * k, 'border', false);
-                techno(p, letter, x, y + 1, 14 * k, 'ink', 'center', 900);
+                const chip = compact ? 21 : 14; p.circle(x, y, chip, 'bg'); p.circle(x, y, chip, 'border', false);
+                techno(p, letter, x, y + 1, compact ? 28 : 17, 'ink', 'center', 900);
             }
             // Comets: chrome rocks with a tail, rotating star shards and rayed solar flares.
             for (const comet of s.comets) {
@@ -143,14 +143,14 @@ export function orbital(env) {
                 const [x, y] = at(comet.sector, outer - (outer - ring) * progress), a = sectorAngle(comet.sector);
                 if (comet.kind === 'rock') {
                     c.save(); c.globalAlpha = .45; p.line([[x, y], [x + Math.cos(a) * 34 * k, y + Math.sin(a) * 34 * k]], 'muted', 7 * k); c.restore();
-                    const r = 14 * k; c.save(); c.beginPath();
+                    const r = compact ? 26 : 15; c.save(); c.beginPath();
                     for (let i = 0; i < 7; i++) { const t = i / 7 * Math.PI * 2 + comet.id, rr = r * (i % 2 ? .78 : 1); c.lineTo(x + Math.cos(t) * rr, y + Math.sin(t) * rr); }
                     c.closePath(); c.fillStyle = chrome(p, x, y - r, x, y + r); c.fill(); c.strokeStyle = p.color('ink'); c.lineWidth = 2; c.stroke(); c.restore();
                 } else if (comet.kind === 'shard') {
-                    starburst(p, x, y, 16 * k, 'accent', 4, reduced ? 0 : s.time * 2, .35);
+                    starburst(p, x, y, compact ? 30 : 17, 'accent', 4, reduced ? 0 : s.time * 2, .35);
                     p.circle(x, y, 4 * k, '#ffffff');
                 } else {
-                    starburst(p, x, y, 18 * k, 'gold', 12, reduced ? 0 : s.time, .6);
+                    starburst(p, x, y, compact ? 30 : 18, 'gold', 12, reduced ? 0 : s.time, .6);
                     candy(p, x, y, 10 * k, 'gold', 1);
                 }
             }

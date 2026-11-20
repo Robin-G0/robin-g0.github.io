@@ -1,7 +1,7 @@
 /* Y2K Chrome game room, tutorial and canvas-adjacent materials. Scope every rule to [data-theme=y2k].
    Materials follow the site theme: a chrome header strip (#f8fbff → #b7c3dc with the #657596 band),
    parallelogram chrome buttons, heavy italic Orbitron headings and palette tokens for light and dark. */
-[data-theme=y2k] #arcade-player { border: 1px solid #8394b6; border-radius: 0; box-shadow: 0 18px 50px #10132940; }
+[data-theme=y2k] #arcade-player { border-color: #8394b6; box-shadow: 0 18px 50px #10132940; }
 [data-theme=y2k] .arcade-room-header { position: relative; background: linear-gradient(#f8fbff, #b7c3dc); color: #182b57; border-bottom: 1px solid #8394b6; }
 [data-theme=y2k] .arcade-room-header::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 6px; pointer-events: none;
     background: linear-gradient(#fff, #a4b3d0 48%, #fff 50%, #657596 53%, #dce3f1); }
@@ -30,7 +30,7 @@
 [data-theme=y2k] .guide-heading h3 { font-family: var(--arcade-display); font-style: italic; text-transform: uppercase; letter-spacing: .12em; font-size: 13px; color: var(--muted); }
 [data-theme=y2k] .guide-progress span { border-radius: 0; clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); background: linear-gradient(#f9fcff, #c7d2e8); color: #182b57; }
 [data-theme=y2k] .guide-progress [aria-current=step] { background: var(--accent); color: var(--bg); }
-[data-theme=y2k] .guide-figure { padding: 6px 0; border-top: 3px solid transparent;
+[data-theme=y2k] .guide-figure { border-top: 3px solid transparent;
     border-image: linear-gradient(90deg, #fff, #a4b3d0 48%, #fff 50%, #657596 53%, #dce3f1) 1; }
 [data-theme=y2k] .y2k-diagram text { font-family: var(--arcade-font); }
 [data-theme=y2k] .y2k-diagram .y2k-display { font-family: var(--arcade-display); font-style: italic; }
@@ -60,23 +60,6 @@
 [data-theme=y2k] #arcade-result h3, [data-theme=y2k] #arcade-paused h3 { font-family: var(--arcade-display); font-style: italic; font-weight: 800; text-transform: uppercase; letter-spacing: -.02em; }
 [data-theme=y2k] #arcade-final-score { font-family: var(--arcade-display); font-style: italic; color: var(--accent); }
 
-/* Phones: a taller board for all three games; rules and timing do not change with the board size. */
-@media (max-width: 640px) {
-    [data-theme=y2k] :is([data-engine=orbital], [data-engine=beat], [data-engine=reactor]) .arcade-stage { height: clamp(300px, calc(100dvh - 300px), 500px); min-height: 300px; max-height: none; aspect-ratio: auto; }
-}
-/* Chrome Beat uses the six-command scheme: give its buttons and camera the same phone layout as Pop-up Panic. */
-[data-theme=y2k] [data-engine=beat] .arcade-camera-dock { grid-template-columns: minmax(250px, 1fr) minmax(230px, 1fr); }
-[data-theme=y2k] [data-engine=beat] .gesture-lesson svg { display: none; }
+/* Chrome Beat uses the six-command scheme. Skin only: the phone shell owns sizes and placement. */
 [data-theme=y2k] [data-engine=beat] .gesture-lesson [data-tutorial-action] { font-size: 34px; }
-@media (max-width: 640px) {
-    [data-theme=y2k] [data-engine=beat] .arcade-camera-dock { grid-template-columns: 1fr; }
-    [data-theme=y2k] [data-engine=beat] .camera-view { grid-column: auto; grid-row: auto; }
-    [data-theme=y2k] [data-engine=beat] .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
-    [data-theme=y2k] [data-engine=beat] .wrist-controls { flex-direction: column; gap: 2px; }
-    [data-theme=y2k] [data-engine=beat] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
-    [data-theme=y2k] [data-engine=beat] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
-    [data-theme=y2k] [data-engine=beat] .wrist-buttons { width: 100%; gap: 4px; }
-    [data-theme=y2k] [data-engine=beat] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; }
-    [data-theme=y2k] [data-engine=beat] .wrist-buttons kbd { display: none; }
-}
 @media (prefers-reduced-motion: reduce) { .y2k-diagram * { animation: none !important; } }

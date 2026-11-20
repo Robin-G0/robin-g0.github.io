@@ -143,7 +143,7 @@ export function reactor(env) {
                     else p.line([[left + 10, y], [left + coreW - 10, y]], color, 3, [4, 4]);
                 }
                 techno(p, level, x, coreBottom - inner * .3, 40 * k, 'ink', 'center', 900);
-                techno(p, `need ${REACTOR.critical - level}`, x, coreBottom + (compact ? 34 : 22), 14 * k, 'muted', 'center', 800);
+                techno(p, `need ${REACTOR.critical - level}`, x, coreBottom + (compact ? 36 : 22), compact ? 28 : 17, 'muted', 'center', 800);
                 if (fusion) { shatter(p, x, critical, s.time - fusion.at, fusion.spark ? 'gold' : 'accent', reduced, 1.6 * k); if (!reduced) flare(p, x, critical, 34 * k, Math.max(0, 1 - (s.time - fusion.at) * 1.6), color); }
                 if (melt) shatter(p, x, (coreTop + coreBottom) / 2, s.time - melt.at, 'gold', reduced, 1.4 * k);
             }
@@ -158,16 +158,16 @@ export function reactor(env) {
             }
             const spill = s.effects.find(e => e.kind === 'spill'); if (spill) shatter(p, chuteX, chuteY, s.time - spill.at, 'gold', reduced, 1.4 * k);
             // Preview: the next two orbs queue above the chute, smaller.
-            s.queue.forEach((orb, i) => orbArt(p, chuteX + (compact ? 110 : 76) + i * (compact ? 70 : 46), chuteY - 36 * k, 14 * k, orb, 0, k * .5));
+            s.queue.forEach((orb, i) => orbArt(p, chuteX + (compact ? 120 : 78) + i * (compact ? 64 : 42), chuteY - 36 * k, compact ? 26 : 16, orb, 0, k * .5));
             // Vent charges, the one chord in this game; the L+R label is the only hint buttons cannot give.
             const ventY = coreBottom - 14 * k, refused = s.effects.find(e => e.kind === 'refused' && s.time - e.at < .4);
             for (let v = 0; v < REACTOR.maxVents; v++) {
-                const vx = 360 + (v - 1) * 30 * k, lit = v < s.vents;
-                p.circle(vx, ventY, 11 * k, lit ? chrome(p, 0, ventY - 11 * k, 0, ventY + 11 * k) : 'border');
+                const vx = 360 + (v - 1) * (compact ? 46 : 30), lit = v < s.vents;
+                p.circle(vx, ventY, compact ? 18 : 11, lit ? chrome(p, 0, ventY - 11 * k, 0, ventY + 11 * k) : 'border');
                 if (lit) for (let blade = 0; blade < 3; blade++) { const a = blade * 2.1 + (reduced || aimed !== 'vent' ? 0 : s.time * 9); p.line([[vx, ventY], [vx + Math.cos(a) * 8 * k, ventY + Math.sin(a) * 8 * k]], 'ink', 2.5); }
                 if (refused) p.circle(vx, ventY, 14 * k, 'gold', false);
             }
-            techno(p, 'L+R VENT', 360, ventY - 24 * k, 11 * k, 'muted', 'center', 800);
+            techno(p, 'L+R VENT', 360, ventY - (compact ? 40 : 26), compact ? 28 : 16, 'muted', 'center', 800);
             bursts(s, p, reduced, b => ({ ...b, x: b.side === 'left' ? coreX[0] : b.side === 'right' ? coreX[1] : 360,
                 y: b.side === 'vent' ? ventY - 46 * k : b.side === 'chute' ? chuteY + orbR + 34 * k : coreTop - 26 * k }));
         }

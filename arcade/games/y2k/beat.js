@@ -123,7 +123,7 @@ export function beat(env) {
                     const x0 = laneX.left - laneW * .35, x1 = laneX.right + laneW * .35, hh = 32 * k;
                     pill(p, x0, y - hh / 2, x1 - x0, hh, touching ? 'ink' : 'accent');
                     for (const lane of WRISTS) if (!note.hits[lane]) arrow(p, laneX[lane], y, 'up', 12 * k, 'bg'); else p.circle(laneX[lane], y, 8 * k, 'bg');
-                    techno(p, 'L+R', 360, y + 1, 15 * k, 'bg', 'center', 900);
+                    techno(p, 'L+R', 360, y + 1, compact ? 28 : 17, 'bg', 'center', 900);
                     continue;
                 }
                 const x = laneX[note.lane];
