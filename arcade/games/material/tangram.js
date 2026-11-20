@@ -189,7 +189,7 @@ function station(s, p, piece, L, k, reduced, pair) {
     // The piece's clock is the sheet's linear progress indicator.
     const remaining = piece.state === 'live' ? 1 - (s.time - piece.born) / piece.limit : piece.state === 'fit' ? 1 : 0;
     progress(p, left + 16 * k, top + L.slotH - 14 * k, L.width - 32 * k, remaining, remaining < .3 ? swatch(p, 'red') : 'accent', 4 * k);
-    if (pair) chip(p, left + 26 * k, top + 22 * k, piece.side ? 'R' : 'L', { size: 15 * k, filled: true, color: 'accent', minWidth: 30 * k });
+    if (pair) chip(p, left + 26 * k, top + 22 * k, piece.side ? 'R' : 'L', { size: 18 * k, filled: true, color: 'accent', minWidth: 36 * k });
     c.restore();
 
     const pressed = s.effects.filter(e => e.kind === 'press' && e.id === piece.id).at(-1);

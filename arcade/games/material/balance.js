@@ -83,7 +83,7 @@ export function balance(env) {
 
 function geometry(p) {
     const compact = p.compact, k = compact ? 1.6 : 1, h = p.h;
-    const arm = compact ? 236 : 252, cardW = compact ? 180 : 132, cardH = compact ? 44 : 28, gap = 3 * k;
+    const arm = compact ? 236 : 252, cardW = compact ? 180 : 132, cardH = compact ? 48 : 28, gap = 3 * k;
     const swing = Math.sin(angleFor(BALANCE.limit)) * arm, hang = BALANCE.capacity * (cardH + gap) + 16 * k;
     const sliderY = h - (compact ? 56 : 34), top = compact ? 84 : 52, bottom = sliderY - 46 * k;
     const rig = swing * 2 + hang, pivotY = top + swing + Math.max(0, (bottom - top - rig) / 2);
@@ -115,7 +115,7 @@ function drawBalance(s, p, reduced) {
     // The next card waits as a small sheet at the right of the header.
     if (s.next) {
         const y = G.compact ? 46 : 30;
-        type(p, 'next', 692 - G.cardW * .6 - 12 * k, y, (G.compact ? 26 : 15), 'muted', 'right', 500, true);
+        type(p, 'next', 692 - G.cardW * .6 - 12 * k, y, (G.compact ? 28 : 17), 'muted', 'right', 500, true);
         card(p, 692 - G.cardW * .3, y, G.cardW * .6, G.cardH * .8, s.next.w, s.next.gold, 1, k * .8);
     }
     // Beam tilt eases with the standard curve and a slight overshoot settle, purely on simulation time.
@@ -182,8 +182,8 @@ function slider(p, G, d, reduced) {
     p.rect(Math.min(360, x), y - 2 * k, Math.abs(x - 360), 4 * k, danger ? swatch(p, 'red') : 'accent', 2 * k);
     p.circle(x, y, 8 * k, danger ? swatch(p, 'red') : 'accent');
     // Value pin above the thumb, as on discrete Material sliders.
-    const pinY = y - 30 * k, r = 14 * k, fill = danger ? swatch(p, 'red') : p.color('accent');
+    const pinY = y - 34 * k, r = 18 * k, fill = danger ? swatch(p, 'red') : p.color('accent');
     c.save(); c.fillStyle = fill; c.beginPath(); c.arc(x, pinY, r, Math.PI * .8, Math.PI * .2); c.lineTo(x, y - 10 * k); c.closePath(); c.fill(); c.restore();
-    type(p, d > 0 ? `R+${d}` : d < 0 ? `L+${-d}` : '0', x, pinY + 1, (d ? 11 : 14) * k, onSwatch(p), 'center', 500);
-    type(p, 'L', left - 22 * k, y + 1, 16 * k, 'muted', 'center', 500); type(p, 'R', left + width + 22 * k, y + 1, 16 * k, 'muted', 'center', 500);
+    type(p, d > 0 ? `R+${d}` : d < 0 ? `L+${-d}` : '0', x, pinY + 1, (d ? 14 : 17) * (G.compact ? 1.25 : 1) * k, onSwatch(p), 'center', 500);
+    type(p, 'L', left - 24 * k, y + 1, 18 * k, 'muted', 'center', 500); type(p, 'R', left + width + 24 * k, y + 1, 18 * k, 'muted', 'center', 500);
 }

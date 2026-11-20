@@ -35,7 +35,7 @@ export const diagrams = {
     tangram: [
         frame(fab(80, 54, 30, '', 0) + curl(80, 54, 13, false, 'md-on-icon') + fab(200, 54, 30, '', .08) + flip(200, 54, 12, 'md-on-icon') + fab(320, 54, 30, '', .16) + curl(320, 54, 13, true, 'md-on-icon')
             + text('sweep ←', 80, 108, 18, 500) + text('turn left', 80, 127, 14) + text('raise ↑', 200, 108, 18, 500) + text('flip over', 200, 127, 14) + text('sweep →', 320, 108, 18, 500) + text('turn right', 320, 127, 14)
-            + text('either wrist moves the piece', 200, 154, 13, 400, 'md-muted')),
+            + text('either wrist moves the piece', 200, 150, 13, 400, 'md-muted')),
         frame(sheet(28, 12, 150, 122) + piece('ell', 1, false, 103, 66, 22, 'md-outline', true)
             + `<rect x="44" y="122" width="118" height="4" rx="2" class="md-track"/><rect x="44" y="122" width="70" height="4" rx="2" class="md-bar"/>`
             + `<g class="md-tangram-turn">${piece('ell', 0, false, 300, 66, 22)}</g>`

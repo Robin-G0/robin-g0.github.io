@@ -130,7 +130,7 @@ export function golf(env) {
 
 function geometry(p, count) {
     const compact = p.compact, k = compact ? 1.6 : 1;
-    const size = Math.min(compact ? 104 : 58, (compact ? 680 : 600) / count), left = 360 - size * count / 2, y = Math.max(compact ? 230 : 150, p.h * .52);
+    const size = Math.min(compact ? 104 : 58, (compact ? 620 : 600) / count), left = 360 - size * count / 2 - (compact ? 20 : 0), y = Math.max(compact ? 230 : 150, p.h * .52);
     return { k, size, center: i => [left + size * (i + .5), y],
         card: [left - 16 * k, y - size / 2 - 72 * k, size * count + 32 * k, size + 112 * k] };
 }
@@ -168,7 +168,7 @@ function draw(s, p, reduced) {
             p.line([[fx, y], [fx, y - pole]], 'ink', 2 * k);
             c.fillStyle = swatch(p, 'pink'); c.beginPath(); c.moveTo(fx, y - pole); c.lineTo(fx + 26 * k, y - pole + 9 * k); c.lineTo(fx, y - pole + 18 * k); c.fill();
         }
-        if (i === 0) type(p, 'tee', x, y + size / 2 + 16 * k, 13 * k, 'muted', 'center', 500, true);
+        if (i === 0) type(p, 'tee', x, y + size / 2 + 18 * k, 17 * k, 'muted', 'center', 500, true);
         c.restore();
     }
     // Ink ripples where the ball lands, splashes where it does not.
@@ -188,14 +188,14 @@ function draw(s, p, reduced) {
             const [x, y] = G.center(cell);
             const px = x, py = y - size / 2 - 24 * k - (stacked ? 40 * k : 0);
             chip(p, px, py, `${action === 'left' ? 'L' : 'R'}${bad ? ' ✕' : ''}`,
-                { size: 15 * k, filled: !bad, color: bad ? swatch(p, 'red') : action === 'left' ? 'accent' : swatch(p, 'pink'), minWidth: 34 * k });
+                { size: 18 * k, filled: !bad, color: bad ? swatch(p, 'red') : action === 'left' ? 'accent' : swatch(p, 'pink'), minWidth: 34 * k });
         }
     }
     ball(s, p, G, reduced);
     // Scorecard: the last six holes as chips under the sheet, par filled, over par outlined.
     if (s.cards.length) {
-        const pitch = 64 * k, x0 = 360 - (s.cards.length - 1) * pitch / 2, y = cy0 + ch + 34 * k;
-        s.cards.forEach((over, i) => chip(p, x0 + i * pitch, y, over <= 0 ? 'par' : `+${over}`, { size: 13 * k, filled: over <= 0, color: over <= 0 ? 'accent' : 'muted', minWidth: 54 * k }));
+        const pitch = 76 * k, x0 = 360 - (s.cards.length - 1) * pitch / 2, y = cy0 + ch + 34 * k;
+        s.cards.forEach((over, i) => chip(p, x0 + i * pitch, y, over <= 0 ? 'par' : `+${over}`, { size: 17 * k, filled: over <= 0, color: over <= 0 ? 'accent' : 'muted', minWidth: 62 * k }));
     }
     drawBursts(s, p, reduced, b => { const [x, y] = G.center(b.cell ?? end); return { ...b, x, y: y - size / 2 - 60 * k }; });
     drawSnacks(s, p, reduced);
@@ -203,7 +203,7 @@ function draw(s, p, reduced) {
 
 /** The ball is a small white sheet: it lifts (bigger, softer shadow) at the top of each hop and lands with a ripple. */
 function ball(s, p, G, reduced) {
-    const k = G.k, r = Math.max(9, G.size * .2), shot = s.shot;
+    const k = G.k, r = Math.max(10, G.size * .3), shot = s.shot;
     let [x, y] = G.center(s.ball), lift = 0, alpha = 1;
     if (shot && !reduced) {
         const hops = shot.path.length, t = (s.time - shot.at) / GOLF.hop;

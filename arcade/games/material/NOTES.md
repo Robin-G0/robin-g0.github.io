@@ -64,6 +64,7 @@ fairway (filled = safe, red outline with ✕ = lost) preview where each club sto
   9 8–12 cells, 2–3 water, up to 2 pads. Some resting cells are dead ends (both shots lost), so the
   obvious drive-first line can fail: `TRAP_SHARE = [0, .25, .5, .6]` of holes per stage are generated
   so it does (`greedyFails`). Measured: drive-first is trapped or over par on ~45–60% of late holes.
+- A scorecard row of chips under the sheet shows the last six holes (par filled, +n outlined).
 - The previous version (power cycle + stroke) had no decision worth repeating.
 
 ## Paper Balance (`balance`, score rules v2, survival, two raises, precision `low`)

@@ -151,9 +151,11 @@ test.describe('material screenshots',()=>{
             await page.keyboard.press('ArrowLeft');await page.clock.runFor(1400);
         }
     };
-    for(const mode of ['light','dark'])for(const [label,size] of [['desktop',{width:1365,height:1000}],['phone',{width:390,height:844}]]){
-        test(`${mode} ${label}`,async({page})=>{
-            await page.setViewportSize(size);
+    const layouts=[['desktop',{viewport:{width:1365,height:1000}}],['phone',{viewport:{width:390,height:844},isMobile:true,hasTouch:true}],
+        ['landscape',{viewport:{width:844,height:390},isMobile:true,hasTouch:true}]];
+    for(const [label,options] of layouts)test.describe(label,()=>{
+        test.use(options);
+        for(const mode of ['light','dark'])test(`${mode} ${label}`,async({page})=>{
             await page.emulateMedia({colorScheme:mode});
             await open(page);await page.evaluate(m=>localStorage.setItem('appearance',m),mode);await page.reload();
             await exposeRoom(page);
@@ -166,13 +168,14 @@ test.describe('material screenshots',()=>{
                     await page.screenshot({path:`${SHOTS}/${engine}-card${step}-${mode}-${label}.png`});
                     await page.locator('[data-guide-next]').click();
                 }
-                await page.screenshot({path:`${SHOTS}/${engine}-start-${mode}-${label}.png`});
                 await page.locator('#arcade-no-camera').click();await page.clock.runFor(600);
                 await play[engine](page);
                 await page.screenshot({path:`${SHOTS}/${engine}-play-${mode}-${label}.png`});
                 await page.locator('#arcade-canvas').screenshot({path:`${SHOTS}/${engine}-canvas-${mode}-${label}.png`});
+                await page.evaluate(()=>window.mdRoom.runner.finish('Game over'));await page.clock.runFor(300);
+                await page.screenshot({path:`${SHOTS}/${engine}-result-${mode}-${label}.png`});
                 await page.locator('#arcade-close').click();
             }
         });
-    }
+    });
 });

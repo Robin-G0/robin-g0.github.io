@@ -19,13 +19,13 @@
 [data-theme=material] #arcade-player .arcade-hud dt { text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
 [data-theme=material] #arcade-player .arcade-hud dd { font-family: var(--arcade-font); font-weight: 300; }
 
-/* The play surface: a taller board on phones (the engines lay out by height), no frame line around the canvas. */
-[data-theme=material] #arcade-player .arcade-stage { outline: 0; }
+/* The play surface: no frame line around the canvas; an accent focus ring for keyboard players. */
+[data-theme=material] #arcade-player .arcade-stage { outline: 0; background: color-mix(in srgb, var(--bg) 55%, var(--soft)); }
+[data-theme=material][data-mode=dark] #arcade-player .arcade-stage { background: var(--bg); }
 [data-theme=material] #arcade-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 @media (max-width: 640px) {
-    [data-theme=material] #arcade-player .arcade-stage { height: clamp(300px, calc(100dvh - 330px), 500px); max-height: none; aspect-ratio: auto; }
-    /* Paper Tangram's six buttons: one compact column of three per wrist, as Pop-up Panic does on phones. */
-    [data-theme=material] [data-engine=tangram] .arcade-inputs { grid-template-columns: 1fr 1fr; padding: 8px 8px 0; gap: 8px; }
+    /* Paper Tangram's six buttons: one compact row of three per wrist, as Pop-up Panic does on phones (button skin only;
+       the shell owns the stage, input bar and camera layout). */
     [data-theme=material] [data-engine=tangram] .wrist-controls { flex-direction: column; gap: 2px; }
     [data-theme=material] [data-engine=tangram] .wrist-title { display: flex; align-items: center; gap: 8px; font-size: 18px; }
     [data-theme=material] [data-engine=tangram] .wrist-title::after { width: 6px; height: 6px; margin: 0; }
@@ -33,6 +33,7 @@
     [data-theme=material] [data-engine=tangram] .wrist-buttons .arcade-action { min-width: 44px; min-height: 48px; }
     [data-theme=material] [data-engine=tangram] .wrist-buttons kbd { display: none; }
 }
+
 
 /* Buttons: Material raised buttons, uppercase medium type, lifting from 2 dp to 8 dp on press. */
 [data-theme=material] #arcade-player button { font-family: var(--arcade-font); border-radius: 4px; transition: box-shadow .28s var(--md-standard), background-color .2s var(--md-standard); }
@@ -49,7 +50,6 @@
 [data-theme=material] #arcade-player .button.primary, [data-theme=material] #arcade-player [data-guide-next], [data-theme=material] #arcade-player #arcade-save-score {
     background: var(--accent); color: var(--bg); border: 0; box-shadow: var(--md-shadow-2); text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
 [data-theme=material] #arcade-player :is(.button.primary, [data-guide-next], [data-guide-back], [data-guide-skip], #arcade-challenge-friend) { font-size: 15px; }
-[data-theme=material] .material-diagram { max-height: 140px; }
 [data-theme=material] #arcade-player :is(.button.primary, [data-guide-next], #arcade-save-score):active { box-shadow: var(--md-shadow-8); }
 [data-theme=material] #arcade-player :is([data-guide-back], [data-guide-skip], #arcade-challenge-friend) { background: transparent; border: 0; color: var(--accent); box-shadow: none; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
 [data-theme=material] #arcade-player :is([data-guide-back], [data-guide-skip], #arcade-challenge-friend):hover { background: var(--soft); }
@@ -59,7 +59,7 @@
 [data-theme=material] .arcade-walkthrough .guide-heading h3 { font-weight: 500; }
 [data-theme=material] .guide-progress span { border-radius: 50%; border: 0; background: color-mix(in srgb, var(--ink) 30%, transparent); color: var(--bg); font-size: 13px; font-weight: 500; }
 [data-theme=material] .guide-progress [aria-current=step] { background: var(--accent); color: var(--bg); }
-[data-theme=material] .guide-figure { background: var(--bg); border-radius: 4px; box-shadow: var(--md-shadow-2); padding: 6px 10px; box-sizing: border-box; flex: 0 0 auto; animation: md-enter .32s var(--md-decelerate); }
+[data-theme=material] .guide-figure { background: var(--bg); border-radius: 4px; box-shadow: var(--md-shadow-2); padding: 6px 10px; box-sizing: border-box; animation: md-enter .32s var(--md-decelerate); }
 [data-theme=material] .guide-title { font-weight: 400; letter-spacing: 0; animation: md-enter .32s var(--md-decelerate) .05s backwards; }
 [data-theme=material] .arcade-walkthrough .guide-caption { font-size: clamp(17px, 2vw, 20px); line-height: 1.3; font-weight: 400; animation: md-enter .32s var(--md-decelerate) .1s backwards; }
 @keyframes md-enter { from { opacity: 0; transform: translateY(16px); } }
